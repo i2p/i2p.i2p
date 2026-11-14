@@ -112,6 +112,10 @@ abstract class IRCFilter {
         // Allow PRIVMSG, but block CTCP.
         if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
+            // The command and recipient may be present without a message body.
+            // Drop the line without letting a malformed peer close the tunnel.
+            if (idx >= field.length || field[idx - 1].length() == 0 || field[idx].length() == 0)
+                return null;
             String msg;
             msg = field[idx++];
             if (idx < field.length)
@@ -127,7 +131,7 @@ abstract class IRCFilter {
                     if (msg.charAt(i) == 0x01)
                         count++;
                 }
-                if (count != 2)
+                if (count != 2 || !msg.startsWith(":\001") || !msg.endsWith("\001"))
                     return null;
 
                 msg=msg.substring(2);
@@ -301,6 +305,8 @@ abstract class IRCFilter {
         // https://ircv3.net/specs/extensions/message-tags.html
         if (field[0].charAt(0) == '@')
             idx++;
+        if (idx >= field.length || field[idx].length() == 0)
+            return null;
         String command = field[idx++].toUpperCase(Locale.US);
 
         if ("PING".equals(command)) {
@@ -348,8 +354,8 @@ abstract class IRCFilter {
         // in addition to the CTCP version
         if("NOTICE".equals(command))
         {
-            if (field.length < idx + 2)
-                return s;  // invalid, allow server response
+            if (field.length < idx + 2 || field[idx].length() == 0 || field[idx + 1].length() == 0)
+                return null;
             String msg = field[idx + 1];
             if(msg.startsWith(":DCC "))
                 return filterDCCOut(field[idx - 1] + ' ' + field[idx] + " :DCC ", msg.substring(5), helper);
@@ -359,8 +365,8 @@ abstract class IRCFilter {
         // Allow PRIVMSG, but block CTCP (except ACTION).
         if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
-            if (field.length < idx + 2)
-                return s;  // invalid, allow server response
+            if (field.length < idx + 2 || field[idx].length() == 0 || field[idx + 1].length() == 0)
+                return null;
             String msg = field[idx + 1];
             if (idx + 2 < field.length)
                 msg += ' ' + field[idx + 2];
@@ -375,7 +381,7 @@ abstract class IRCFilter {
                     if (msg.charAt(i) == 0x01)
                         count++;
                 }
-                if (count != 2)
+                if (count != 2 || !msg.startsWith(":\001") || !msg.endsWith("\001"))
                     return null;
 
                 msg=msg.substring(2);
@@ -428,6 +434,8 @@ abstract class IRCFilter {
         }
 
         if ("PART".equals(command)) {
+            if (idx >= field.length || field[idx].length() == 0)
+                return null;
             // hide client message
             return "PART " + field[idx] + " :leaving";
         }
