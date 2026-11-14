@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
@@ -645,19 +646,28 @@ public class JobQueue {
      * completion.
      */
     private void updateJobTimings(long delta) {
+        // A recurring job may have requeued itself while still running.
+        Set<JobTiming> updated = Collections.newSetFromMap(new IdentityHashMap<JobTiming, Boolean>());
         synchronized (_jobLock) {
             for (Job j : _timedJobs) {
-                j.getTiming().offsetChanged(delta);
+                JobTiming timing = j.getTiming();
+                if (updated.add(timing))
+                    timing.offsetChanged(delta);
             }
             for (Job j : _readyJobs) {
-                j.getTiming().offsetChanged(delta);
+                JobTiming timing = j.getTiming();
+                if (updated.add(timing))
+                    timing.offsetChanged(delta);
             }
         }
         synchronized (_runnerLock) {
             for (JobQueueRunner runner : _queueRunners.values()) {
                 Job job = runner.getCurrentJob();
-                if (job != null)
-                    job.getTiming().offsetChanged(delta);
+                if (job != null) {
+                    JobTiming timing = job.getTiming();
+                    if (updated.add(timing))
+                        timing.offsetChanged(delta);
+                }
             }
         }
     }
