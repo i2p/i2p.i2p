@@ -1538,7 +1538,7 @@ if (mail != null && (reply || replyAll)) {
 		List<String> rv = new ArrayList<String>(8);
 		for( Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 			String parameter = e.nextElement();
-			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).equals("1")) {
+			if( parameter.startsWith( "check" ) && "1".equals(request.getParameter(parameter))) {
 				String item = parameter.substring(5);
 				rv.add(item);
 			}
@@ -2911,14 +2911,11 @@ if (mail != null && (reply || replyAll)) {
 	 *  @since 0.9.33 adapted from I2PSnarkServlet
 	 */
 	private void sendRedirect(HttpServletRequest req, HttpServletResponse resp, String q) throws IOException {
-		String url = req.getRequestURL().toString();
-		StringBuilder buf = new StringBuilder(128);
-		int qq = url.indexOf('?');
-		if (qq >= 0)
-			url = url.substring(0, qq);
-		buf.append(url);
-		if (q != null && q.length() > 0)
-			buf.append(q.replace("&amp;", "&"));  // no you don't html escape the redirect header
+        StringBuilder buf = new StringBuilder(myself);
+        if (q != null && !q.isEmpty()) {
+            if (!q.startsWith("?") || q.indexOf('\r') >= 0 || q.indexOf('\n') >= 0) throw new IOException("Invalid mail redirect query");
+            buf.append(q.replace("&amp;", "&"));
+        }
 		resp.setHeader("Location", buf.toString());
 		resp.setStatus(303);
 		resp.getOutputStream().close();
