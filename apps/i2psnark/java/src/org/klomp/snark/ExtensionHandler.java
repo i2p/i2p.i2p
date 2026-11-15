@@ -38,6 +38,7 @@ abstract class ExtensionHandler {
     public static final int ID_COMMENT = 4;
     /** @since 0.9.31 */
     public static final String TYPE_COMMENT = "ut_comment";
+    public static final int ID_CATALOG = 5;
     /** Pieces * SHA1 Hash length, + 25% extra for file names, bencoding overhead, etc */
     private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 20 * 5 / 4;
     private static final int PARALLEL_REQUESTS = 3;
@@ -51,6 +52,11 @@ abstract class ExtensionHandler {
    *  @return bencoded outgoing handshake message
    */
     public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht, boolean uploadOnly, boolean comment) {
+        return getHandshake(metasize, pexAndMetadata, dht, uploadOnly, comment, false);
+    }
+
+    public static byte[] getHandshake(int metasize, boolean pexAndMetadata, boolean dht,
+                                      boolean uploadOnly, boolean comment, boolean catalog) {
         Map<String, Object> handshake = new TreeMap<String, Object>();
         Map<String, Integer> m = new TreeMap<String, Integer>();
         if (pexAndMetadata) {
@@ -65,6 +71,8 @@ abstract class ExtensionHandler {
         if (comment) {
             m.put(TYPE_COMMENT, Integer.valueOf(ID_COMMENT));
         }
+        if (catalog)
+            m.put(PeerCatalog.EXTENSION, Integer.valueOf(ID_CATALOG));
         // include the map even if empty so the far-end doesn't NPE
         handshake.put("m", m);
         handshake.put("p", Integer.valueOf(TrackerClient.PORT));
@@ -90,6 +98,11 @@ abstract class ExtensionHandler {
             handleDHT(peer, listener, bs, log);
         else if (id == ID_COMMENT)
             handleComment(peer, listener, bs, log);
+        else if (id == ID_CATALOG) {
+            PeerCatalog catalog = listener.getUtil().getPeerCatalog();
+            if (catalog != null)
+                catalog.receive(peer, bs);
+        }
         else if (log.shouldLog(Log.INFO))
             log.info("Unknown extension msg " + id + " from " + peer);
     }

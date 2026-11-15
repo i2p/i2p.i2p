@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
@@ -91,6 +92,8 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private final PeerCoordinatorSet _peerCoordinatorSet;
     private final ConnectionAcceptor _connectionAcceptor;
     private final BandwidthManager _bwManager;
+    private final PeerCatalog _peerCatalog;
+    private static final String PROP_SHARED_TORRENTS = "i2psnark.sharedTorrents";
     private Thread _monitor;
     private volatile boolean _running;
     private volatile boolean _stopping;
@@ -298,6 +301,10 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         _log = _context.logManager().getLog(SnarkManager.class);
         _messages = new UIMessages(MAX_MESSAGES);
         _util = new I2PSnarkUtil(_context, ctxName, this);
+        _peerCatalog = new PeerCatalog(ctx, new Supplier<Collection<Snark>>() {
+            public Collection<Snark> get() { return _snarks.values(); }
+        });
+        _util.setPeerCatalog(_peerCatalog);
         _peerCoordinatorSet = new PeerCoordinatorSet();
         _connectionAcceptor = new ConnectionAcceptor(_util, _peerCoordinatorSet);
         _bwManager = new BandwidthManager(ctx, DEFAULT_MAX_UP_BW * 1024, DEFAULT_MAX_DOWN_BW * 1024);
@@ -319,6 +326,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      */
     public void start() {
         _running = true;
+        _peerCatalog.start();
         ClientAppManager cmgr = _context.clientAppManager();
         if ("i2psnark".equals(_contextName)) {
             // Register with the ClientAppManager so the rpc plugin can find us
@@ -411,6 +419,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT);
         }
         _running = false;
+        _peerCatalog.stop();
         _monitor.interrupt();
         _connectionAcceptor.halt();
         _idleChecker.cancel();
@@ -480,6 +489,34 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
 
     /** hook to I2PSnarkUtil for the servlet */
     public I2PSnarkUtil util() { return _util; }
+
+    public PeerCatalog getPeerCatalog() { return _peerCatalog; }
+
+    /** Persist only explicitly selected, known public torrents. */
+    public void setSharedTorrents(Set<String> selected) {
+        List<String> approved = new ArrayList<String>();
+        for (Snark snark : _snarks.values()) {
+            String hash = I2PSnarkUtil.toHex(snark.getInfoHash()).toLowerCase(java.util.Locale.US);
+            if (PeerCatalog.canShare(snark) && selected.contains(hash) && approved.size() < PeerCatalog.MAX_SHARED)
+                approved.add(hash);
+        }
+        Collections.sort(approved);
+        synchronized(_configLock) {
+            setListConfig(PROP_SHARED_TORRENTS, approved);
+            _peerCatalog.setSharedHashes(approved);
+            saveConfig();
+        }
+    }
+
+    /** Request listings through already connected public torrent peers only. */
+    public int refreshPeerCatalog() {
+        List<Peer> peers = new ArrayList<Peer>();
+        for (Snark snark : _snarks.values()) {
+            if (PeerCatalog.canShare(snark))
+                peers.addAll(snark.getPeerList());
+        }
+        return _peerCatalog.refresh(peers);
+    }
 
     /**
      *  The BandwidthManager.
@@ -1046,6 +1083,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         //if (eepHost != null)
         //    _util.setProxy(eepHost, eepPort);
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
+        _peerCatalog.setSharedHashes(getListConfig(PROP_SHARED_TORRENTS, ""));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
         _util.setMaxFilesPerTorrent(getInt(PROP_MAX_FILES_PER_TORRENT, DEFAULT_MAX_FILES_PER_TORRENT));
         _util.setStartupDelay(getInt(PROP_STARTUP_DELAY, DEFAULT_STARTUP_DELAY));

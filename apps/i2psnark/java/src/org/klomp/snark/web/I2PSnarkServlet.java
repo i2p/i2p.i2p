@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
@@ -59,6 +60,7 @@ import org.klomp.snark.MagnetURI;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Peer;
 import org.klomp.snark.PeerID;
+import org.klomp.snark.PeerCatalog;
 import org.klomp.snark.Snark;
 import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
@@ -226,6 +228,16 @@ public class I2PSnarkServlet extends BasicServlet {
         String peerString = getQueryString(req, pOverride, null, null, "");
 
         String cspNonce = Integer.toHexString(_context.random().nextInt());
+        if ("/.ajax/catalog.html".equals(path)) {
+            if (!"GET".equals(method)) {
+                resp.sendError(405);
+                return;
+            }
+            setHTMLHeaders(resp, cspNonce, false);
+            resp.setHeader("Cache-Control", "no-store");
+            writeCatalogResults(resp.getWriter(), catalogQuery(req));
+            return;
+        }
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
             setHTMLHeaders(resp, cspNonce, false);
@@ -354,6 +366,8 @@ public class I2PSnarkServlet extends BasicServlet {
                           "var ajaxDelay = " + (delay * 1000) + ";\n" +
                           "</script>\n" +
                           "<script src=\".resources/js/initajax.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
+            out.write("<link rel=\"stylesheet\" href=\"" + catalogBase() + ".resources/catalog.css?" + CoreVersion.VERSION + "\">\n" +
+                      "<script defer src=\"" + catalogBase() + ".resources/js/catalog.js?" + CoreVersion.VERSION + "\"></script>\n");
             //}
             out.write("<script nonce=\"" + cspNonce + "\" type=\"text/javascript\">\n"  +
                       "var deleteMessage1 = \"" + _t("Are you sure you want to delete the file \\''{0}\\'' (downloaded data will not be deleted) ?") + "\";\n" +
@@ -423,9 +437,11 @@ public class I2PSnarkServlet extends BasicServlet {
         String newURL = req.getParameter("newURL");
         if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
             _manager.addMessage(_t("Click \"Add torrent\" button to fetch torrent"));
-        out.write("<div id=\"page\" class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
-
         String newNonce = getNonce(req.getSession(), false);
+        out.write("<div id=\"page\" class=\"page" + (isConfigure ? "" : " catalog-layout") + "\">");
+        if (!isConfigure)
+            writeCatalogSidebar(out, req, newNonce);
+        out.write("<div id=\"mainsection\" class=\"mainsection\">");
         writeMessages(out, isConfigure, peerString, newNonce);
 
         if (isConfigure) {
@@ -471,7 +487,9 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
         resp.setHeader("X-Content-Type-Options", "nosniff");
-        resp.setHeader("Referrer-Policy", "no-referrer");
+        // no-referrer makes browser form POSTs send Origin: null, which the
+        // console correctly rejects. Keep local form origins without external referrers.
+        resp.setHeader("Referrer-Policy", "same-origin");
         resp.setHeader("Accept-Ranges", "none");
     }
 
@@ -1033,6 +1051,15 @@ public class I2PSnarkServlet extends BasicServlet {
                 buf.append("&amp;nf_s=");
             buf.append(s);
         }
+        String catalogSearch = catalogQuery(req);
+        if (catalogSearch.length() > 0) {
+            try {
+                buf.append(buf.length() == 0 ? "?" : "&amp;").append("nf_catalogq=")
+                   .append(URLEncoder.encode(catalogSearch, "UTF-8"));
+            } catch (java.io.UnsupportedEncodingException impossible) {
+                throw new AssertionError(impossible);
+            }
+        }
         return buf.toString();
     }
 
@@ -1136,7 +1163,24 @@ public class I2PSnarkServlet extends BasicServlet {
         //    _manager.addMessage("Action must be with POST");
         //    return;
         //}
-        if ("Add".equals(action)) {
+        if ("CatalogShare".equals(action)) {
+            Set<String> selected = new java.util.HashSet<String>();
+            for (Snark snark : _manager.getTorrents()) {
+                if (!PeerCatalog.canShare(snark))
+                    continue;
+                String hash = I2PSnarkUtil.toHex(snark.getInfoHash()).toLowerCase(Locale.US);
+                if (req.getParameter("share_" + hash) != null)
+                    selected.add(hash);
+            }
+            _manager.setSharedTorrents(selected);
+            _manager.addMessage(_t("Peer sharing selections saved."));
+        } else if ("CatalogRefresh".equals(action)) {
+            int count = _manager.refreshPeerCatalog();
+            if (count > 0)
+                _manager.addMessage(_t("Requested shared torrents from {0} peers.", count));
+            else
+                _manager.addMessage(_t("No compatible public-torrent peers are available, or a refresh was requested within 30 seconds."));
+        } else if ("Add".equals(action)) {
             File dd = _manager.getDataDir();
             if (!dd.canWrite()) {
                 _manager.addMessage(_t("No write permissions for data directory") + ": " + dd);
@@ -2551,6 +2595,85 @@ public class I2PSnarkServlet extends BasicServlet {
         if (!isUDP)
             buf.append("</a>");
         return buf.toString();
+    }
+
+    private String catalogBase() {
+        return _contextPath.endsWith("/") ? _contextPath : _contextPath + '/';
+    }
+
+    private static String catalogQuery(HttpServletRequest req) {
+        String query = req.getParameter("nf_catalogq");
+        if (query == null)
+            return "";
+        query = query.trim();
+        return query.length() <= 80 ? query : query.substring(0, 80);
+    }
+
+    private void writeCatalogSidebar(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
+        String query = catalogQuery(req);
+        String escapedQuery = DataHelper.escapeHTML(query);
+        out.write("<aside id=\"peer-catalog\" aria-label=\"" + _t("Peer search") + "\">\n<h3>" + _t("Peer search") + "</h3>\n");
+        out.write("<p>" + _t("Search torrents shared by connected peers.") + "</p>\n");
+        out.write("<form id=\"catalog-search\" method=\"GET\" action=\"" + catalogBase() + "\">\n" +
+                  "<label for=\"catalog-query\">" + _t("Search shared torrents") + "</label>\n" +
+                  "<input id=\"catalog-query\" name=\"nf_catalogq\" maxlength=\"80\" value=\"" + escapedQuery + "\" type=\"search\">\n" +
+                  "<button type=\"submit\">" + _t("Search") + "</button></form>\n");
+        out.write("<form method=\"POST\" action=\"" + catalogBase() + "_post\">\n");
+        writeHiddenInputs(out, req, "CatalogRefresh", nonce);
+        out.write("<input type=\"hidden\" name=\"nf_catalogq\" value=\"" + escapedQuery + "\">\n" +
+                  "<button type=\"submit\">" + _t("Refresh peer listings") + "</button></form>\n");
+        out.write("<div id=\"catalog-results\" aria-live=\"polite\" data-url=\"" + catalogBase() + ".ajax/catalog.html\">\n");
+        writeCatalogResults(out, query);
+        out.write("</div>\n<details id=\"catalog-sharing\"><summary>" + _t("Share my torrents") + "</summary>\n" +
+                  "<p>" + _t("Only selected, running public torrents are shared. Connected peers can copy their names and magnet links.") + "</p>\n" +
+                  "<form method=\"POST\" action=\"" + catalogBase() + "_post\">\n");
+        writeHiddenInputs(out, req, "CatalogShare", nonce);
+        out.write("<input type=\"hidden\" name=\"nf_catalogq\" value=\"" + escapedQuery + "\">\n");
+        List<Snark> publicTorrents = new ArrayList<Snark>();
+        for (Snark snark : _manager.getTorrents()) {
+            if (PeerCatalog.canShare(snark))
+                publicTorrents.add(snark);
+        }
+        Collections.sort(publicTorrents, new Comparator<Snark>() {
+            public int compare(Snark a, Snark b) {
+                boolean aShared = _manager.getPeerCatalog().isShared(a.getInfoHash());
+                boolean bShared = _manager.getPeerCatalog().isShared(b.getInfoHash());
+                return aShared != bShared ? (aShared ? -1 : 1) : a.getBaseName().compareToIgnoreCase(b.getBaseName());
+            }
+        });
+        int count = 0;
+        for (Snark snark : publicTorrents) {
+            if (count++ >= PeerCatalog.MAX_SHARED)
+                break;
+            String hash = I2PSnarkUtil.toHex(snark.getInfoHash()).toLowerCase(Locale.US);
+            boolean selected = _manager.getPeerCatalog().isShared(snark.getInfoHash());
+            out.write("<label class=\"catalog-choice\"><input type=\"checkbox\" name=\"share_" + hash + "\"" +
+                      (selected ? " checked" : "") + "> " + DataHelper.escapeHTML(snark.getBaseName()) + "</label>\n");
+        }
+        if (publicTorrents.isEmpty())
+            out.write("<p>" + _t("Add a public torrent to choose what to share.") + "</p>\n");
+        else if (publicTorrents.size() > PeerCatalog.MAX_SHARED)
+            out.write("<p>" + _t("Showing the first {0} public torrents, with shared torrents first.", PeerCatalog.MAX_SHARED) + "</p>\n");
+        out.write("<button type=\"submit\">" + _t("Save sharing choices") + "</button></form></details>\n</aside>\n");
+    }
+
+    private void writeCatalogResults(PrintWriter out, String query) throws IOException {
+        PeerCatalog catalog = _manager.getPeerCatalog();
+        int pending = catalog.pendingCount();
+        if (pending > 0)
+            out.write("<p class=\"catalog-status\">" + _t("Waiting for {0} peers.", pending) + "</p>\n");
+        List<PeerCatalog.Entry> results = catalog.search(query);
+        if (results.isEmpty()) {
+            out.write("<p>" + _t("No shared torrents found. Connect to a public torrent and refresh peer listings.") + "</p>\n");
+            return;
+        }
+        out.write("<p>" + _t("Names are supplied by peers. Torrent metadata is verified when added.") + "</p>\n<ul class=\"catalog-list\">\n");
+        for (PeerCatalog.Entry entry : results) {
+            String review = catalogBase() + "?nofilter_newURL=" + URLEncoder.encode(entry.getMagnet(), "UTF-8") + "#add";
+            out.write("<li><span>" + DataHelper.escapeHTML(entry.getName()) + "</span><a href=\"" + DataHelper.escapeHTML(review) + "\">" +
+                      _t("Review torrent") + "</a></li>\n");
+        }
+        out.write("</ul>\n");
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
