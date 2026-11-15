@@ -225,7 +225,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String pOverride = _manager.util().connected() ? null : "";
         String peerString = getQueryString(req, pOverride, null, null, "");
 
-        String cspNonce = Integer.toHexString(_context.random().nextInt());
+        String cspNonce = randomToken();
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
             setHTMLHeaders(resp, cspNonce, false);
@@ -465,7 +465,7 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setContentType("text/html; charset=UTF-8");
         // "no-store, max-age=0" forces all our images to be reloaded on ajax refresh
         resp.setHeader("Cache-Control", "max-age=86400, no-cache, must-revalidate");
-        resp.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src '" + (allowMedia ? "self" : "none") + "'");
+        resp.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'nonce-" + cspNonce + "'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src '" + (allowMedia ? "self" : "none") + "'");
         resp.setDateHeader("Expires", 86400);
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
@@ -5151,6 +5151,13 @@ public class I2PSnarkServlet extends BasicServlet {
         return true;
     }
 
+    /** Fresh 128-bit token for CSP and session-bound form nonces. */
+    private String randomToken() {
+        byte[] bytes = new byte[16];
+        _context.random().nextBytes(bytes);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
     /**
      *  Replaces process-wide nonce
      *  @param session returns an invalid nonce if null
@@ -5164,7 +5171,7 @@ public class I2PSnarkServlet extends BasicServlet {
             return "FAIL_SESSION_NOT_SET";
         }
         // add a prefix to distinguish from other nonces for debugging
-        String rv = "SN" + (xhr ? 'B' : 'A') + _context.random().nextLong();
+        String rv = "SN" + (xhr ? 'B' : 'A') + randomToken();
         String att = xhr ? SESSION_SNARK_NONCE2 : SESSION_SNARK_NONCE1;
         synchronized(session) {
             LinkedList<String> nonces = (LinkedList<String>) session.getAttribute(att);
