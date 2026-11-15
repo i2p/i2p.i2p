@@ -68,7 +68,12 @@ JNIEXPORT jobject JNICALL Java_freenet_support_CPUInformation_CPUID_doCPUID
 {
 	int a,b,c,d;
 	jclass clsResult = (*env)->FindClass(env, "freenet/support/CPUInformation/CPUID$CPUIDResult");
-	jmethodID constructor = (*env)->GetMethodID(env, clsResult,"<init>","(IIII)V" );
+	jmethodID constructor;
+	if (clsResult == NULL)
+		return NULL;
+	constructor = (*env)->GetMethodID(env, clsResult,"<init>","(IIII)V" );
+	if (constructor == NULL)
+		return NULL;
 	#ifdef _MSC_VER
 		//Use MSVC assembler notation
 		_asm 
