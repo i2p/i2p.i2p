@@ -18,10 +18,11 @@ to serve static html files and images.
     <Arg>org.eclipse.jetty.servlet.Default.cacheControl</Arg>
     <Arg>max-age=3600,public</Arg>
   </Call>
-  <!-- change to false to disallow directory listings -->
+  <!-- Set to true only when you intend to publish directory listings.
+       Disabling listings does not restrict access to known file URLs. -->
   <Call name="setInitParameter">
     <Arg>org.eclipse.jetty.servlet.Default.dirAllowed</Arg>
-    <Arg>true</Arg>
+    <Arg>false</Arg>
   </Call>
   <Call name="addServlet">
     <Arg>net.i2p.servlet.I2PDefaultServlet</Arg>
