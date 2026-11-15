@@ -681,7 +681,7 @@ public class WebMail extends HttpServlet
 					 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
 					 "\" name=\"mailhtmlframe" + mailPart.getID() +
 					 "\" id=\"mailhtmlframe" + mailPart.getID() +
-					 "\" class=\"iframedsusi\" width=\"100%\" height=\"100%\" scrolling=\"auto\" frameborder=\"0\" border=\"0\" allowtransparency=\"true\"></iframe>");
+					 "\" sandbox=\"allow-same-origin\" class=\"iframedsusi\" width=\"100%\" height=\"100%\" scrolling=\"auto\" frameborder=\"0\" border=\"0\" allowtransparency=\"true\"></iframe>");
 				out.println("</td></tr><tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
 				out.println("<p class=\"info\"><i>" + _t("To protect your privacy, SusiMail has blocked remote content in this message.") + "</i>");
 				out.println("<noscript><br><i>" + _t("Enable javascript for improved display of this message.") + "</i></noscript></p>");
@@ -2289,17 +2289,18 @@ public class WebMail extends HttpServlet
 		    httpRequest.getParameter(CID_ATTACHMENT) != null ||
 		    httpRequest.getParameter(DRAFT_ATTACHMENT) != null) {
 			// we don't even let the iframe get to the console, it must be within /susimail/
-			String me = "127.0.0.1:7657";
+			String me = "http://127.0.0.1:7657";
 			String requrl = httpRequest.getRequestURL().toString();
 			try {
 				URI uri = new URI(requrl);
-				me = uri.getHost() + ':' + uri.getPort();
+				me = new URI(uri.getScheme(), uri.getRawAuthority(), null, null, null).toASCIIString();
 			} catch(URISyntaxException use) {}
 			// img-src allows for cid: urls that were fixed up by RegexOutputStream
-			response.setHeader("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src " + me + "/js/iframeResizer.contentWindow.js; form-action 'none'; frame-ancestors " + me + myself + "; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
+			// Keep scripts disabled even when the attachment is opened outside its iframe.
+			response.setHeader("Content-Security-Policy", "default-src 'none'; base-uri 'none'; sandbox allow-same-origin; style-src 'unsafe-inline'; script-src 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
 			// character encoding will be set in sendAttachment()
 		} else {
-			response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
+			response.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'none'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
 			response.setCharacterEncoding("UTF-8");
 		}
 		response.setHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), vibrate=(), vr=()");
@@ -2718,7 +2719,6 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/Markdown.Converter.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 					out.println("<script src=\"/susimail/js/iframer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 					out.println("<script src=\"/js/iframed.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
-					out.println("<script src=\"/js/iframeResizer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
@@ -2923,7 +2923,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
 						 HttpServletResponse response, boolean isRaw)
 	{
-        setNoCacheHeaders(response);
+		setNoCacheHeaders(response);
 		boolean shown = false;
 		if(part != null) {
 			Log log = sessionObject.log;
@@ -2949,11 +2949,6 @@ public class WebMail extends HttpServlet
 						response.setCharacterEncoding(part.charset);
 					out = response.getOutputStream();
 					if ("text/html".equals(part.type)) {
-						// inject the js into the iframe
-						// For content without <head>, we put it at the end and hope for the best.
-						out = new RegexOutputStream(out, "<head>",
-						                            "<head>\n\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n",
-						                            "\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
 						// convert cid: urls to /susimail/?cid= urls
 						out = new RegexOutputStream(out, " src=\"cid:",
 						                            " src=\"/susimail/?msg=" + Base64.encode(part.uidl) + "&amp;cid=",
@@ -2979,6 +2974,7 @@ public class WebMail extends HttpServlet
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
 					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
 					                   "filename*=" + name3 + ".zip");
+					// The name inside the archive must be safe too, not just the HTTP filename.
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
 					// was 2

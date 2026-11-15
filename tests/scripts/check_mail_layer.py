@@ -65,7 +65,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=ROOT)
     parser.add_argument("--dependency-root", type=Path, default=ROOT)
-    parser.add_argument("--suite", nargs="+", choices=("all", "protocol", "privacy", "downloads", "http", "identity", "vault", "mfa", "protection", "content", "flood", "request", "frame"), default=['privacy'])
+    parser.add_argument("--suite", nargs="+", choices=("all", "protocol", "privacy", "downloads", "http", "identity", "vault", "mfa", "protection", "content", "flood", "request", "frame"), default=['http', 'frame'])
     parser.add_argument("--output", type=Path, default=ROOT / "tests/results/mail-security/layer")
     args = parser.parse_args()
     output = args.output.resolve()
