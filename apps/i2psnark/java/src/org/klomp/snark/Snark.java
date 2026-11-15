@@ -59,7 +59,7 @@ public class Snark
 
   /** most of these used to be public, use accessors below instead */
   private String torrent;
-  private MetaInfo meta;
+  private volatile MetaInfo meta;
   private Storage storage;
   private PeerCoordinator coordinator;
   private ConnectionAcceptor acceptor;
@@ -932,6 +932,9 @@ public class Snark
    * @since 0.8.4
    */
   public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
+      TrackerClient tc = trackerclient;
+      if (tc != null)
+          tc.gotMetaInfo(metainfo);
       try {
           String base = Storage.filterName(metainfo.getName());
           File baseFile;

@@ -21,7 +21,16 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -100,6 +109,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private final ConcurrentHashMap<NID, Token> _incomingTokens;
     /** recently unreachable, with lastSeen() as the added-to-blacklist time  */
     private final Set<NID> _blacklist;
+    private final ThreadPoolExecutor _queryExecutor;
+    private final ThreadPoolExecutor _searchExecutor;
     private SimpleTimer2.TimedEvent _cleaner, _explorer;
 
     /** hook to inject and receive datagrams */
@@ -142,6 +153,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private static final int REPLY_PEERS = 2;
     private static final int REPLY_NODES = 3;
     private static final int REPLY_NETWORK_FAIL = 4;
+    private static final int REPLY_TIMEOUT = 5;
+    private static final int LOOKUP_PARALLELISM = 3;
+    private static final long LOOKUP_QUERY_TIMEOUT = 25*1000;
 
     public static final boolean SECURE_NID = true;
 
@@ -178,6 +192,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _outgoingTokens = new ConcurrentHashMap<Token, NodeInfo>();
         _incomingTokens = new ConcurrentHashMap<NID, Token>();
         _blacklist = new ConcurrentHashSet<NID>();
+        _queryExecutor = createExecutor("DHT query", LOOKUP_PARALLELISM, 64);
+        _searchExecutor = createExecutor("DHT search", 4, 32);
 
         // Construct my NodeInfo
         // Pick ports over a big range to marginally increase security
@@ -204,6 +220,41 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         _knownNodes = new DHTNodes(ctx, _myNID);
 
         start();
+    }
+
+    private static ThreadPoolExecutor createExecutor(final String name, int threads, int queued) {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(threads, threads, 60, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(queued), new ThreadFactory() {
+                    public Thread newThread(Runnable task) {
+                        return new I2PAppThread(task, name, true);
+                    }
+                });
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
+    }
+
+    public Future<?> getPeersAndAnnounceAsync(final byte[] ih, final int max, final long maxWait,
+                                             final int annMax, final long annMaxWait,
+                                             final boolean isSeed, final boolean noSeeds,
+                                             final Consumer<Collection<Hash>> onPeers) {
+        if (!_isRunning)
+            throw new RejectedExecutionException("DHT is stopped");
+        final byte[] infoHash = ih.clone();
+        _searchExecutor.purge();
+        return _searchExecutor.submit(new Runnable() {
+            public void run() {
+                try {
+                    Collection<Hash> peers = getPeersAndAnnounce(infoHash, max, maxWait,
+                                                                annMax, annMaxWait, isSeed, noSeeds);
+                    if (_isRunning && !Thread.currentThread().isInterrupted())
+                        onPeers.accept(peers);
+                } catch (RuntimeException failure) {
+                    if (_log.shouldWarn())
+                        _log.warn("DHT peer discovery failed", failure);
+                    throw failure;
+                }
+            }
+        });
     }
 
     ///////////////// Public methods
@@ -279,10 +330,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             ReplyWaiter waiter = sendFindNode(nInfo, target);
             if (waiter == null)
                 continue;
-            synchronized(waiter) {
-                try {
-                    waiter.wait(maxWait);
-                } catch (InterruptedException ie) {}
+            try {
+                waiter.await(maxWait);
+            } catch (InterruptedException ie) {
+                waiter.networkFail();
+                Thread.currentThread().interrupt();
+                return;
             }
 
             int replyType = waiter.getReplyCode();
@@ -295,7 +348,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                  if (_log.shouldLog(Log.DEBUG))
                      _log.debug("Got " + reply.size() + " nodes");
                  for (NodeInfo ni : reply) {
-                     if (! (ni.equals(_myNodeInfo) || (toTry.contains(ni) && tried.contains(ni))))
+                     if (!(ni.equals(_myNodeInfo) || toTry.contains(ni) || tried.contains(ni)))
                          toTry.add(ni);
                  }
             } else if (replyType == REPLY_NETWORK_FAIL) {
@@ -346,7 +399,9 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (rv.size() >= max)
             return rv;
         rv = new HashSet<Hash>(rv);
-        long endTime = _context.clock().now() + maxWait;
+        if (maxWait <= 0)
+            throw new IllegalArgumentException("Nonpositive lookup timeout");
+        long endTime = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(maxWait);
 
         // needs to be much higher than log(size) since many lookups will fail
         // at first and we will give up too early
@@ -361,95 +416,83 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting getPeers for " + iHash + " (b64: " + new NID(ih) + ") " + " with " + nodes.size() + " to try");
-        for (int i = 0; i < maxNodes; i++) {
-            if (!_isRunning)
-                break;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Now to try: " + toTry);
-            NodeInfo nInfo;
-            try {
-                nInfo = toTry.first();
-            } catch (NoSuchElementException nsee) {
-                break;
+        BlockingQueue<ReplyWaiter> replies = new LinkedBlockingQueue<ReplyWaiter>();
+        Set<ReplyWaiter> pending = new HashSet<ReplyWaiter>();
+        int sent = 0;
+        try {
+            while (_isRunning && !Thread.currentThread().isInterrupted() && rv.size() < max) {
+                // Start several independent queries, including destination resolution.
+                // One unreachable node must not hold up all the other candidates.
+                while (pending.size() < LOOKUP_PARALLELISM && sent < maxNodes && !toTry.isEmpty()) {
+                    long remaining = TimeUnit.NANOSECONDS.toMillis(endTime - System.nanoTime());
+                    if (remaining <= 0)
+                        break;
+                    if (pending.isEmpty() && !heardFrom.isEmpty() &&
+                        comp.compare(toTry.first(), heardFrom.first()) >= 0)
+                        break;
+                    NodeInfo nInfo = toTry.first();
+                    toTry.remove(nInfo);
+                    if (nInfo.equals(_myNodeInfo) || !tried.add(nInfo))
+                        continue;
+                    sent++;
+                    ReplyWaiter waiter = sendGetPeers(nInfo, iHash, noSeeds, replies,
+                                                      Math.min(LOOKUP_QUERY_TIMEOUT, remaining));
+                    if (waiter != null)
+                        pending.add(waiter);
+                }
+                long remaining = endTime - System.nanoTime();
+                if (pending.isEmpty() || remaining <= 0)
+                    break;
+                ReplyWaiter waiter = replies.poll(remaining, TimeUnit.NANOSECONDS);
+                if (waiter == null)
+                    break;
+                if (!pending.remove(waiter))
+                    continue;
+                int replyType = waiter.getReplyCode();
+                if (replyType == REPLY_PEERS) {
+                    heardFrom.add(waiter.getSentTo());
+                    for (Hash h : (List<Hash>) waiter.getReplyObject()) {
+                        if (!h.equals(_myNodeInfo.getHash()))
+                            rv.add(h);
+                        if (rv.size() >= max)
+                            break;
+                    }
+                } else if (replyType == REPLY_NODES) {
+                    heardFrom.add(waiter.getSentTo());
+                    for (NodeInfo ni : (List<NodeInfo>) waiter.getReplyObject()) {
+                        if (!ni.equals(_myNodeInfo) && !tried.contains(ni))
+                            toTry.add(ni);
+                    }
+                } else if (replyType == REPLY_NETWORK_FAIL) {
+                    break;
+                }
             }
-            toTry.remove(nInfo);
-            tried.add(nInfo);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Try " + i + ": " + nInfo);
-
-            ReplyWaiter waiter = sendGetPeers(nInfo, iHash, noSeeds);
-            if (waiter == null)
-                continue;
-            synchronized(waiter) {
-                try {
-                    waiter.wait(Math.max(15*1000, (Math.min(25*1000, endTime - _context.clock().now()))));
-                } catch (InterruptedException ie) {}
-            }
-
-            int replyType = waiter.getReplyCode();
-            if (replyType == REPLY_NONE) {
-                 if (_log.shouldLog(Log.DEBUG))
-                     _log.debug("Got no reply");
-            } else if (replyType == REPLY_PONG) {
-                 if (_log.shouldLog(Log.DEBUG))
-                     _log.debug("Got pong");
-            } else if (replyType == REPLY_PEERS) {
-                 heardFrom.add(waiter.getSentTo());
-                 if (_log.shouldLog(Log.DEBUG))
-                     _log.debug("Got peers");
-                 List<Hash> reply = (List<Hash>) waiter.getReplyObject();
-                 // shouldn't send us an empty peers list but through
-                 // 0.9.8.1 it will
-                 if (!reply.isEmpty()) {
-                     for (int j = 0; j < reply.size() && rv.size() < max; j++) {
-                          Hash h = reply.get(j);
-                          if (!h.equals(_myNodeInfo.getHash()))
-                              rv.add(h);
-                     }
-                 }
-                 if (_log.shouldLog(Log.INFO))
-                     _log.info("Finished get Peers, got " + reply.size() + " from DHT, returning " + rv.size());
-                 break;
-            } else if (replyType == REPLY_NODES) {
-                 heardFrom.add(waiter.getSentTo());
-                 List<NodeInfo> reply = (List<NodeInfo>) waiter.getReplyObject();
-                 if (_log.shouldLog(Log.DEBUG))
-                     _log.debug("Got " + reply.size() + " nodes");
-                 for (NodeInfo ni : reply) {
-                     if (! (ni.equals(_myNodeInfo) || tried.contains(ni) || toTry.contains(ni)))
-                         toTry.add(ni);
-                 }
-            } else if (replyType == REPLY_NETWORK_FAIL) {
-                 break;
-            } else {
-                 if (_log.shouldLog(Log.INFO))
-                     _log.info("Got unexpected reply " + replyType + ": " + waiter.getReplyObject());
-            }
-            if (_context.clock().now() > endTime)
-                break;
-            if (!toTry.isEmpty() && !heardFrom.isEmpty() &&
-                comp.compare(toTry.first(), heardFrom.first()) >= 0) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Finished get Peers, nothing closer to try after " + (i+1));
-                break;
-            }
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        } finally {
+            for (ReplyWaiter waiter : pending)
+                waiter.networkFail();
         }
+        if (!_isRunning || Thread.currentThread().isInterrupted())
+            return rv;
         // now announce
         if (!heardFrom.isEmpty()) {
             announce(ih, isSeed);
             // announce to the closest we've heard from
             int annCnt = 0;
-            long start = _context.clock().now();
+            long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(annMaxWait);
             for (Iterator<NodeInfo> iter = heardFrom.iterator(); iter.hasNext() && annCnt < annMax && _isRunning; ) {
                 NodeInfo annTo = iter.next();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Announcing to closest from get peers: " + annTo);
-                long toWait = annMaxWait > 0 ? Math.min(annMaxWait, 60*1000) : 0;
+                long toWait = annMaxWait > 0 ? Math.min(60*1000,
+                        TimeUnit.NANOSECONDS.toMillis(end - System.nanoTime())) : 0;
+                if (annMaxWait > 0 && toWait <= 0)
+                    break;
                 if (announce(ih, annTo, toWait, isSeed))
                     annCnt++;
                 if (annMaxWait > 0) {
-                    annMaxWait -= _context.clock().now() - start;
-                    if (annMaxWait < 1000)
+                    if (System.nanoTime() >= end)
                         break;
                 }
             }
@@ -504,6 +547,10 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public void unannounce(byte[] ih) {
         InfoHash iHash = new InfoHash(ih);
         _tracker.unannounce(iHash, _myNodeInfo.getHash());
+        for (ReplyWaiter waiter : _sentQueries.values()) {
+            if (iHash.equals(waiter.getSentObject()))
+                waiter.networkFail();
+        }
     }
 
     /**
@@ -527,19 +574,20 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     public int announce(byte[] ih, int max, long maxWait, boolean isSeed) {
         announce(ih, isSeed);
         int rv = 0;
-        long start = _context.clock().now();
+        long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(maxWait);
         InfoHash iHash = new InfoHash(ih);
         List<NodeInfo> nodes = _knownNodes.findClosest(iHash, max);
         if (_log.shouldLog(Log.INFO))
             _log.info("Found " + nodes.size() + " to announce to for " + iHash);
         for (NodeInfo nInfo : nodes) {
-            if (!_isRunning)
+            if (!_isRunning || Thread.currentThread().isInterrupted())
                 break;
-            if (announce(ih, nInfo, Math.min(maxWait, 60*1000), isSeed))
+            long remaining = maxWait > 0 ? Math.min(60*1000,
+                    TimeUnit.NANOSECONDS.toMillis(end - System.nanoTime())) : 0;
+            if (maxWait > 0 && remaining <= 0)
+                break;
+            if (announce(ih, nInfo, remaining, isSeed))
                 rv++;
-            maxWait -= _context.clock().now() - start;
-            if (maxWait < 1000)
-                break;
         }
         return rv;
     }
@@ -557,6 +605,8 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @return success
      */
     private boolean announce(byte[] ih, NodeInfo nInfo, long maxWait, boolean isSeed) {
+        if (!_isRunning || Thread.currentThread().isInterrupted())
+            return false;
         InfoHash iHash = new InfoHash(ih);
         // it isn't clear from BEP 5 if a token is bound to a single infohash?
         // for now, just bind to the NID
@@ -576,10 +626,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             if (waiter == null)
                 return false;
             long start = _context.clock().now();
-            synchronized(waiter) {
-                try {
-                    waiter.wait(maxWait);
-                } catch (InterruptedException ie) {}
+            try {
+                waiter.await(maxWait);
+            } catch (InterruptedException ie) {
+                waiter.networkFail();
+                Thread.currentThread().interrupt();
+                return false;
             }
             int replyType = waiter.getReplyCode();
             if (!(replyType == REPLY_PEERS || replyType == REPLY_NODES)) {
@@ -608,10 +660,12 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             return false;
         if (maxWait <= 0)
             return true;
-        synchronized(waiter) {
-            try {
-                waiter.wait(maxWait);
-            } catch (InterruptedException ie) {}
+        try {
+            waiter.await(maxWait);
+        } catch (InterruptedException ie) {
+            waiter.networkFail();
+            Thread.currentThread().interrupt();
+            return false;
         }
         int replyType = waiter.getReplyCode();
         return replyType == REPLY_PONG;
@@ -650,6 +704,11 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (!_isRunning)
             return;
         _isRunning = false;
+        for (Runnable task : _searchExecutor.shutdownNow()) {
+            if (task instanceof Future<?>)
+                ((Future<?>) task).cancel(false);
+        }
+        _queryExecutor.shutdownNow();
         if (_log.shouldInfo())
             _log.info("KRPC stop", new Exception());
         _cleaner.cancel();
@@ -713,7 +772,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     // Announces use the response port.
 
     /**
-     *  Blocking if we have to look up the dest for the nodeinfo
+     *  Destination resolution and sending run on the query executor.
      *
      *  @param nInfo who to send it to
      *  @return null on error
@@ -729,7 +788,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     }
 
     /**
-     *  Blocking if we have to look up the dest for the nodeinfo
+     *  Destination resolution and sending run on the query executor.
      *
      *  @param nInfo who to send it to
      *  @param tID target ID we are looking for
@@ -763,11 +822,19 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (noSeeds)
             args.put("noseed", Integer.valueOf(1));
         map.put("a", args);
-        ReplyWaiter rv = sendQuery(nInfo, map, true);
-        // save the InfoHash so we can get it later
-        if (rv != null)
-            rv.setSentObject(ih);
-        return rv;
+        return sendQuery(nInfo, map, true, ih, null, DEFAULT_QUERY_TIMEOUT);
+    }
+
+    private ReplyWaiter sendGetPeers(NodeInfo nInfo, InfoHash ih, boolean noSeeds,
+                                     BlockingQueue<ReplyWaiter> replies, long timeout) {
+        Map<String, Object> map = new TreeMap<String, Object>();
+        map.put("q", "get_peers");
+        Map<String, Object> args = new TreeMap<String, Object>();
+        args.put("info_hash", ih.getData());
+        if (noSeeds)
+            args.put("noseed", Integer.valueOf(1));
+        map.put("a", args);
+        return sendQuery(nInfo, map, true, ih, replies, timeout);
     }
 
     /**
@@ -790,7 +857,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         args.put("seed", Integer.valueOf(isSeed ? 1 : 0));
         map.put("a", args);
         // an announce need not be signed, we have a token
-        ReplyWaiter rv = sendQuery(nInfo, map, false);
+        ReplyWaiter rv = sendQuery(nInfo, map, false, ih, null, DEFAULT_QUERY_TIMEOUT);
         return rv;
     }
 
@@ -867,15 +934,20 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
 
     // Low-level send methods
 
-    // TODO sendQuery with onReply / onTimeout args
-
     /**
-     *  Blocking if repliable and we must lookup b32
+     *  Non-blocking. Destination lookups and sends use a bounded executor.
      *  @param repliable true for all but announce
      *  @return null on error
      */
-    @SuppressWarnings("unchecked")
     private ReplyWaiter sendQuery(NodeInfo nInfo, Map<String, Object> map, boolean repliable) {
+        return sendQuery(nInfo, map, repliable, null, null, DEFAULT_QUERY_TIMEOUT);
+    }
+
+    @SuppressWarnings("unchecked")
+    private ReplyWaiter sendQuery(NodeInfo nInfo, final Map<String, Object> map, final boolean repliable,
+                                  Object sentObject, BlockingQueue<ReplyWaiter> replies, long timeout) {
+        if (!_isRunning || Thread.currentThread().isInterrupted())
+            return null;
         if (nInfo.equals(_myNodeInfo))
             throw new IllegalArgumentException("don't send to ourselves");
         if (_log.shouldLog(Log.DEBUG))
@@ -889,15 +961,6 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping non-repliable query, no dest for " + nInfo);
                 return null;
-            } else {
-                // Lookup the dest for the hash
-                // TODO spin off into thread or queue? We really don't want to block here
-                if (!lookupDest(nInfo)) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Dropping repliable query, no dest for " + nInfo);
-                    timeout(nInfo);
-                    return null;
-                }
             }
         }
         map.put("y", "q");
@@ -907,17 +970,34 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
         if (args == null)
             throw new IllegalArgumentException("no args");
         args.put("id", _myID);
-        int port = nInfo.getPort();
-        if (!repliable)
-            port++;
-        boolean success = sendMessage(nInfo.getDestination(), port, map, repliable);
-        if (success) {
-            // save for the caller to get
-            ReplyWaiter rv = new ReplyWaiter(mID, nInfo, null, null);
-            _sentQueries.put(mID, rv);
-            return rv;
+        final NodeInfo target = nInfo;
+        final ReplyWaiter waiter = new ReplyWaiter(mID, target, sentObject, replies);
+        // Register all response state before a send can produce an immediate reply.
+        _sentQueries.put(mID, waiter);
+        waiter.schedule(timeout);
+        try {
+            _queryExecutor.execute(new Runnable() {
+                public void run() {
+                    if (!waiter.isPending())
+                        return;
+                    if (target.getDestination() == null && !lookupDest(target)) {
+                        waiter.timeReached();
+                        return;
+                    }
+                    if (!waiter.isPending() || !_isRunning || Thread.currentThread().isInterrupted()) {
+                        waiter.networkFail();
+                        return;
+                    }
+                    int port = target.getPort() + (repliable ? 0 : 1);
+                    if (!sendMessage(target.getDestination(), port, map, repliable))
+                        waiter.networkFail();
+                }
+            });
+        } catch (RejectedExecutionException ree) {
+            waiter.networkFail();
+            return null;
         }
-        return null;
+        return waiter;
     }
 
     /**
@@ -1010,7 +1090,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
      *  @return success
      */
     private boolean sendMessage(Destination dest, int toPort, Map<String, Object> map, boolean repliable) {
-        if (_session.isClosed()) {
+        if (!_isRunning || _session.isClosed()) {
             // Don't allow DHT to open a closed session
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Not sending message, session is closed");
@@ -1493,37 +1573,30 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
     private class ReplyWaiter extends SimpleTimer2.TimedEvent {
         private final MsgID mid;
         private final NodeInfo sentTo;
-        private final Runnable onReply;
-        private final Runnable onTimeout;
+        private final BlockingQueue<ReplyWaiter> replies;
         private volatile int replyCode;
-        private Object sentObject;
+        private volatile boolean finished;
+        private final Object sentObject;
         private Object replyObject;
 
         /**
-         *  Either wait on this object with a timeout, or use non-null Runnables.
-         *  Any sent data to be remembered may be stored by setSentObject().
-         *  Reply object may be in getReplyObject().
-         *  @param onReply must be fast, otherwise set to null and wait on this UNUSED
-         *  @param onTimeout must be fast, otherwise set to null and wait on this UNUSED
+         * All request state is initialized before registration and sending.
+         * A completion is delivered at most once, including timeout and shutdown.
          */
-        public ReplyWaiter(MsgID mID, NodeInfo nInfo, Runnable onReply, Runnable onTimeout) {
-            super(SimpleTimer2.getInstance(), DEFAULT_QUERY_TIMEOUT);
+        public ReplyWaiter(MsgID mID, NodeInfo nInfo, Object sentObject,
+                           BlockingQueue<ReplyWaiter> replies) {
+            super(_context.simpleTimer2());
             this.mid = mID;
             this.sentTo = nInfo;
-            this.onReply = onReply;
-            this.onTimeout = onTimeout;
+            this.sentObject = sentObject;
+            this.replies = replies;
         }
 
         public NodeInfo getSentTo() {
             return sentTo;
         }
 
-        /** only used for get_peers, to save the Info Hash */
-        public void setSentObject(Object o) {
-            sentObject = o;
-        }
-
-        /** @return that stored with setSentObject() */
+        /** @return the info hash for get_peers, or null */
         public Object getSentObject() {
             return sentObject;
         }
@@ -1535,7 +1608,7 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
          *  Should contain String if getReplyCode is &gt; 200.
          *  @return may be null depending on what happened. Cast to expected type.
          */
-        public Object getReplyObject() {
+        public synchronized Object getReplyObject() {
             return replyObject;
         }
 
@@ -1547,48 +1620,69 @@ public class KRPC implements I2PSessionMuxedListener, DHT {
             return replyCode;
         }
 
+        public boolean isPending() {
+            return !finished;
+        }
+
+        /** Handles replies that arrive before the caller starts waiting. */
+        public synchronized void await(long maxWait) throws InterruptedException {
+            long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(maxWait);
+            long remaining;
+            while (isPending() && (remaining = end - System.nanoTime()) > 0)
+                TimeUnit.NANOSECONDS.timedWait(this, remaining);
+        }
+
+        private boolean finish(int code, Object value) {
+            synchronized(this) {
+                if (!isPending())
+                    return false;
+                replyObject = value;
+                replyCode = code;
+                finished = true;
+                notifyAll();
+            }
+            cancel();
+            _sentQueries.remove(mid, this);
+            return true;
+        }
+
+        private void notifySearch() {
+            if (replies != null)
+                replies.offer(this);
+        }
+
         /**
-         *  Will notify this and run onReply.
-         *  Also removes from _sentQueries and calls heardFrom().
+         * Notify the caller and remember a responding node in our routing table.
          */
         public void gotReply(int code, Object o) {
-            cancel();
-            _sentQueries.remove(mid);
-            replyObject = o;
-            replyCode = code;
+            if (!finish(code, o))
+                return;
             // if it is fake, heardFrom is called by receivePong()
             if (!sentTo.getNID().equals(FAKE_NID))
                 heardFrom(sentTo);
-            if (onReply != null)
-                onReply.run();
-            synchronized(this) {
-                this.notifyAll();
-            }
+            notifySearch();
         }
 
         /** timer callback on timeout */
         public void timeReached() {
-            _sentQueries.remove(mid);
-            if (onTimeout != null)
-                onTimeout.run();
+            if (!_isRunning) {
+                networkFail();
+                return;
+            }
+            if (!finish(REPLY_TIMEOUT, null))
+                return;
             timeout(sentTo);
             if (_log.shouldLog(Log.INFO))
                 _log.warn("timeout waiting for reply from " + sentTo);
-            synchronized(this) {
-                this.notifyAll();
-            }
+            notifySearch();
         }
 
         /**
-         *  Will notify this but not run onReply or onTimeout,
-         *  or remove from _sentQueries, or call heardFrom().
+         * Abandon a request without penalizing a node for local cancellation.
          */
         public void networkFail() {
-            cancel();
-            replyCode = REPLY_NETWORK_FAIL;
-            synchronized(this) {
-                this.notifyAll();
-            }
+            if (finish(REPLY_NETWORK_FAIL, null))
+                notifySearch();
         }
     }
 

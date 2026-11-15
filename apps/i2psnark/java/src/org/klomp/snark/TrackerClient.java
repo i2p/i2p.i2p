@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Consumer;
 
 import net.i2p.crypto.SigType;
 import net.i2p.data.DataHelper;
@@ -58,8 +61,9 @@ import org.klomp.snark.dht.DHT;
  * The TimedEvent creates a new thread and starts it, so it does not
  * clog SimpleTimer2.
  *
- * The thread runs one pass through the trackers, the PEX, and the DHT,
- * then queues a new TimedEvent and exits.
+ * The thread starts independent DHT discovery, runs one pass through the
+ * trackers and PEX, then queues a new TimedEvent and exits. DHT lookups and
+ * destination resolution use bounded background executors.
  *
  * Thus there are only threads that are actively announcing, not one thread per torrent forever.
  *
@@ -97,7 +101,7 @@ public class TrackerClient implements Runnable {
 
   private final I2PSnarkUtil _util;
   // non-final for reinitialize()
-  private MetaInfo meta;
+  private volatile MetaInfo meta;
   private final String infoHash;
   private final String peerID;
   private final List<String> additionalTrackerURLs;
@@ -122,7 +126,11 @@ public class TrackerClient implements Runnable {
   // Not necessarily seeding, as we may have skipped some files.
   private boolean completed;
   private volatile boolean _fastUnannounce;
-  private long lastDHTAnnounce;
+  private volatile long lastDHTAnnounce;
+  private Future<?> _dhtTask;
+  private DHT _dhtTaskSource;
+  private long _discoveryGeneration;
+  private volatile int _dhtSeenPeers;
   private final List<TCTracker> trackers;
   private final List<TCTracker> backupTrackers;
   private long _startedOn;
@@ -161,6 +169,9 @@ public class TrackerClient implements Runnable {
           return;
       }
       stop = false;
+      _discoveryGeneration++;
+      lastDHTAnnounce = 0;
+      _dhtSeenPeers = 0;
       consecutiveFails = 0;
       runStarted = false;
       _fastUnannounce = false;
@@ -178,6 +189,11 @@ public class TrackerClient implements Runnable {
    * @param fast if true, limit the life of the unannounce threads
    */
   public synchronized void halt(boolean fast) {
+    _discoveryGeneration++;
+    if (_dhtTask != null) {
+        _dhtTask.cancel(true);
+        _dhtTask = null;
+    }
     boolean wasStopped = stop;
     if (wasStopped) {
         if (_log.shouldLog(Log.WARN))
@@ -435,8 +451,12 @@ public class TrackerClient implements Runnable {
 
             // Local DHT tracker announce
             DHT dht = _util.getDHT();
-            if (dht != null && (meta == null || !meta.isPrivate()))
+            if (dht != null && !isPrivateTorrent())
                 dht.announce(snark.getInfoHash(), coordinator.completed());
+
+            // Start DHT discovery before any potentially slow tracker requests.
+            // Its callback connects discovered peers independently of this loop.
+            int dhtPeers = getPeersFromDHT();
 
             int oldSeenPeers = snark.getTrackerSeenPeers();
             int maxSeenPeers = 0;
@@ -449,7 +469,7 @@ public class TrackerClient implements Runnable {
             int p = getPeersFromPEX();
             if (p > maxSeenPeers)
                 maxSeenPeers = p;
-            p = getPeersFromDHT();
+            p = Math.max(dhtPeers, _dhtSeenPeers);
             if (p > maxSeenPeers) {
                 maxSeenPeers = p;
                 // fast update for UI at startup
@@ -457,7 +477,8 @@ public class TrackerClient implements Runnable {
                     snark.setTrackerSeenPeers(maxSeenPeers);
             }
             // backup if DHT needs bootstrapping
-            if (trackers.isEmpty() && !backupTrackers.isEmpty() && dht != null && dht.size() < 16) {
+            if (trackers.isEmpty() && !backupTrackers.isEmpty() && !isPrivateTorrent() &&
+                dht != null && dht.size() < 16) {
                 p = getPeersFromTrackers(backupTrackers);
                 if (p > maxSeenPeers)
                     maxSeenPeers = p;
@@ -603,7 +624,7 @@ public class TrackerClient implements Runnable {
 
                     // pass everybody over to our tracker
                     DHT dht = _util.getDHT();
-                    if (dht != null) {
+                    if (dht != null && !isPrivateTorrent()) {
                         for (Peer peer : peers) {
                             dht.announce(snark.getInfoHash(), peer.getPeerID().getDestHash(),
                                          false);  // TODO actual seed/leech status
@@ -681,7 +702,7 @@ public class TrackerClient implements Runnable {
   private int getPeersFromPEX() {
             // Get peers from PEX
             int rv = 0;
-            if (coordinator.needOutboundPeers() && (meta == null || !meta.isPrivate()) && !stop) {
+            if (coordinator.needOutboundPeers() && !isPrivateTorrent() && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
                     if (_log.shouldLog(Log.INFO))
@@ -713,58 +734,84 @@ public class TrackerClient implements Runnable {
   /**
    *  @return max peers seen
    */
-  private int getPeersFromDHT() {
-            // Get peers from DHT
-            // FIXME this needs to be in its own thread
-            int rv = 0;
-            DHT dht = _util.getDHT();
-            if (dht != null &&
-                (meta == null || !meta.isPrivate()) &&
-                (!stop) &&
-                (meta == null || _util.getContext().clock().now() >  lastDHTAnnounce + MIN_DHT_ANNOUNCE_INTERVAL)) {
-                int numwant;
-                if (!coordinator.needOutboundPeers())
-                    numwant = 1;
-                else
-                    numwant = _util.getMaxConnections();
-                Collection<Hash> hashes = dht.getPeersAndAnnounce(snark.getInfoHash(), numwant,
-                                                                  5*60*1000, DHT_ANNOUNCE_PEERS, 3*60*1000,
-                                                                  coordinator.completed(), numwant <= 1);
-                if (!hashes.isEmpty()) {
-                    runStarted = true;
-                    lastDHTAnnounce = _util.getContext().clock().now();
-                    rv = hashes.size();
-                } else {
-                    lastDHTAnnounce = 0;
-                }
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Got " + hashes + " from DHT");
+  private synchronized int getPeersFromDHT() {
+      final DHT dht = _util.getDHT();
+      if (_dhtTask != null && _dhtTaskSource != dht) {
+          _dhtTask.cancel(true);
+          _dhtTask = null;
+          _discoveryGeneration++;
+          lastDHTAnnounce = 0;
+          _dhtSeenPeers = 0;
+      }
+      if (dht == null || stop || isPrivateTorrent() ||
+          (_dhtTask != null && !_dhtTask.isDone()) ||
+          (meta != null && _util.getContext().clock().now() <= lastDHTAnnounce + MIN_DHT_ANNOUNCE_INTERVAL))
+          return _dhtSeenPeers;
+      final long generation = _discoveryGeneration;
+      int numwant = coordinator.needOutboundPeers() ? _util.getMaxConnections() : 1;
+      try {
+          _dhtTaskSource = dht;
+          _dhtTask = dht.getPeersAndAnnounceAsync(snark.getInfoHash(), numwant,
+                  5*60*1000, DHT_ANNOUNCE_PEERS, 0, coordinator.completed(), numwant <= 1,
+                  new Consumer<Collection<Hash>>() {
+                      public void accept(Collection<Hash> hashes) {
+                          synchronized(TrackerClient.this) {
+                              if (stop || generation != _discoveryGeneration || _util.getDHT() != dht ||
+                                  isPrivateTorrent())
+                                  return;
+                              _dhtSeenPeers = hashes.size();
+                              if (!hashes.isEmpty()) {
+                                  runStarted = true;
+                                  lastDHTAnnounce = _util.getContext().clock().now();
+                                  if (snark.getTrackerSeenPeers() < hashes.size())
+                                      snark.setTrackerSeenPeers(hashes.size());
+                              } else {
+                                  lastDHTAnnounce = 0;
+                              }
+                              List<Hash> ordered = new ArrayList<Hash>(hashes);
+                              Collections.shuffle(ordered, _util.getContext().random());
+                              for (Hash hash : ordered) {
+                                  if (!coordinator.needOutboundPeers())
+                                      break;
+                                  Destination mine = _util.getMyDestination();
+                                  if (mine != null && mine.calculateHash().equals(hash))
+                                      continue;
+                                  try {
+                                      PeerID pid = new PeerID(hash.getData(), _util);
+                                      coordinator.addPeer(new Peer(pid, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
+                                  } catch (InvalidBEncodingException ibe) {}
+                              }
+                          }
+                      }
+                  });
+      } catch (RejectedExecutionException ree) {
+          if (_log.shouldDebug())
+              _log.debug("DHT discovery busy or stopping for " + _threadName);
+      }
+      return _dhtSeenPeers;
+  }
 
-                // now try these peers
-                if ((!stop) && !hashes.isEmpty()) {
-                    List<Peer> peers = new ArrayList<Peer>(hashes.size());
-                    for (Hash h : hashes) {
-                        try {
-                            PeerID pID = new PeerID(h.getData(), _util);
-                            peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
-                        } catch (InvalidBEncodingException ibe) {}
-                    }
-                    Random r = _util.getContext().random();
-                    Collections.shuffle(peers, r);
-                    Iterator<Peer> it = peers.iterator();
-                    while ((!stop) && it.hasNext() && coordinator.needOutboundPeers()) {
-                        Peer cur = it.next();
-                        if (coordinator.addPeer(cur) && it.hasNext()) {
-                            int delay = r.nextInt(DELAY_RAND) + DELAY_MIN;
-                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
-                         }
-                    }
-                }
-            } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Not getting DHT peers");
-            }
-            return rv;
+  private boolean isPrivateTorrent() {
+      MetaInfo current = snark.getMetaInfo();
+      if (current == null)
+          current = meta;
+      return current != null && current.isPrivate();
+  }
+
+  /** Stop public discovery as soon as magnet metadata identifies a private torrent. */
+  synchronized void gotMetaInfo(MetaInfo current) {
+      meta = current;
+      if (current.isPrivate()) {
+          _discoveryGeneration++;
+          if (_dhtTask != null) {
+              _dhtTask.cancel(true);
+              _dhtTask = null;
+          }
+          _dhtSeenPeers = 0;
+          DHT dht = _util.getDHT();
+          if (dht != null)
+              dht.unannounce(snark.getInfoHash());
+      }
   }
 
   /**

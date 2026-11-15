@@ -28,7 +28,7 @@ class NodeInfo extends SimpleDataStructure {
 
     private final NID nID;
     private final Hash hash;
-    private Destination dest;
+    private volatile Destination dest;
     private final int port;
 
     public static final int LENGTH = NID.HASH_LENGTH + Hash.HASH_LENGTH + 2;
