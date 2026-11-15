@@ -75,6 +75,7 @@ import org.eclipse.jetty.server.Session;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.GracefulHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.resource.URLResourceFactory;
@@ -234,6 +235,8 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.4 */
     public synchronized void startup() {
+        if (_state == STARTING || _state == RUNNING || _state == STOPPING)
+            return;
         changeState(STARTING);
         checkJavaVersion();
         startTrayApp();
@@ -243,29 +246,41 @@ public class RouterConsoleRunner implements RouterApp {
 
     /** @since 0.9.4 */
     public synchronized void shutdown(String[] args) {
-        if (_state == STOPPED)
+        if (_state == STOPPED || _state == STOPPING)
             return;
         // this unregisters us with the ClientAppManager
         changeState(STOPPING);
-        if (PluginStarter.pluginsEnabled(_context))
-            (new I2PAppThread(new PluginStopper(_context, _server), "PluginStopper")).start();
-        stopAllWebApps();
+        new I2PAppThread(this::stopConsole, "Console shutdown").start();
+    }
+
+    private void stopConsole() {
+        boolean stoppedNormally = false;
         try {
-            _server.stop();
-        } catch (Exception ie) {}
-        _mgr.unregister(_navHelper);
-        PortMapper portMapper = _context.portMapper();
-        portMapper.unregister(PortMapper.SVC_CONSOLE);
-        portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
-        synchronized(RouterConsoleRunner.class) {
-            if (_jettyTimer != null) {
-                try {
-                    _jettyTimer.stop();
-                } catch (Exception e) {}
-                _jettyTimer = null;
+            try {
+                if (_server != null)
+                    _server.stop();
+            } catch (Exception failure) {
+                _context.logManager().getLog(RouterConsoleRunner.class).warn("Console shutdown failed", failure);
             }
-        }
-        changeState(STOPPED);
+            // Keep plugin services available until accepted HTTP work has drained.
+            if (PluginStarter.pluginsEnabled(_context))
+                (new I2PAppThread(new PluginStopper(_context, _server), "PluginStopper")).start();
+            stopAllWebApps();
+            if (_mgr != null)
+                _mgr.unregister(_navHelper);
+            PortMapper portMapper = _context.portMapper();
+            portMapper.unregister(PortMapper.SVC_CONSOLE);
+            portMapper.unregister(PortMapper.SVC_HTTPS_CONSOLE);
+            synchronized(RouterConsoleRunner.class) {
+                if (_jettyTimer != null) {
+                    try {
+                        _jettyTimer.stop();
+                    } catch (Exception e) {}
+                    _jettyTimer = null;
+                }
+            }
+            stoppedNormally = _server == null || _server.isStopped();
+        } finally { changeState(stoppedNormally ? STOPPED : ClientAppState.CRASHED); }
     }
 
     /** @since 0.9.4 */
@@ -502,7 +517,8 @@ public class RouterConsoleRunner implements RouterApp {
         ContextHandlerCollection chColl = new ContextHandlerCollection();
         HostCheckHandler chCollWrapper = new HostCheckHandler(_context);
         chCollWrapper.setHandler(chColl);
-        _server.setHandler(hColl);
+        _server.setHandler(new GracefulHandler(hColl));
+        _server.setStopTimeout(5000);
         hColl.addHandler(chCollWrapper);
         hColl.addHandler(new DefaultHandler());
 
