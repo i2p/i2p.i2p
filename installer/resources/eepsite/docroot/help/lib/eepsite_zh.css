@@ -30,7 +30,7 @@ li {
 }
 
 li a {
-     white-space: nowrap;
+     white-space: normal;
 }
 
 code {
@@ -48,4 +48,3 @@ code {
 .footnote {
      font-size: 11pt !important;
  }
- 
