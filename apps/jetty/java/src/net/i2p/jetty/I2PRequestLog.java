@@ -16,6 +16,8 @@ package net.i2p.jetty;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.StringWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -95,6 +97,9 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     private transient OutputStream _fileOut;
     private transient DateCache _logDateCache;
     private transient java.io.Writer _writer;
+    private volatile AsyncLogWriter _asyncWriter;
+    private int _queueCapacity = 1024;
+    private volatile long _lastDroppedRecords;
 
     private final static boolean DEFAULT_GZIP = false;
     private static final int DEFAULT_MIN_GZIP_SIZE = 64*1024;
@@ -135,6 +140,18 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         _filename = filename;
     }
     
+    /** Configure the finite log queue before starting. Full queues drop records, not requests. */
+    public void setQueueCapacity(int capacity) {
+        if (isRunning()) throw new IllegalStateException("Configure before starting");
+        if (capacity <= 0) throw new IllegalArgumentException("Positive capacity required");
+        _queueCapacity = capacity;
+    }
+
+    public long getDroppedRecords() {
+        AsyncLogWriter writer = _asyncWriter;
+        return writer != null ? writer.getDroppedRecords() : _lastDroppedRecords;
+    }
+
     public String getFilename() 
     {
         return _filename;
@@ -375,35 +392,17 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                     buf.append(" - ");
 
 
-            if (!_extended && !_logCookies && !_logLatency)
-            {
-                synchronized(_writer)
-                {
-                    buf.append(System.getProperty("line.separator", "\n"));
-                    _writer.write(buf.toString());
-                    _writer.flush();
-                }
+            if (_extended) {
+                StringWriter extended = new StringWriter(128);
+                logExtended(request, response, extended);
+                buf.append(extended.toString());
             }
-            else
-            {
-                synchronized(_writer)
-                {
-                    _writer.write(buf.toString());
-
-                    // TODO do outside synchronized scope
-                    if (_extended)
-                        logExtended(request, response, _writer);
-
-                    if (_logLatency)
-                    {
-                        _writer.write(' ');
-                        _writer.write(Long.toString(System.currentTimeMillis() - Request.getTimeStamp(request)));
-                    }
-
-                    _writer.write(System.getProperty("line.separator", "\n"));
-                    _writer.flush();
-                }
-            }
+            if (_logLatency)
+                buf.append(' ').append(System.currentTimeMillis() - Request.getTimeStamp(request));
+            buf.append('\n');
+            AsyncLogWriter writer = _asyncWriter;
+            if (writer != null)
+                writer.write(buf.toString());
         } 
         catch (IOException e) 
         {
@@ -460,7 +459,10 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         
         _out = _fileOut;
         
-        _writer = new OutputStreamWriter(_out, "UTF-8");
+        _writer = new BufferedWriter(new OutputStreamWriter(_out, "UTF-8"), 16384);
+        AsyncLogWriter writer = new AsyncLogWriter(_writer, _closeOut, _queueCapacity);
+        writer.start();
+        _asyncWriter = writer;
         super.doStart();
     }
 
@@ -468,15 +470,20 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
     protected void doStop() throws Exception
     {
         super.doStop();
-        try {if (_writer != null) _writer.flush();} catch (IOException e) {}
-        if (_out != null && _closeOut) 
-            try {_out.close();} catch (IOException e) {}
-            
-        _out = null;
-        _fileOut = null;
-        _closeOut = false;
-        _logDateCache = null;
-        _writer = null;
+        AsyncLogWriter writer = _asyncWriter;
+        _asyncWriter = null;
+        try {
+            if (writer != null)
+                writer.stop();
+        } finally {
+            if (writer != null) _lastDroppedRecords = writer.getDroppedRecords();
+            // The worker owns flushing and closing, including a slow disk during shutdown.
+            _out = null;
+            _fileOut = null;
+            _closeOut = false;
+            _logDateCache = null;
+            _writer = null;
+        }
     }
 
     /* ------------------------------------------------------------ */
