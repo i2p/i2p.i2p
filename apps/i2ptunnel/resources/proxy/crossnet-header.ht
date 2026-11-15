@@ -1,0 +1,32 @@
+HTTP/1.1 403 Request Denied
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-cache
+Connection: close
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline' http://proxy.i2p; form-action 'self' http://proxy.i2p; frame-ancestors 'self' http://127.0.0.1:7657/; img-src http://proxy.i2p
+
+<!DOCTYPE html>
+<html><head>
+<title>_("Warning: Cross-Network Request Denied")</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link blocking="render" href="http://proxy.i2p/themes/console/default/proxy.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="logo">
+ <a href="http://127.0.0.1:7657/" title="_("Router Console")"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="_("I2P Router Console")" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config">_("Configuration")</a> <a href="http://127.0.0.1:7657/help">_("Help")</a> <a href="http://127.0.0.1:7657/dns">_("Addressbook")</a>
+</div>
+<div class="warning" id="warning">
+<h3>_("Warning: Cross-Network Request Denied")</h3>
+<p>
+_("A page on one network (I2P or the clearnet) tried to load a sub-resource (such as an image, icon, favicon, script, stylesheet or font) from the other network.")
+</p>
+<p>
+_("This request was blocked because it would leak which site you were viewing and could be used to correlate your I2P and clearnet activity (a de-anonymization attack).")
+</p>
+<p>
+_("Top-level navigation is not affected: you can still follow a link to the other network yourself. To allow these automatic cross-network loads, set {0} to false in the HTTP proxy tunnel's advanced options.", "<code>i2ptunnel.httpclient.blockCrossNetwork</code>")
+</p>
+</div>
