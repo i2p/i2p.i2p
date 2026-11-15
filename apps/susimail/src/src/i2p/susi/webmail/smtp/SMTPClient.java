@@ -199,10 +199,15 @@ public class SMTPClient {
 		int result = 0;
 		StringBuilder fullResponse = new StringBuilder(512);
 		try {
-			InputStream in = socket.getInputStream();
+			InputStream in = new i2p.susi.util.TimedResponseInputStream(socket, 120000);
 			StringBuilder buf = new StringBuilder(128);
+            long start = System.nanoTime();
+            int lines = 0;
+            boolean complete = false;
 			while (DataHelper.readLine(in, buf)) {
-				// A server may echo credentials or addresses in its response.
+				if (++lines > 100 || fullResponse.length() + buf.length() > 65536 || System.nanoTime() - start > 120000000000L)
+                    throw new IOException("SMTP reply exceeds the safety limit");
+                // A server may echo credentials or addresses in its response.
 				int len = buf.length();
 				if (len < 4) {
 					result = 0;
@@ -216,11 +221,14 @@ public class SMTPClient {
 						break;
 					}
 				}
+                if (result < 100 || result > 599 || !buf.substring(0, 3).equals(Integer.toString(result)))
+                    throw new IOException("Inconsistent SMTP reply status");
 				fullResponse.append(buf.substring(4));
-				if (buf.charAt(3) == ' ')
-					break;
+				if (buf.charAt(3) == ' ') { complete = true; break; }
+                if (buf.charAt(3) != '-') throw new IOException("Malformed SMTP reply");
 				buf.setLength(0);
 			}
+            if (!complete) result = 0;
 		} catch (IOException e) {
 			error += e + "\n";
 			result = 0;
@@ -359,7 +367,7 @@ public class SMTPClient {
 				writeMail(out, body, attachments, boundary);
 				out.write("\r\n.\r\n");
 				out.flush();
-				socket.setSoTimeout(0);
+				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result == 250)
 					mailSent = true;
