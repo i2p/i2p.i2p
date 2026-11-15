@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ import javax.servlet.ServletException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.web.HostCheckHandler;
 import net.i2p.servlet.filters.XSSFilter;
 
 import org.eclipse.jetty.ee8.servlet.FilterHolder;
@@ -35,6 +37,7 @@ import org.klomp.snark.web.I2PSnarkServlet;
 public final class PeerCatalogWebRegression {
     private static int checks;
     private static String cookie;
+    private static String referrerPolicy;
 
     public static void main(String[] args) throws Throwable {
         Path work = Files.createTempDirectory("catalog-web-");
@@ -55,7 +58,10 @@ public final class PeerCatalogWebRegression {
         web.setContextPath("/i2psnark");
         web.addFilter(new FilterHolder(new XSSFilter()), "/*", java.util.EnumSet.of(javax.servlet.DispatcherType.REQUEST));
         web.addServlet(new ServletHolder(new TestServlet(manager)), "/");
-        server.setHandler(web.getCoreContextHandler());
+        HostCheckHandler guard = new HostCheckHandler(context);
+        guard.setListenHosts(Set.of("localhost", "127.0.0.1"));
+        guard.setHandler(web.getCoreContextHandler());
+        server.setHandler(guard);
         try {
             server.start();
             String first = request(connector, "GET", "/i2psnark/", "");
@@ -182,10 +188,17 @@ public final class PeerCatalogWebRegression {
     }
 
     private static String request(LocalConnector connector, String method, String path, String body) throws Exception {
-        String headers = method + ' ' + path + " HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n";
+        String headers = method + ' ' + path + " HTTP/1.1\r\nHost: 127.0.0.1:7657\r\nConnection: close\r\n";
         if (cookie != null) headers += "Cookie: " + cookie + "\r\n";
-        if (method.equals("POST")) headers += "Content-Type: application/x-www-form-urlencoded\r\nContent-Length: " + body.getBytes(StandardCharsets.UTF_8).length + "\r\n";
+        if (method.equals("POST")) {
+            // Model native browser form navigation, including no-referrer's opaque Origin.
+            headers += "Origin: " + ("no-referrer".equals(referrerPolicy) ? "null" : "http://127.0.0.1:7657") +
+                       "\r\nSec-Fetch-Site: same-origin\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: " +
+                       body.getBytes(StandardCharsets.UTF_8).length + "\r\n";
+        }
         String response = connector.getResponse(headers + "\r\n" + body);
+        Matcher policy = Pattern.compile("(?im)^Referrer-Policy: ([^\r\n]+)").matcher(response);
+        if (method.equals("GET") && policy.find()) referrerPolicy = policy.group(1);
         Matcher setCookie = Pattern.compile("(?im)^Set-Cookie: ([^;\r\n]+)").matcher(response);
         if (setCookie.find()) cookie = setCookie.group(1);
         return response;

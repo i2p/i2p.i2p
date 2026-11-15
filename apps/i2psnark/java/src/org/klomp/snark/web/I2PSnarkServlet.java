@@ -487,7 +487,9 @@ public class I2PSnarkServlet extends BasicServlet {
         resp.setHeader("X-Frame-Options", "SAMEORIGIN");
         resp.setHeader("X-XSS-Protection", "1; mode=block");
         resp.setHeader("X-Content-Type-Options", "nosniff");
-        resp.setHeader("Referrer-Policy", "no-referrer");
+        // no-referrer makes browser form POSTs send Origin: null, which the
+        // console correctly rejects. Keep local form origins without external referrers.
+        resp.setHeader("Referrer-Policy", "same-origin");
         resp.setHeader("Accept-Ranges", "none");
     }
 

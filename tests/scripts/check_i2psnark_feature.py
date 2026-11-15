@@ -28,6 +28,8 @@ def main():
     jars = ("core/java/build/i2p.jar", "apps/ministreaming/java/build/mstreaming.jar",
             "apps/systray/java/build/systray.jar", "apps/desktopgui/dist/desktopgui.jar", "apps/jetty/jettylib/*")
     classpath = os.pathsep.join(str(ROOT / jar) for jar in jars)
+    if args.case == "catalog":
+        classpath += os.pathsep + str(ROOT / "apps/routerconsole/java/build/routerconsole.jar")
     sources = sorted((ROOT / "apps/i2psnark/java/src").rglob("*.java"))
     fixtures = CASES[args.case]
     sources += [ROOT / "tests/regression" / (name + ".java") for name, _ in fixtures]
