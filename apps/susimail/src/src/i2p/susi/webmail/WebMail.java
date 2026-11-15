@@ -2070,7 +2070,7 @@ public class WebMail extends HttpServlet
 /**** not on the folder view any more, handled in processConfigButtons()
 		if (buttonPressed(request, SETPAGESIZE)) {
 			try {
-				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
+				int pageSize = Math.min(200, Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE))));
 				int oldPageSize = sessionObject.folder.getPageSize();
 				if( pageSize != oldPageSize )
 					sessionObject.folder.setPageSize( pageSize );
@@ -2185,6 +2185,12 @@ public class WebMail extends HttpServlet
 	 * @return new state, or null if unknown
 	 */
 	private static State processConfigButtons(SessionObject sessionObject, RequestWrapper request, boolean isPOST, State state) {
+        boolean configuring = buttonPressed(request, CONFIGURE) || request.getParameter(CONFIG_TEXT) != null || state == State.CONFIG;
+        if (configuring && (sessionObject.vault == null || !sessionObject.vault.isActive())) {
+            sessionObject.error += "Sign in before opening or changing global mail settings.\n";
+            return State.AUTH;
+        }
+
 		if (buttonPressed(request, CONFIGURE)) {
 			return state.CONFIG;
 		}
@@ -2194,6 +2200,22 @@ public class WebMail extends HttpServlet
 		if (!isPOST || request.getParameter(CONFIG_TEXT) == null)
 			return state;
 		if (buttonPressed(request, SAVE)) {
+            String key = "config:" + sessionObject.vault.directory;
+            long now = I2PAppContext.getGlobalContext().clock().now();
+            if (!LoginLimiter.allowed(key, now) || !LoginLimiter.WORK.tryAcquire()) {
+                sessionObject.error += "Wait one minute before retrying a global settings change.\n"; return State.CONFIG;
+            }
+            try {
+                AccountSecurity security = new AccountSecurity(sessionObject.vault);
+                if (!sessionObject.vault.matchesPassword(request.getParameter("securityPassword")) ||
+                        (security.mfaEnabled() && !security.verifyLogin(request.getParameter("securityCode"), now))) {
+                    LoginLimiter.failed(key, now);
+                    sessionObject.error += "The encryption password or required authenticator code was not accepted.\n";
+                    return State.CONFIG;
+                }
+                LoginLimiter.succeeded(key);
+            } catch (IOException damaged) { sessionObject.error += damaged.getMessage() + '\n'; return State.CONFIG; }
+            finally { LoginLimiter.WORK.release(); }
 			try {
 				String raw = request.getParameter(CONFIG_TEXT);
 				Properties props = new Properties();
@@ -2212,7 +2234,7 @@ public class WebMail extends HttpServlet
 				Folder<String> folder = getCurrentFolder(sessionObject, request);
 				if (folder != null && ps != null) {
 					try {
-						int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
+						int pageSize = Math.min(200, Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE))));
 						int oldPageSize = folder.getPageSize();
 						if( pageSize != oldPageSize )
 							folder.setPageSize( pageSize );
@@ -2233,7 +2255,7 @@ public class WebMail extends HttpServlet
 		} else if (buttonPressed(request, SETPAGESIZE)) {
 			Folder<String> folder = getCurrentFolder(sessionObject, request);
 			try {
-				int pageSize = Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE)));
+				int pageSize = Math.min(200, Math.max(5, Integer.parseInt(request.getParameter(PAGESIZE))));
 				if (folder != null) {
 					int oldPageSize = folder.getPageSize();
 					if( pageSize != oldPageSize )
@@ -4559,7 +4581,8 @@ public class WebMail extends HttpServlet
 		}
 		out.println("</textarea>");
 		out.println("<div id=\"prefsave\">");
-		out.println(button(SAVE, _t("Save Configuration")));
+		out.println("<p>Connection and trust changes require your encryption password and the enabled second factor.</p><label>Encryption password <input type=\"password\" name=\"securityPassword\" maxlength=\"1024\" autocomplete=\"current-password\"></label><label>Authenticator or recovery code, if enabled <input name=\"securityCode\" maxlength=\"40\" autocomplete=\"one-time-code\"></label>");
+        out.println(button(SAVE, _t("Save Configuration")));
 		out.println(button(CANCEL, _t("Cancel")));
 		if (folder != null)
 			out.println(spacer + button(LOGOUT, _t("Logout") ));

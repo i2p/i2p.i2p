@@ -137,6 +137,9 @@ public final class SusiMailInstallRegression {
         check(header(login, "Cache-Control").contains("no-store"), "normal deployment keeps login responses out of caches");
         check(get("/susimail/themes/security.css").contains("--mail-bg") && get("/susimail/themes/mail-content.css").contains("font-family"), "normal WAR packages and serves the new local stylesheets");
         String duplicate = post("/susimail/", "pass=first&pass=second"); check(duplicate.startsWith("HTTP/1.1 400"), "installed request filter rejects ambiguous duplicate parameters");
+        String anonymousSettings = post("/susimail/", form("save","1","config_text","dkim.require.example.test=false","susiNonce",nonce(login)));
+        check(anonymousSettings.contains("Sign in before opening or changing global mail settings") && !Files.exists(config.resolve("susimail.config")), "anonymous sessions cannot rewrite global trust or connection settings");
+        check(!get("/susimail/?configure=1").contains("<textarea"), "global configuration is not exposed before mailbox unlock");
         String oldCookie = cookie;
         String submitted = post("/susimail/", form("login","1","user","installed","pass",PASSWORD,"susiNonce",nonce(login)));
         check(submitted.startsWith("HTTP/1.1 303") && header(submitted, "Location").startsWith("/susimail/"), "fresh account login starts through a relative redirect");
@@ -144,6 +147,12 @@ public final class SusiMailInstallRegression {
         String inbox = waitForInbox();
         check(provider.passwords.get() > 0 && provider.deliveries.get() > 0, "normal installed login preserves password punctuation and spaces while authenticating and fetching");
         check(inbox.contains("Saved mail encrypted") && inbox.contains("Mail security"), "installed inbox exposes encryption status and security settings");
+        String configuration = get("/susimail/?configure=1");
+        String rejectedSettings = post("/susimail/", form("save","1","config_text","pager.pagesize=30","securityPassword","wrong","susiNonce",nonce(configuration)));
+        check(get("/susimail/?configure=1").contains("encryption password or required authenticator code was not accepted") && !Files.exists(config.resolve("susimail.config")), "unlocked sessions must reauthenticate before changing global settings");
+        configuration = get("/susimail/?configure=1");
+        String acceptedSettings = post("/susimail/", form("save","1","config_text","pager.pagesize=30","securityPassword",PASSWORD,"susiNonce",nonce(configuration)));
+        check((acceptedSettings.startsWith("HTTP/1.1 200") || acceptedSettings.startsWith("HTTP/1.1 303")) && Files.exists(config.resolve("susimail.config")), "valid encryption password authorizes a normal configuration save");
         String draftId = net.i2p.data.Base64.encode("installed-upload");
         String compose = get("/susimail/?newmsg=" + draftId);
         String boundary = "SyntheticMailBoundary";
@@ -176,6 +185,10 @@ public final class SusiMailInstallRegression {
         Matcher codes = Pattern.compile("<code>([a-f0-9]{8}(?:-[a-f0-9]{8}){3})</code>").matcher(enabled); List<String> recovery = new ArrayList<String>();
         while (codes.find()) recovery.add(codes.group(1));
         check(recovery.size() == 8 && enabled.contains("Two-factor protection on"), "installed TOTP enrollment confirms a code and displays recovery values once");
+        String protectedConfig = get("/susimail/?configure=1");
+        byte[] unchangedConfig = Files.readAllBytes(config.resolve("susimail.config"));
+        String noSecondFactor = post("/susimail/", form("save","1","config_text","pager.pagesize=31","securityPassword",PASSWORD,"susiNonce",nonce(protectedConfig)));
+        check(get("/susimail/?configure=1").contains("encryption password or required authenticator code was not accepted") && Arrays.equals(unchangedConfig, Files.readAllBytes(config.resolve("susimail.config"))), "enabled TOTP also protects global trust changes");
         check(!get("/susimail/?security=1").contains("Your new recovery codes"), "reloading settings does not reveal recovery codes again");
         Files.writeString(output.resolve("security-light.html"), settings.substring(settings.indexOf("<!DOCTYPE")));
         Files.writeString(output.resolve("security-mfa.html"), enabled.substring(enabled.indexOf("<!DOCTYPE")));

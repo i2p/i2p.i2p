@@ -5,7 +5,7 @@ The mail client now protects local cache contents, checks sender identity and me
 | Protection | Result |
 | --- | --- |
 | Protocol commands and diagnostics | Reject control bytes, including Unicode values that truncate into wire controls. SMTP AUTH uses unwrapped UTF-8 Base64. Command contents, echoed server text, credentials and session identifiers are omitted from the affected diagnostics. |
-| Browser privacy and sessions | Private `no-store` responses, fresh mailbox session IDs, 128-bit form nonces, session-bound POST checks and relative redirects. The mail-specific request filter bounds fields and duplicate parameters without rewriting or logging secret values. |
+| Browser privacy and sessions | Private `no-store` responses, fresh mailbox session IDs, 128-bit form nonces, session-bound POST checks and relative redirects. Global trust/settings access requires an unlocked mailbox and password/optional-factor reauthentication. The mail-specific request filter bounds fields and duplicate parameters without rewriting or logging secret values. |
 | Identity and integrity | Establish raw header boundaries before decoding encoded words. Show the actual mailbox address. Reject conflicting identity fields and require confirmation for a different Reply-To. Verify complete-body RSA-SHA256 DKIM against explicitly pinned keys; recheck when keys, cached content or signature validity change. |
 | Font smuggling and phishing | Rebuild HTML from semantic tags. Remove author CSS, fonts, hidden formatting, active markup, forms and remote images. Raster CID images remain available with limits. Supported external links open a trusted destination check before the user follows them. |
 | Attachments | Sandbox HTML without script, form, popup or top-navigation permission. Validate inline types and sanitize ZIP entry names. Draft attachment paths stay within the account. Uploaded and forwarded cache files are encrypted. |
@@ -57,7 +57,7 @@ java -cp 'target/local-i2p/tools/ant/lib/*' org.apache.tools.ant.Main \
   -f apps/susimail/build.xml war
 ```
 
-The reviewed combined source passes **393 checks**: 111 original protocol/browser checks, 105 identity/integrity checks, 130 encryption/MFA/policy/resource checks, 12 request-boundary checks, 28 installed-WAR workflow checks and seven JavaScript scenarios. Reports record source/dependency hashes and compiler/runtime output under `tests/results/mail-security/`.
+The reviewed combined source passes **398 checks**: 111 original protocol/browser checks, 105 identity/integrity checks, 130 encryption/MFA/policy/resource checks, 12 request-boundary checks, 33 installed-WAR workflow checks and seven JavaScript scenarios. Reports record source/dependency hashes and compiler/runtime output under `tests/results/mail-security/`.
 
 The normal Ant WAR build passes, including the default translation step. The deployment fixture loads that WAR's actual classes, descriptor, filter, multipart/session configuration and static assets into Jetty. Its HTTP workflows cover first online authentication, cache encryption, TOTP enrollment, recovery-code consumption, offline enforcement, sender blocking, encrypted multipart uploads/draft reopening and sanitized message links. POP3 uses an in-JVM synthetic provider; SMTP tests cover complete sequential/pipelined byte-stream conversations. No real accounts or external mail servers are used.
 
