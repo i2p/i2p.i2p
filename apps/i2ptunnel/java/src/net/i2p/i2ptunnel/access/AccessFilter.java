@@ -6,7 +6,10 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 
 import java.io.File;
@@ -49,7 +52,9 @@ class AccessFilter implements StatefulConnectionFilter {
      * All disk i/o from all instances of this filter
      * happen on this thread (apart from initial load)
      */
-    private static final ExecutorService DISK_WRITER = Executors.newSingleThreadExecutor();
+    private static final int MAX_PENDING_WRITES = 128;
+    private static final ExecutorService DISK_WRITER = new ThreadPoolExecutor(
+            1, 1, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(MAX_PENDING_WRITES));
 
     private final FilterDefinition definition;
     private final I2PAppContext context;
@@ -225,21 +230,27 @@ class AccessFilter implements StatefulConnectionFilter {
         public void timeReached() {
             if (!timersRunning.get())
                 return;
-            DISK_WRITER.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        record();
-                        reload();
-                        Syncer syncer = AccessFilter.this.syncer;
-                        if (syncer != null) 
-                            syncer.schedule(SYNC_INTERVAL);
-                    } catch (IOException bad) {
-                        Log log = context.logManager().getLog(AccessFilter.class);
-                        log.error("syncing access list failed", bad);
+            try {
+                DISK_WRITER.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            record();
+                            reload();
+                            Syncer syncer = AccessFilter.this.syncer;
+                            if (syncer != null) 
+                                syncer.schedule(SYNC_INTERVAL);
+                        } catch (IOException bad) {
+                            Log log = context.logManager().getLog(AccessFilter.class);
+                            log.error("syncing access list failed", bad);
+                        }
                     }
-                }
-            });
+                });
+            } catch (RejectedExecutionException overloaded) {
+                // Keep disk work off the timer thread and retry after saturation.
+                if (timersRunning.get() && AccessFilter.this.syncer == this)
+                    schedule(SYNC_INTERVAL);
+            }
          }   
     }
 }
