@@ -40,3 +40,36 @@ dependencies {
     api 'org.apache.tomcat:tomcat-util:' + ext.tomcatVersion
     api 'org.apache.tomcat:tomcat-util-scan:' + ext.tomcatVersion
 }
+
+// Resolve native QUIC only when explicitly requested. HTTP/1 users retain the
+// normal Java-only runtime. This configuration includes the native Quiche and
+// JNA transitives supplied by Jetty's published dependency graph.
+configurations {
+    http3Runtime
+}
+
+dependencies {
+    http3Runtime "org.eclipse.jetty.http3:jetty-http3-server:${jettyVersion}"
+    http3Runtime "org.eclipse.jetty.quic:jetty-quic-quiche-jna:${jettyVersion}"
+}
+
+sourceSets {
+    http3 {
+        java.srcDir 'java/http3-src'
+        compileClasspath = sourceSets.main.output + configurations.http3Runtime
+    }
+}
+
+task http3I2pJar(type: Jar) {
+    archiveFileName = 'jetty-http3-i2p.jar'
+    from sourceSets.http3.output
+    from('../../licenses/LICENSE-Apache2.0.txt') { into 'META-INF'; rename { 'LICENSE.txt' } }
+    from('../../licenses/LICENSE-Jetty.txt') { into 'META-INF'; rename { 'NOTICE-Jetty.txt' } }
+    manifest { attributes 'Implementation-Version': jettyVersion }
+}
+
+task copyHttp3Runtime(type: Copy) {
+    from configurations.http3Runtime
+    from http3I2pJar
+    into "$buildDir/http3"
+}

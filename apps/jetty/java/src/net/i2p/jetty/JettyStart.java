@@ -208,6 +208,9 @@ public class JettyStart implements ClientApp {
                                 Connector[] connectors = server.getConnectors();
                                 for (int i = 0; i < connectors.length; i++) {
                                     Connector conn = connectors[i];
+                                    // QUIC is direct UDP access, not an I2P streaming tunnel target.
+                                    if (conn.getProtocols().contains("h3"))
+                                        continue;
                                     if (conn instanceof AbstractNetworkConnector) {
                                         AbstractNetworkConnector nconn = (AbstractNetworkConnector) conn;
                                         int port = nconn.getPort();
