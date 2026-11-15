@@ -61,6 +61,8 @@ public class TunnelController implements Logging {
     private final List<String> _messages;
     private List<I2PSession> _sessions;
     private volatile TunnelState _state;
+    /** Invalidates a bulk start when this tunnel is stopped or destroyed. Guarded by this. */
+    private long _lifecycleGeneration;
     private volatile SimpleTimer2.TimedEvent _pkfc;
 
     /** @since 0.9.19 */
@@ -410,6 +412,16 @@ public class TunnelController implements Logging {
                 return;
         }
         new I2PAppThread(new Runnable() { public void run() { startTunnel(); } }, "Tunnel Starter " + getName()).start();
+    }
+
+    synchronized long getLifecycleGeneration() {
+        return _lifecycleGeneration;
+    }
+
+    /** Start only if no stop or destroy has superseded the delayed bulk restart. */
+    synchronized void startTunnelBackground(long generation) {
+        if (generation == _lifecycleGeneration)
+            startTunnelBackground();
     }
 
     /**
@@ -793,6 +805,7 @@ public class TunnelController implements Logging {
      */
     public void stopTunnel() {
         synchronized (this) {
+            _lifecycleGeneration++;
             if (_state != TunnelState.STARTING && _state != TunnelState.RUNNING)
                 return;
             changeState(TunnelState.STOPPING);
@@ -817,6 +830,7 @@ public class TunnelController implements Logging {
      */
     public void destroyTunnel() {
         synchronized (this) {
+            _lifecycleGeneration++;
             if (_state != TunnelState.RUNNING)
                 return;
             changeState(TunnelState.DESTROYING);
