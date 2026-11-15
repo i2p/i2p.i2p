@@ -13,11 +13,11 @@
     <property file="override.properties"/>
     <property file="build.properties"/>
     <!--  When changing, also change javadoc URL in build.properties,
-          and checksum in apps/jetty/build.xml
+          and bundled artifact hashes under apps/jetty/jetty-home-*/
           and versions in gradle.properties
      -->
-    <property name="jetty.ver" value="12.0.28" />
-    <property name="jetty.ver.debian" value="12.0.32" />
+    <property name="jetty.ver" value="12.0.41" />
+    <property name="jetty.ver.debian" value="12.0.41" />
     <property name="tomcat.ver" value="9.0.107" />
 
     <!-- You probably don't want to change anything from here down -->
@@ -2984,9 +2984,10 @@
             <fileset dir="../i2p-${Extended.Version}/router/java/src/org/bouncycastle" />
           <!--
             libjetty12-java
-            Delete all the 12.0.28 jars, we use the 12.0.17 ee8 jars which are not in the libjetty12 deb
+            Keep the matching EE8 companion bundle; the remaining Jetty jars come from libjetty12-java.
            -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty" includes="jetty-home-*/**"
+                     excludes="jetty-home-${jetty.ver.debian}-debian/**" />
             <!-- libtomcat9-java -->
             <fileset dir="../i2p-${Extended.Version}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
@@ -3062,9 +3063,10 @@
             <fileset dir="../i2p-${Extended.Version}/router/java/src/org/bouncycastle" />
           <!--
             libjetty12-java
-            Delete all the 12.0.28 jars, we use the 12.0.17 ee8 jars which are not in the libjetty12 deb
+            Keep the matching EE8 companion bundle; the remaining Jetty jars come from libjetty12-java.
            -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver}" />
+            <fileset dir="../i2p-${Extended.Version}/apps/jetty" includes="jetty-home-*/**"
+                     excludes="jetty-home-${jetty.ver.debian}-debian/**" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version}/apps/susidns/src/lib/standard.jar" />
             <fileset dir="../i2p-${Extended.Version}/installer/resources/icons/flags" />
@@ -3137,9 +3139,10 @@
             <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
           <!--
             libjetty12-java
-            Delete all the 12.0.17 jars, we use the 12.0.28 jars
+            Keep the complete bundled Jetty version for builds without system Jetty jars.
            -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver.debian}" />
+            <fileset dir="../i2p-${Extended.Version.J}/apps/jetty" includes="jetty-home-*/**"
+                     excludes="jetty-home-${jetty.ver}/**" />
             <!-- libtomcat9-java -->
             <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <!-- libjstl1.1-java or glassfish-javaee or libtaglibs-standard -->
@@ -3212,9 +3215,10 @@
             <file name="../i2p-${Extended.Version.J}/installer/resources/GeoLite2-Country.mmdb.gz" />
           <!--
             libjetty12-java
-            Delete all the 12.0.17 jars, we use the 12.0.28 jars
+            Keep the complete bundled Jetty version for builds without system Jetty jars.
            -->
-            <fileset dir="../i2p-${Extended.Version}/apps/jetty/jetty-home-${jetty.ver.debian}" />
+            <fileset dir="../i2p-${Extended.Version.J}/apps/jetty" includes="jetty-home-*/**"
+                     excludes="jetty-home-${jetty.ver}/**" />
             <fileset dir="../i2p-${Extended.Version.J}/apps/jetty/apache-tomcat-${tomcat.ver}" />
             <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/jstl.jar" />
             <file name="../i2p-${Extended.Version.J}/apps/susidns/src/lib/standard.jar" />
