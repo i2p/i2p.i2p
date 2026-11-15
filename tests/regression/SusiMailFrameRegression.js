@@ -61,6 +61,12 @@ check("window resize updates each frame independently", () => {
     assert.equal(second.style.height, "435px");
     assert.equal(first.style.height, "395px");
 });
+check("message links navigate the trusted parent to the destination check", () => {
+    let prevented = false;
+    first.contentDocument.emit("click", { target: { closest(selector) { assert.equal(selector, "a[data-safe-link]"); return { href: "http://mail.test/susimail/?openLink=https%3A%2F%2Fexample.test" }; } }, preventDefault() { prevented = true; } });
+    assert.equal(prevented, true);
+    assert.equal(destination, "http://mail.test/susimail/?openLink=https%3A%2F%2Fexample.test");
+});
 check("navigation away from a message does not break the parent", () => {
     first.contentDocument = null;
     first.emit("load");

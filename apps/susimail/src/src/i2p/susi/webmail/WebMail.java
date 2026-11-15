@@ -646,11 +646,11 @@ public class WebMail extends HttpServlet
 			boolean prepareAttachment = false;
 			String reason = "";
 
-			String ident = quoteHTML(
+			String ident = quoteHTML(SenderIdentity.display(
 					( mailPart.description != null ? mailPart.description + ", " : "" ) +
 					( mailPart.filename != null ? mailPart.filename + ", " : "" ) +
 					( mailPart.name != null ? mailPart.name + ", " : "" ) +
-					( mailPart.type != null ? '(' + mailPart.type + ')' : _t("unknown") ) );
+					( mailPart.type != null ? '(' + mailPart.type + ')' : _t("unknown") ) ));
 
 			if( level == 0 && mailPart.version == null ) {
 				/*
@@ -732,7 +732,7 @@ public class WebMail extends HttpServlet
 				if( html ) {
 					out.println( "<hr><div class=\"attached\">" );
 					String type = mailPart.type;
-					if (type != null && type.startsWith("image/")) {
+					if (type != null && type.startsWith("image/") && SafeMailHTML.safeInlineType(type)) {
 						// we at least show images safely...
 						String name = mailPart.filename;
 						if (name == null) {
@@ -740,7 +740,7 @@ public class WebMail extends HttpServlet
 							if (name == null)
 								name = mailPart.description;
 						}
-						name = quoteHTML(name);
+						name = quoteHTML(SenderIdentity.display(name));
 						out.println("<img src=\"" + myself + '?' + RAW_ATTACHMENT + '=' +
 							 mailPart.getID() +
 							 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
@@ -1805,7 +1805,7 @@ if (mail != null && (reply || replyAll)) {
 					}
 				}
 				if( part != null ) {
-					if (sendAttachment(sessionObject, part, response, isRaw))
+					if (sendAttachment(sessionObject, part, response, isRaw, mc.getFolderName()))
 						return true;
 				}
 			} catch( NumberFormatException nfe ) {
@@ -2315,7 +2315,7 @@ if (mail != null && (reply || replyAll)) {
 			} catch(URISyntaxException use) {}
 			// img-src allows for cid: urls that were fixed up by RegexOutputStream
 			// Keep scripts disabled even when the attachment is opened outside its iframe.
-			response.setHeader("Content-Security-Policy", "default-src 'none'; base-uri 'none'; sandbox allow-same-origin; style-src 'unsafe-inline'; script-src 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
+			response.setHeader("Content-Security-Policy", "default-src 'none'; base-uri 'none'; sandbox allow-same-origin; style-src " + me + myself + "themes/mail-content.css; script-src 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
 			// character encoding will be set in sendAttachment()
 		} else {
 			response.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'none'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
@@ -2368,7 +2368,8 @@ if (mail != null && (reply || replyAll)) {
 				}
 			}
 
-			//// Start state determination and button processing
+			if (sessionObject.mailbox != null && request.getParameter("openLink") != null) { showLinkWarning(response, request.getParameter("openLink")); return; }
+            //// Start state determination and button processing
 
 			State state = null;
 			if (sessionObject.mailbox == null) {
@@ -2938,80 +2939,7 @@ if (mail != null && (reply || replyAll)) {
 	 * @param isRaw if true, don't zip it
 	 * @return success
 	 */
-	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
-						 HttpServletResponse response, boolean isRaw)
-	{
-		setNoCacheHeaders(response);
-		boolean shown = false;
-		if(part != null) {
-			Log log = sessionObject.log;
-			String name = part.filename;
-			if (name == null) {
-				name = part.name;
-				if (name == null) {
-					name = part.description;
-					if (name == null)
-						name = "part" + part.getID();
-				}
-			}
-			String name2 = FilenameUtil.sanitizeFilename(name);
-			if (name2.length() == 0 || name2.equals(".") || name2.equals(".."))
-				name2 = "attachment";
-			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
-			if (isRaw) {
-				OutputStream out = null;
-				try {
-					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
-					                   "filename*=" + name3);
-					if (part.type != null)
-						response.setContentType(part.type);
-					if (part.charset != null)
-						response.setCharacterEncoding(part.charset);
-					out = response.getOutputStream();
-					if ("text/html".equals(part.type)) {
-						// convert cid: urls to /susimail/?cid= urls
-						out = new RegexOutputStream(out, " src=\"cid:",
-						                            " src=\"/susimail/?msg=" + Base64.encode(part.uidl) + "&amp;cid=",
-						                            null);
-						// don't set content length, as it may change due to replacements
-					} else {
-						if (part.decodedLength >= 0)
-							response.setContentLength(part.decodedLength);
-					}
-					if (log.shouldDebug()) log.debug("Sending raw attachment " + name + " length " + part.decodedLength);
-					part.decode(0, new OutputStreamBuffer(out));
-					shown = true;
-				} catch (IOException e) {
-					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
-				} finally {
-					if (out != null)
-						try { out.close(); } catch (IOException ioe) {}
-				}
-			} else {
-				ZipOutputStream zip = null;
-				try {
-					zip = new ZipOutputStream( response.getOutputStream() );
-					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
-					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
-					                   "filename*=" + name3 + ".zip");
-					// The name inside the archive must be safe too, not just the HTTP filename.
-					ZipEntry entry = new ZipEntry(name2);
-					zip.putNextEntry( entry );
-					// was 2
-					part.decode(0, new OutputStreamBuffer(zip));
-					zip.closeEntry();
-					zip.finish();
-					shown = true;
-				} catch (IOException e) {
-					log.error("Error sending zip attachment " + name + " length " + part.decodedLength, e);
-				} finally {
-					if ( zip != null)
-						try { zip.close(); } catch (IOException ioe) {}
-				}
-			}
-		}
-		return shown;
-	}
+	
 
 	/**
 	 * Send the mail to be saved by the browser
@@ -3520,10 +3448,10 @@ if (mail != null && (reply || replyAll)) {
 				} else {
 					out.println("<tr><td align=\"right\">&nbsp;</td>");
 				}
-				out.println("<td id=\"attachedfile\" align=\"left\"><label><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(attachment.getFileName()) + "</label>");
+				out.println("<td id=\"attachedfile\" align=\"left\"><label><input type=\"checkbox\" class=\"optbox\" name=\"check" + attachment.hashCode() + "\" value=\"1\">&nbsp;" + quoteHTML(SenderIdentity.display(attachment.getFileName())) + "</label>");
 				out.println(DataHelper.formatSize2(attachment.getSize()) + 'B');
 				String type = attachment.getContentType();
-				if (type != null && type.startsWith("image/")) {
+				if (type != null && type.startsWith("image/") && SafeMailHTML.safeInlineType(type)) {
 					out.println("<img class=\"thumb\" alt=\"\" src=\"" + myself + '?' + DRAFT_ATTACHMENT + '=' + attachment.hashCode() + "\">");
 				}
 				out.println("</td></tr>");
@@ -4324,5 +4252,97 @@ private static void showMessageSecurity(PrintWriter out, Mail mail) {
 					"\" value=\"1\"> " + _t("Replies go to a different address. I have checked the reply address.") + "</label></p>");
 		}
 		out.println("</div>");
+	}
+private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
+						 HttpServletResponse response, boolean isRaw)
+	{
+		return sendAttachment(sessionObject, part, response, isRaw, DIR_FOLDER);
+	}
+private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
+						 HttpServletResponse response, boolean isRaw, String folder)
+	{
+		if (isRaw && part != null && !SafeMailHTML.safeInlineType(part.type))
+			return false;
+		setNoCacheHeaders(response);
+		boolean shown = false;
+		if(part != null) {
+			Log log = sessionObject.log;
+			String name = part.filename;
+			if (name == null) {
+				name = part.name;
+				if (name == null) {
+					name = part.description;
+					if (name == null)
+						name = "part" + part.getID();
+				}
+			}
+			String name2 = FilenameUtil.sanitizeFilename(name);
+			if (name2.length() == 0 || name2.equals(".") || name2.equals(".."))
+				name2 = "attachment";
+			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+			if (isRaw) {
+				OutputStream out = null;
+				try {
+					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
+					                   "filename*=" + name3);
+					if (part.type != null)
+						response.setContentType(part.type);
+					if (part.charset != null)
+						response.setCharacterEncoding(part.charset);
+					out = response.getOutputStream();
+					if ("text/html".equals(part.type)) {
+						byte[] safe = SafeMailHTML.render(part, folder);
+						response.setCharacterEncoding("UTF-8");
+						response.setContentLength(safe.length);
+						out.write(safe);
+					} else {
+						if (part.decodedLength >= 0)
+							response.setContentLength(part.decodedLength);
+						part.decode(0, new OutputStreamBuffer(out));
+					}
+					shown = true;
+				} catch (IOException e) {
+					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
+				} finally {
+					if (out != null)
+						try { out.close(); } catch (IOException ioe) {}
+				}
+			} else {
+				ZipOutputStream zip = null;
+				try {
+					zip = new ZipOutputStream( response.getOutputStream() );
+					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
+					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
+					                   "filename*=" + name3 + ".zip");
+					// The name inside the archive must be safe too, not just the HTTP filename.
+					ZipEntry entry = new ZipEntry(name2);
+					zip.putNextEntry( entry );
+					// was 2
+					part.decode(0, new OutputStreamBuffer(zip));
+					zip.closeEntry();
+					zip.finish();
+					shown = true;
+				} catch (IOException e) {
+					log.error("Error sending zip attachment " + name + " length " + part.decodedLength, e);
+				} finally {
+					if ( zip != null)
+						try { zip.close(); } catch (IOException ioe) {}
+				}
+			}
+		}
+		return shown;
+	}
+private static void showLinkWarning(HttpServletResponse response, String supplied) throws IOException {
+		String destination = SafeMailHTML.safeURL(supplied);
+		response.setContentType("text/html; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Check link destination</title><link rel=\"stylesheet\" href=\"/susimail/themes/security.css\"></head><body><main class=\"security-card\"><h1>" + _t("Check link destination") + "</h1>");
+		if (destination == null) {
+			out.println("<p role=\"alert\">" + _t("This link uses an unsafe or unsupported destination and has been blocked.") + "</p>");
+		} else {
+			out.println("<p>" + _t("Check the complete address before opening it. A sender signature does not make a website trustworthy.") + "</p><p class=\"link-destination\"><bdi dir=\"ltr\">" + quoteHTML(destination) + "</bdi></p>");
+			out.println("<a class=\"primary-action\" href=\"" + quoteHTML(destination) + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + _t("Open this destination") + "</a>");
+		}
+		out.println("<p><a href=\"/susimail/\">" + _t("Return to mail") + "</a></p></main></body></html>");
 	}
 }

@@ -21,6 +21,14 @@ function setupFrame() {
 			try {
 				if (frame.contentDocument)
 					frame.contentDocument.addEventListener("load", resizeMailFrame, true);
+				if (frame.contentDocument)
+					frame.contentDocument.addEventListener("click", function(event) {
+						const link = event.target.closest && event.target.closest("a[data-safe-link]");
+						if (link) {
+							event.preventDefault();
+							window.location.assign(link.href);
+						}
+					}, true);
 			} catch (e) {}
 		}, true);
 		window.addEventListener("resize", resizeMailFrame);
