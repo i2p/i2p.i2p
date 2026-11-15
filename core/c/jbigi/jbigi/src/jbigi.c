@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <gmp.h>
 #include "jbigi.h"
 
 /******** prototypes */
 
-void convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue);
+int convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue);
 void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue);
+
+static void conversion_error(JNIEnv* env, const char* type, const char* message) {
+    jclass exc = (*env)->FindClass(env, type);
+    if (exc != NULL)
+        (*env)->ThrowNew(env, exc, message);
+}
 
 /*
  * Versions:
@@ -105,7 +112,8 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
         mpz_t mmod;
         jbyteArray jresult;
 
-        convert_j2mp(env, jmod,  &mmod);
+        if (!convert_j2mp(env, jmod, &mmod))
+            return 0;
         if (mpz_sgn(mmod) <= 0) {
             mpz_clear(mmod);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
@@ -114,7 +122,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
         }
 
         // disallow negative exponents to avoid divide by zero exception if no inverse exists
-        convert_j2mp(env, jexp,  &mexp);
+        if (!convert_j2mp(env, jexp, &mexp)) {
+            mpz_clear(mmod);
+            return 0;
+        }
         if (mpz_sgn(mexp) < 0) {
             mpz_clears(mmod, mexp, NULL);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
@@ -122,7 +133,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
             return 0;
         }
 
-        convert_j2mp(env, jbase, &mbase);
+        if (!convert_j2mp(env, jbase, &mbase)) {
+            mpz_clears(mmod, mexp, NULL);
+            return 0;
+        }
  
         /* Perform the actual powmod. We use mmod for the result because it is
          * always at least as big as the result.
@@ -166,7 +180,8 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPowCT
         mpz_t mmod;
         jbyteArray jresult;
 
-        convert_j2mp(env, jmod,  &mmod);
+        if (!convert_j2mp(env, jmod, &mmod))
+            return 0;
         if (mpz_sgn(mmod) <= 0) {
             mpz_clear(mmod);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
@@ -182,7 +197,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPowCT
         }
 
         // disallow negative or zero exponents as specified in the GMP docs
-        convert_j2mp(env, jexp,  &mexp);
+        if (!convert_j2mp(env, jexp, &mexp)) {
+            mpz_clear(mmod);
+            return 0;
+        }
         if (mpz_sgn(mexp) <= 0) {
             mpz_clears(mmod, mexp, NULL);
             jclass exc = (*env)->FindClass(env, "java/lang/ArithmeticException");
@@ -190,7 +208,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPowCT
             return 0;
         }
 
-        convert_j2mp(env, jbase, &mbase);
+        if (!convert_j2mp(env, jbase, &mbase)) {
+            mpz_clears(mmod, mexp, NULL);
+            return 0;
+        }
  
         mpz_powm_sec(mmod, mbase, mexp, mmod);
 
@@ -228,7 +249,8 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModInverse
         mpz_t mgcd;
         jbyteArray jresult;
 
-        convert_j2mp(env, jmod,  &mmod);
+        if (!convert_j2mp(env, jmod, &mmod))
+            return 0;
 
         if (mpz_sgn(mmod) <= 0) {
             mpz_clear(mmod);
@@ -237,7 +259,10 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModInverse
             return 0;
         }
 
-        convert_j2mp(env, jbase, &mbase);
+        if (!convert_j2mp(env, jbase, &mbase)) {
+            mpz_clear(mmod);
+            return 0;
+        }
         mpz_init_set_si(mexp, -1);
  
         /* We must protect the jvm by doing a gcd test first.
@@ -315,18 +340,29 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeNeg
  * Initializes the GMP value with enough preallocated size, and converts the
  * Java value into the GMP value. The value that mvalue points to should be
  * uninitialized
+ * Returns zero on a JNI/input failure without initializing mvalue.
  *
  * As of version 3, negative values are correctly converted.
  */
 
-void convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue)
+int convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue)
 {
         jsize size;
         jbyte* jbuffer;
         mpz_t mask;
 
+        if (jvalue == NULL) {
+            conversion_error(env, "java/lang/NullPointerException", "Null integer encoding");
+            return 0;
+        }
         size = (*env)->GetArrayLength(env, jvalue);
+        if (size == 0) {
+            conversion_error(env, "java/lang/NumberFormatException", "Empty integer encoding");
+            return 0;
+        }
         jbuffer = (*env)->GetByteArrayElements(env, jvalue, NULL);
+        if (jbuffer == NULL)
+            return 0; /* Preserve the pending JNI allocation exception. */
 
         mpz_init2(*mvalue, sizeof(jbyte) * 8 * size); //preallocate the size
 
@@ -350,7 +386,7 @@ void convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue)
             mpz_com(*mvalue, *mvalue);
             // construct the mask needed to get rid of the new high bit
             mpz_init_set_ui(mask, 1);
-            mpz_mul_2exp(mask, mask, size * 8);
+            mpz_mul_2exp(mask, mask, (mp_bitcnt_t) size * 8);
             mpz_sub_ui(mask, mask, 1);
             // mask off the high bits, making a postive number (the magnitude, off by one)
             mpz_and(*mvalue, *mvalue, mask);
@@ -362,6 +398,7 @@ void convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue)
             mpz_neg(*mvalue, *mvalue);
         }
         (*env)->ReleaseByteArrayElements(env, jvalue, jbuffer, JNI_ABORT);
+        return 1;
 }
 
 /******** convert_mp2j() */
@@ -380,10 +417,11 @@ void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue)
         size_t size; 
         jbyte* buffer;
         jboolean copy;
-        int i;
+        size_t i;
         int neg;
 
         copy = JNI_FALSE;
+        *jvalue = NULL;
 
         neg = mpz_sgn(mvalue) < 0;
         if (neg) {
@@ -394,9 +432,19 @@ void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue)
 
         /* sizeinbase() + 7 => Ceil division */
         size = (mpz_sizeinbase(mvalue, 2) + 7) / 8 + sizeof(jbyte);
-        *jvalue = (*env)->NewByteArray(env, size);
+        if (size > INT_MAX) {
+            conversion_error(env, "java/lang/OutOfMemoryError", "Integer encoding too large");
+            return;
+        }
+        *jvalue = (*env)->NewByteArray(env, (jsize) size);
+        if (*jvalue == NULL)
+            return;
 
         buffer = (*env)->GetByteArrayElements(env, *jvalue, &copy);
+        if (buffer == NULL) {
+            *jvalue = NULL;
+            return;
+        }
         buffer[0] = 0x00;
 
         if (!neg) {
