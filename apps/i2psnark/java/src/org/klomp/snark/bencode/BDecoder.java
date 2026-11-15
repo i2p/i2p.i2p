@@ -38,6 +38,10 @@ import java.util.Map;
  * A bencoded byte stream can represent byte arrays, numbers, lists and
  * maps (dictionaries).
  *
+ * Container nesting is limited to 100 levels. Integer encodings are
+ * limited to 256 characters, including an optional minus sign.
+ * Byte strings are limited to 16 MiB unless the caller supplies another limit.
+ *
  * It currently contains a hack to indicate a name of a dictionary of
  * which a SHA-1 digest hash should be calculated (the hash over the
  * original bencoded bytes).
@@ -46,19 +50,26 @@ import java.util.Map;
  */
 public class BDecoder
 {
+  private static final int MAX_DEPTH = 100;
+  private static final int MAX_NUMBER_LENGTH = 256;
+  private static final int DEFAULT_MAX_STRING_LENGTH = 16*1024*1024;
+
   // The InputStream to BDecode.
   private final InputStream in;
+  private final int maxStringLength;
+
+  private int depth;
 
   // The last indicator read.
-  // Zero if unknown.
+  // -2 if unknown.
   // '0'..'9' indicates a byte[].
   // 'i' indicates an Number.
   // 'l' indicates a List.
   // 'd' indicates a Map.
   // 'e' indicates end of Number, List or Map (only used internally).
   // -1 indicates end of stream.
-  // Call getNextIndicator to get the current value (will never return zero).
-  private int indicator = 0;
+  // Call getNextIndicator to get the current value.
+  private int indicator = -2;
 
   // Used for ugly hack to get SHA hash over the metainfo info map
   private static final String special_map = "info";
@@ -92,7 +103,16 @@ public class BDecoder
    */
   public BDecoder(InputStream in)
   {
+    this(in, DEFAULT_MAX_STRING_LENGTH);
+  }
+
+  /** Limit byte-string allocations when decoding a bounded network message. */
+  public BDecoder(InputStream in, int maxStringLength)
+  {
+    if (maxStringLength < 0)
+      throw new IllegalArgumentException("Negative byte string limit");
     this.in = in;
+    this.maxStringLength = maxStringLength;
   }
 
   /**
@@ -103,10 +123,10 @@ public class BDecoder
    * has ended.
    *
    * @throws InvalidBEncodingException when the stream doesn't start with a
-   * bencoded value or the stream isn't a bencoded stream at all.
+   * bencoded value, the stream isn't a bencoded stream at all, or
+   * containers are nested too deeply.
    * @throws IOException when somthing bad happens with the stream
    * to read from.
-   * @throws StackOverflowError
    */
   public static BEValue bdecode(InputStream in) throws IOException, Throwable
   {
@@ -141,7 +161,7 @@ public class BDecoder
    */
   public int getNextIndicator() throws IOException
   {
-    if (indicator == 0)
+    if (indicator == -2)
       {
         indicator = in.read();
         // XXX - Used for ugly hack
@@ -155,7 +175,7 @@ public class BDecoder
    * has ended or bdecodes the rest of the stream and returns the
    * appropriate BEValue encoded object.
    *
-   * @throws StackOverflowError
+   * @throws InvalidBEncodingException when containers are nested too deeply
    */
   public BEValue bdecode() throws IOException, Throwable
   {
@@ -188,13 +208,17 @@ public class BDecoder
     if (num < 0 || num > 9)
       throw new InvalidBEncodingException("Number expected, not '"
                                           + (char)c + "'");
-    indicator = 0;
+    indicator = -2;
 
     c = read();
     int i = c - '0';
+    int digits = 1;
     while (i >= 0 && i <= 9)
       {
-        // XXX - This can overflow!
+        if (++digits > 10)
+          throw new InvalidBEncodingException("Byte string length has too many digits");
+        if (num > (Integer.MAX_VALUE - i) / 10)
+          throw new InvalidBEncodingException("Byte string length too large");
         num = num*10 + i;
         c = read();
         i = c - '0';
@@ -203,6 +227,9 @@ public class BDecoder
     if (c != ':')
       throw new InvalidBEncodingException("Colon expected, not '"
                                           + (char)c + "'");
+
+    if (num > maxStringLength)
+      throw new InvalidBEncodingException("Byte string exceeds message limit");
 
     return new BEValue(read(num));
   }
@@ -218,7 +245,7 @@ public class BDecoder
     if (c != 'i')
       throw new InvalidBEncodingException("Expected 'i', not '"
                                           + (char)c + "'");
-    indicator = 0;
+    indicator = -2;
 
     c = read();
     if (c == '0')
@@ -231,7 +258,6 @@ public class BDecoder
                                               + " not '" + (char)c + "'");
       }
 
-    // XXX - We don't support more the 255 char big integers
     StringBuilder chars = new StringBuilder(16);
 
     if (c == '-')
@@ -248,6 +274,8 @@ public class BDecoder
     c = read();
     while(c >= '0' && c <= '9')
       {
+        if (chars.length() >= MAX_NUMBER_LENGTH)
+          throw new InvalidBEncodingException("Too many digits: " + (chars.length() + 1));
         chars.append((char)c);
         c = read();
       }
@@ -263,8 +291,6 @@ public class BDecoder
         num = Integer.valueOf(s);
     else if (len < 19)
         num = Long.valueOf(s);
-    else if (len > 256)
-        throw new InvalidBEncodingException("Too many digits: " + len);
     else
         num = new BigInteger(s);
     return new BEValue(num);
@@ -275,7 +301,7 @@ public class BDecoder
    * is a list. If it is not a list it will throw
    * InvalidBEncodingException.
    *
-   * @throws StackOverflowError
+   * @throws InvalidBEncodingException when containers are nested too deeply
    */
   public BEValue bdecodeList() throws IOException, Throwable
   {
@@ -283,18 +309,28 @@ public class BDecoder
     if (c != 'l')
       throw new InvalidBEncodingException("Expected 'l', not '"
                                           + (char)c + "'");
-    indicator = 0;
+    enterContainer();
+    indicator = -2;
 
-    List<BEValue> result = new ArrayList<BEValue>();
-    c = getNextIndicator();
-    while (c != 'e')
+    try
       {
-        result.add(bdecode());
+        List<BEValue> result = new ArrayList<BEValue>();
         c = getNextIndicator();
-      }
-    indicator = 0;
+        while (c != 'e')
+          {
+            if (c == -1)
+              throw new EOFException("Unexpected end of list");
+            result.add(bdecode());
+            c = getNextIndicator();
+          }
+        indicator = -2;
 
-    return new BEValue(result);
+        return new BEValue(result);
+      }
+    finally
+      {
+        depth--;
+      }
   }
 
   /**
@@ -302,7 +338,7 @@ public class BDecoder
    * is a map (dictionary). If it is not a map it will throw
    * InvalidBEncodingException.
    *
-   * @throws StackOverflowError
+   * @throws InvalidBEncodingException when containers are nested too deeply
    */
   public BEValue bdecodeMap() throws IOException, Throwable
   {
@@ -312,38 +348,57 @@ public class BDecoder
     else if (c != 'd')
       throw new InvalidBEncodingException("Expected 'd', not '"
                                           + (char)c + "'");
-    indicator = 0;
+    enterContainer();
+    indicator = -2;
 
-    Map<String, BEValue> result = new HashMap<String, BEValue>();
-    c = getNextIndicator();
-    while (c != 'e')
+    try
       {
-        // Dictionary keys are always strings.
-        String key = bdecode().getString();
-
-        // XXX ugly hack
-        // This will not screw up if an info map contains an info map,
-        // but it will if there are two info maps (not one inside the other)
-        boolean special = (!in_special_map) && special_map.equals(key);
-        if (special) {
-          createDigest();
-          in_special_map = true;
-        }
-
-        BEValue value = bdecode();
-        BEValue old = result.put(key, value);
-        if (old != null)
-            throw new InvalidBEncodingException("Duplicate key " + key + " in dictionary");
-
-        // XXX ugly hack continued
-        if (special)
-          in_special_map = false;
-        
+        Map<String, BEValue> result = new HashMap<String, BEValue>();
         c = getNextIndicator();
-      }
-    indicator = 0;
+        while (c != 'e')
+          {
+            if (c == -1)
+              throw new EOFException("Unexpected end of dictionary");
+            // Dictionary keys are always strings.
+            String key = bdecodeBytes().getString();
 
-    return new BEValue(result);
+            // XXX ugly hack
+            // This will not screw up if an info map contains an info map,
+            // but it will if there are two info maps (not one inside the other)
+            boolean special = (!in_special_map) && special_map.equals(key);
+            if (special) {
+              createDigest();
+              in_special_map = true;
+            }
+
+            BEValue value = bdecode();
+            if (value == null)
+              throw new EOFException("Missing dictionary value");
+            BEValue old = result.put(key, value);
+            if (old != null)
+                throw new InvalidBEncodingException("Duplicate key " + key + " in dictionary");
+
+            // XXX ugly hack continued
+            if (special)
+              in_special_map = false;
+
+            c = getNextIndicator();
+          }
+        indicator = -2;
+
+        return new BEValue(result);
+      }
+    finally
+      {
+        depth--;
+      }
+  }
+
+  private void enterContainer() throws InvalidBEncodingException
+  {
+    if (depth >= MAX_DEPTH)
+      throw new InvalidBEncodingException("Containers nested too deeply");
+    depth++;
   }
 
   /**
@@ -362,10 +417,7 @@ public class BDecoder
   /**
    * Returns a byte[] containing length valid bytes starting at offset
    * zero.  Throws EOFException if InputStream.read() returned -1
-   * before all requested bytes could be read.  Note that the byte[]
-   * returned might be bigger then requested but will only contain
-   * length valid bytes.  The returned byte[] will be reused when this
-   * method is called again.
+   * before all requested bytes could be read.
    */
   private byte[] read(int length) throws IOException
   {

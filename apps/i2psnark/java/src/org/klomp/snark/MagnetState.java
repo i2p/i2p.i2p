@@ -191,7 +191,7 @@ class MagnetState {
         // top map has nothing in it but the info map (no announce)
         Map<String, BEValue> map = new HashMap<String, BEValue>();
         InputStream is = new ByteArrayInputStream(metainfoBytes);
-        BDecoder dec = new BDecoder(is);
+        BDecoder dec = new BDecoder(is, metainfoBytes.length);
         BEValue bev = dec.bdecodeMap();
         map.put("info", bev);
         MetaInfo newmeta = new MetaInfo(map);
