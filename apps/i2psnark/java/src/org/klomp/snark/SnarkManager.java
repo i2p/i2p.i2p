@@ -2825,7 +2825,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             addMessageNoEscape(_t("Download finished: {0}", linkify(snark)));
             dtgNotify(Log.INFO,
                       _t("Download finished: {0}", snark.getBaseName()),
-                      "/i2psnark/" + linkify(snark));
+                      getTorrentURL(snark));
             updateStatus(snark);
         }
     }
@@ -2940,9 +2940,14 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private void dtgNotify(int priority, String message, String path) {
         ClientAppManager cmgr = _context.clientAppManager();
         if (cmgr != null) {
-            NotificationService ns = (NotificationService) cmgr.getRegisteredApp("desktopgui");
-            if (ns != null)
-                ns.notify("I2PSnark", null, priority, _t("I2PSnark"), message, path);
+            ClientApp app = cmgr.getRegisteredApp("desktopgui");
+            if (app instanceof NotificationService) {
+                try {
+                    ((NotificationService) app).notify("I2PSnark", null, priority, _t("I2PSnark"), message, path);
+                } catch (RuntimeException failure) {
+                    _log.warn("Desktop notification failed", failure);
+                }
+            }
             cmgr.addBubble(PortMapper.SVC_I2PSNARK, message);
         }
         if (!_context.isRouterContext())
@@ -2963,12 +2968,21 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             return DataHelper.escapeHTML(snark.getBaseName());
         StringBuilder buf = new StringBuilder(256);
         String base = DataHelper.escapeHTML(storage.getBaseName());
-        String enc = base.replace("[", "%5B").replace("]", "%5D").replace("|", "%7C");
-        buf.append("<a href=\"").append(_contextPath).append('/').append(enc);
-        if (meta.getFiles() != null || !storage.complete())
-            buf.append('/');
+        buf.append("<a href=\"").append(DataHelper.escapeHTML(getTorrentURL(snark)));
         buf.append("\">").append(base).append("</a>");
         return buf.toString();
+    }
+
+    /** URL-escaped path for notifications and links from other local applications. */
+    public String getTorrentURL(Snark snark) {
+        MetaInfo meta = snark.getMetaInfo();
+        Storage storage = snark.getStorage();
+        if (meta == null || storage == null)
+            return _contextPath + '/';
+        String path = _contextPath + '/' + URIUtil.encodePath(storage.getBaseName());
+        if (meta.getFiles() != null || !storage.complete())
+            path += '/';
+        return path;
     }
 
     /**
