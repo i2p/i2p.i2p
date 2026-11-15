@@ -225,7 +225,7 @@ public class I2PSnarkServlet extends BasicServlet {
         String pOverride = _manager.util().connected() ? null : "";
         String peerString = getQueryString(req, pOverride, null, null, "");
 
-        String cspNonce = Integer.toHexString(_context.random().nextInt());
+        String cspNonce = Long.toHexString(_context.random().nextLong());
         // AJAX for mainsection
         if ("/.ajax/xhr1.html".equals(path)) {
             setHTMLHeaders(resp, cspNonce, false);
