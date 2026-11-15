@@ -1,1 +1,70 @@
-:root { color-scheme: light dark; } body { font: 16px/1.6 system-ui,sans-serif; margin: 2rem auto; padding: 1rem; max-width: 760px; } .security-card { padding: 1.5rem; border: 1px solid #789; border-radius: .7rem; } .link-destination { padding: 1rem; border: 1px solid #789; overflow-wrap: anywhere; } a { text-underline-offset: .2em; } :focus-visible { outline: 3px solid #4580db; outline-offset: 3px; }
+:root {
+  color-scheme: light;
+  --mail-bg: #f2f5fa; --mail-surface: #fff; --mail-ink: #15243b;
+  --mail-muted: #53647b; --mail-line: #d8e0ec; --mail-accent: #205bc5;
+  --mail-soft: #edf3ff; --mail-good: #146442; --mail-bad: #9e292d;
+}
+body[data-mail-theme="dark"] {
+  color-scheme: dark;
+  --mail-bg: #101723; --mail-surface: #1b2636; --mail-ink: #e4edf9;
+  --mail-muted: #adbbd0; --mail-line: #35445b; --mail-accent: #9ac0ff;
+  --mail-soft: #23364f; --mail-good: #8edab7; --mail-bad: #ffb0b2;
+}
+body { background: var(--mail-bg) !important; color: var(--mail-ink) !important; font: 15px/1.55 system-ui, sans-serif !important; margin: 0; }
+body, p, li, b, strong, h1, h2, h3, label, td, th { text-shadow: none !important; }
+p, li, b, strong, h1, h2, h3, label { color: inherit; }
+* { box-sizing: border-box; }
+*:focus-visible { outline: 3px solid var(--mail-accent) !important; outline-offset: 3px; }
+a { color: var(--mail-accent); text-underline-offset: .2em; }
+input, textarea, select, button { font: inherit; }
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  color: var(--mail-ink); background-color: var(--mail-surface); border: 1px solid var(--mail-line);
+  border-radius: .55rem; padding: .6rem .75rem; min-height: 42px; max-width: 100%; box-shadow: none;
+}
+input[type="submit"], button, .primary-action, .secondary-action {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  padding: .6rem 1rem !important; min-height: 42px; margin: .25rem .35rem .25rem 0;
+  border: 1px solid var(--mail-line); border-radius: .55rem; color: var(--mail-ink);
+  background: var(--mail-surface) !important; background-image: none !important;
+  box-shadow: none !important; cursor: pointer; text-decoration: none; width: auto;
+}
+.primary-action { background: #205bc5 !important; border-color: #205bc5 !important; color: #fff !important; }
+button:hover, input[type="submit"]:hover, .secondary-action:hover { border-color: var(--mail-accent); background-color: var(--mail-soft) !important; }
+.primary-action:hover { background: #174ba8 !important; }
+button:disabled, input:disabled { opacity: .55; cursor: default; }
+.security-shell { max-width: 1160px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+.security-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.security-heading h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -.04em; margin: .2rem 0; }
+.security-heading p { margin: .25rem 0; color: var(--mail-muted); }
+.eyebrow { font-size: .73rem; font-weight: 750; letter-spacing: .12em; color: var(--mail-muted); margin: 0 0 .6rem; }
+.security-summary { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--mail-line); background: var(--mail-surface); border-radius: .9rem; margin-bottom: 1.5rem; }
+.security-summary > div { padding: 1.15rem 1.3rem; }
+.security-summary > div + div { border-inline-start: 1px solid var(--mail-line); }
+.security-summary strong, .security-summary span:not(.status-dot) { display: block; }
+.security-summary span:not(.status-dot) { font-size: .85rem; color: var(--mail-muted); margin-top: .3rem; }
+.status-dot { float: left; width: .55rem; height: .55rem; background: #19865b; border-radius: 50%; margin: .5rem .5rem 0 0; }
+.security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+.security-card { background: var(--mail-surface); border: 1px solid var(--mail-line); border-radius: .9rem; padding: 1.6rem; box-shadow: 0 5px 20px #10284908; }
+.security-card h2 { font-size: 1.3rem; letter-spacing: -.02em; margin: 0 0 .65rem; }
+.security-card p { margin: .5rem 0 1rem; color: var(--mail-muted); font-size: .94rem; }
+.security-card label { display: block; font-size: .9rem; font-weight: 600; margin: 1rem 0; }
+.security-card label input:not([type="checkbox"]) { display: block; width: 100%; margin-top: .4rem; font-weight: 400; }
+.check-field input { margin-right: .45rem; width: 18px; height: 18px; vertical-align: middle; accent-color: #205bc5; }
+.security-card .field-hint { font-size: .83rem; }
+.notice { border: 1px solid var(--mail-line); border-radius: .65rem; background: var(--mail-soft); padding: .85rem 1rem; margin: 1rem 0; overflow-wrap: anywhere; }
+.notice-error { color: var(--mail-bad); border-color: currentColor; }
+.notice-success { color: var(--mail-good); border-color: currentColor; }
+.setup-key { display: block; padding: .8rem; font-size: 1rem; overflow-wrap: anywhere; user-select: all; }
+.blocklist { padding: 0; list-style: none; max-height: 220px; overflow: auto; margin: 1rem 0 0; }
+.blocklist li { border-top: 1px solid var(--mail-line); padding: .55rem 0; font: .85rem ui-monospace, monospace; overflow-wrap: anywhere; }
+.status-badge { display: inline-block; padding: .3rem .65rem; border-radius: 2rem; background: var(--mail-soft); color: var(--mail-good) !important; font-size: .8rem !important; }
+.protection-list { border-top: 1px solid var(--mail-line); margin-top: 1.1rem; padding-top: .7rem; }
+.protection-list p { font-size: .83rem; margin: .35rem 0; }
+.recovery-card { margin-top: 1.5rem; border-color: var(--mail-accent); }
+.recovery-codes { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; padding: 0; list-style: none; }
+.recovery-codes code { display: block; border: 1px solid var(--mail-line); border-radius: .4rem; padding: .65rem; overflow-wrap: anywhere; user-select: all; }
+.security-footer { text-align: center; font-size: .8rem; color: var(--mail-muted); margin-top: 2rem; }
+.link-destination { padding: 1rem; background: var(--mail-soft); border-radius: .6rem; overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
+body > .security-card { max-width: 760px; margin: 8vh auto; }
+
+@media(max-width:760px) { .security-shell { padding:1rem; } .security-grid,.security-summary,.recovery-codes { grid-template-columns:1fr; } .security-heading { align-items:start; flex-direction:column; } }

@@ -318,6 +318,8 @@ public class WebMail extends HttpServlet
 		int newMails = -1;
 		String user, pass, host, error = "", info = "";
 		MailVault vault;
+        byte[] pendingTOTP;
+        long pendingTOTPCreated;
 		boolean authenticating, cancelled;
 		// Just convenience to pass from PSCB to P-R-G
 		String draftUIDL;
@@ -353,7 +355,9 @@ public class WebMail extends HttpServlet
 		public synchronized void valueUnbound(HttpSessionBindingEvent event) {
 			cancelled = true;
 			if (vault != null) { vault.close(); vault = null; }
-			pass = null;
+			if (pendingTOTP != null) java.util.Arrays.fill(pendingTOTP, (byte) 0);
+            pendingTOTP = null;
+            pass = null;
 			caches.clear();
 			if (log.shouldDebug()) log.debug("Mail session removed");
 			POP3MailBox mbox = mailbox;
@@ -2484,7 +2488,25 @@ public class WebMail extends HttpServlet
 				catch (IOException damaged) { httpSession.invalidate(); response.sendError(401, "Saved account security data failed an integrity check. Restore an intact backup before signing in."); return; }
                 
 
-				
+				if (request.getParameter("security") != null) {
+					List<String> recovery = java.util.Collections.emptyList();
+					if (isPOST) {
+						try { recovery = processSecurityAction(sessionObject, request); }
+						catch (IOException invalid) { sessionObject.error += invalid.getMessage() + '\n'; }
+					}
+					long now = ctx.clock().now();
+					if (sessionObject.pendingTOTP != null && now - sessionObject.pendingTOTPCreated > 300000) {
+						java.util.Arrays.fill(sessionObject.pendingTOTP, (byte) 0); sessionObject.pendingTOTP = null;
+					}
+					byte[] token = new byte[16]; ctx.random().nextBytes(token);
+					String nonce = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(token);
+					sessionObject.addNonce(nonce);
+					response.setContentType("text/html; charset=UTF-8");
+					response.getWriter().write(SecurityView.render(sessionObject.user, nonce, new AccountSecurity(sessionObject.vault),
+						sessionObject.pendingTOTP == null ? null : AccountSecurity.base32(sessionObject.pendingTOTP), recovery,
+						sessionObject.info, sessionObject.error, sessionObject.themePath.contains("dark")));
+					return;
+				}
 			}
 
 			if (sessionObject.mailbox != null && request.getParameter("openLink") != null) {
@@ -2867,7 +2889,7 @@ public class WebMail extends HttpServlet
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
 				
-				out.println("<div class=\"page\" id=\"page\">");
+				out.println("<a href=\"/susimail/?security=1\">Mail security</a><div class=\"page\" id=\"page\">");
 
 				if (state != State.LIST) {
 					// For all states except LIST, we have one big form for the whole page.
@@ -3779,6 +3801,7 @@ public class WebMail extends HttpServlet
 
 
 		out.println("<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
+		out.println("<tr><td>" + _t("Authenticator or recovery code") + "</td><td><input type=\"text\" name=\"authCode\" maxlength=\"40\" autocomplete=\"one-time-code\" spellcheck=\"false\" aria-label=\"Authenticator or recovery code\"><small>" + _t("Leave empty if optional two-factor protection is not enabled.") + "</small></td></tr>");
 		out.println("<tr><td colspan=\"2\"><details><summary>" + _t("Local encryption password options") + "</summary><p>" + _t("Saved mail uses your email password for local encryption. If your email password changed, enter the previous encryption password here.") + "</p><label>" + _t("Previous encryption password") + " <input type=\"password\" name=\"cachePassword\" maxlength=\"1024\" autocomplete=\"off\"></label><label>" + _t("Repeat password for first offline encryption") + " <input type=\"password\" name=\"confirmPassword\" maxlength=\"1024\" autocomplete=\"off\"></label></details></td></tr>");
 		// which is better?
 		out.println(
@@ -4492,4 +4515,49 @@ public class WebMail extends HttpServlet
     private static String[] getThemes(I2PAppContext ctx) {
         return THEMES;
     }
+private static List<String> processSecurityAction(SessionObject session, RequestWrapper request) throws IOException {
+		String action = request.getParameter("securityAction");
+		if (action == null || action.length() > 40) throw new IOException("Choose a valid security action.");
+		AccountSecurity security = new AccountSecurity(session.vault);
+		long now = I2PAppContext.getGlobalContext().clock().now();
+		if (action.equals("cancelTOTP")) {
+			if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
+			session.pendingTOTP = null;
+		} else {
+			String rateKey = "security:" + session.vault.directory;
+			if (!LoginLimiter.allowed(rateKey, now)) throw new IOException("Wait one minute before trying another security change.");
+			if (!session.vault.matchesPassword(request.getParameter("securityPassword"))) {
+				LoginLimiter.failed(rateKey, now); throw new IOException("The encryption password was not accepted.");
+			}
+			String code = request.getParameter("securityCode");
+			try {
+				if (action.equals("startTOTP")) {
+					if (security.mfaEnabled()) throw new IOException("Two-factor protection is already enabled.");
+					if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
+					session.pendingTOTP = AccountSecurity.newSecret(); session.pendingTOTPCreated = now;
+				} else if (action.equals("enableTOTP")) {
+					if (session.pendingTOTP == null || now - session.pendingTOTPCreated > 300000) throw new IOException("Authenticator setup expired. Start setup again.");
+					List<String> codes = security.enable(session.pendingTOTP, code, now);
+					java.util.Arrays.fill(session.pendingTOTP, (byte) 0); session.pendingTOTP = null;
+					session.info = _t("Two-factor protection is enabled. Save the recovery codes shown below.");
+					LoginLimiter.succeeded(rateKey); return codes;
+				} else if (action.equals("regenerateRecovery")) {
+					List<String> codes = security.regenerate(code, now);
+					session.info = _t("New recovery codes replace all previous recovery codes.");
+					LoginLimiter.succeeded(rateKey); return codes;
+				} else if (action.equals("disableTOTP")) {
+					security.disable(code, now); session.info = _t("Optional two-factor protection is now off.");
+				} else if (action.equals("changeEncryptionPassword")) {
+					String password = request.getParameter("newEncryptionPassword");
+					if (password == null || password.length() < 8 || password.length() > 1024 || !password.equals(request.getParameter("repeatEncryptionPassword")))
+						throw new IOException("Enter matching encryption passwords of at least eight characters.");
+					if (security.mfaEnabled() && !security.verifyLogin(code, now)) throw new IOException("The authenticator or recovery code was not accepted.");
+					session.vault.changePassword(password);
+					session.info = _t("The encryption password was updated. Other open mail sessions have been locked.");
+				} else throw new IOException("Unknown security action.");
+				LoginLimiter.succeeded(rateKey);
+			} catch (IOException rejected) { LoginLimiter.failed(rateKey, now); throw rejected; }
+		}
+		return java.util.Collections.emptyList();
+	}
 }
