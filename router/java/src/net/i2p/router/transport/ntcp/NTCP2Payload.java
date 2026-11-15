@@ -94,8 +94,8 @@ class NTCP2Payload {
             i += 2;
             if (i + len > end) {
                 throw new IOException("Block " + blocks + " type " + type + " length " + len +
-                                      " at offset " + (i - 3 - off) + " runs over frame of size " + length +
-                                      '\n' + net.i2p.util.HexDump.dump(payload, off, length));
+                                      " at offset " + (i - 3 - off) + " runs over frame of size " + length /* +
+                                      '\n' + net.i2p.util.HexDump.dump(payload, off, length) */ );
             }
             switch (type) {
                 // don't modify i inside switch
