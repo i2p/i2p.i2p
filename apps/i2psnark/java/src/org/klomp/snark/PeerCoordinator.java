@@ -1313,6 +1313,9 @@ class PeerCoordinator implements PeerListener, BandwidthListener
 
   public void disconnected(Peer peer)
   {
+    PeerCatalog catalog = _util.getPeerCatalog();
+    if (catalog != null)
+        catalog.disconnected(peer);
     if (_log.shouldLog(Log.INFO))
         _log.info("Disconnected " + peer, new Exception("Disconnected by"));
     

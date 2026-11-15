@@ -86,6 +86,7 @@ public class I2PSnarkUtil implements DisconnectListener {
     private boolean _areFilesPublic;
     private List<String> _openTrackers;
     private DHT _dht;
+    private PeerCatalog _peerCatalog;
     private boolean _enableUDP = ENABLE_UDP_TRACKER;
     private UDPTrackerClient _udpTracker;
     private long _startedTime;
@@ -393,6 +394,9 @@ public class I2PSnarkUtil implements DisconnectListener {
      * @since 0.8.4
      */
     public DHT getDHT() { return _dht; }
+
+    void setPeerCatalog(PeerCatalog catalog) { _peerCatalog = catalog; }
+    public PeerCatalog getPeerCatalog() { return _peerCatalog; }
 
     /**
      * @return null if disabled or not started

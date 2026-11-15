@@ -50,8 +50,8 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   private final byte[] my_id;
   private final byte[] infohash;
   /** will start out null in magnet mode */
-  protected MetaInfo metainfo;
-  private Map<String, BEValue> handshakeMap;
+  protected volatile MetaInfo metainfo;
+  private volatile Map<String, BEValue> handshakeMap;
 
   // The data in/output streams set during the handshake and used by
   // the actual connections.
@@ -308,7 +308,10 @@ public class Peer implements Comparable<Peer>, BandwidthListener
             boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
             boolean dht = util.getDHT() != null;
             boolean comment = util.utCommentsEnabled();
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly, comment));
+            // Magnets may later become public; no listings are exchanged until
+            // metadata is known and the connection is confirmed non-private.
+            boolean catalog = util.getPeerCatalog() != null && (metainfo == null || !metainfo.isPrivate());
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata, dht, uploadOnly, comment, catalog));
         }
 
         // Send our bitmap
