@@ -318,9 +318,9 @@ public class WebMail extends HttpServlet
 		int newMails = -1;
 		String user, pass, host, error = "", info = "";
 		MailVault vault;
-        byte[] pendingTOTP;
-        long pendingTOTPCreated;
 		boolean authenticating, cancelled;
+		byte[] pendingTOTP;
+		long pendingTOTPCreated;
 		// Just convenience to pass from PSCB to P-R-G
 		String draftUIDL;
 		// TODO Map of UIDL to List
@@ -356,8 +356,8 @@ public class WebMail extends HttpServlet
 			cancelled = true;
 			if (vault != null) { vault.close(); vault = null; }
 			if (pendingTOTP != null) java.util.Arrays.fill(pendingTOTP, (byte) 0);
-            pendingTOTP = null;
-            pass = null;
+			pendingTOTP = null;
+			pass = null;
 			caches.clear();
 			if (log.shouldDebug()) log.debug("Mail session removed");
 			POP3MailBox mbox = mailbox;
@@ -2890,9 +2890,11 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/js/iframed.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
-				out.print("</head>\n<body>");
-				
-				out.println("<a href=\"/susimail/?security=1\">Mail security</a><div class=\"page\" id=\"page\">");
+				out.println("<link rel=\"stylesheet\" href=\"/susimail/themes/security.css?" + CoreVersion.VERSION + "\">");
+				out.print("</head>\n<body data-mail-theme=\"" + (theme.contains("dark") ? "dark" : "light") + "\">");
+				if (sessionObject.vault != null)
+					out.println("<nav aria-label=\"Mail protection\"><a class=\"mail-security-link\" href=\"/susimail/?security=1\">" + _t("Mail security") + "</a><span class=\"status-badge\">" + _t("Saved mail encrypted") + "</span></nav>");
+				out.println("<div class=\"page\" id=\"page\">");
 
 				if (state != State.LIST) {
 					// For all states except LIST, we have one big form for the whole page.
@@ -3086,9 +3088,77 @@ public class WebMail extends HttpServlet
 		return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(token);
 	}
 
-    
+    private static void processMailSafetyAction(SessionObject session, RequestWrapper request) throws IOException {
+        MailCache cache = getCurrentMailCache(session, request);
+        String uidl = Base64.decodeToString(request.getParameter(B64UIDL));
+        Mail mail = cache == null ? null : cache.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
+        if (mail == null) throw new IOException("Select an existing message first.");
+        AccountSecurity settings = new AccountSecurity(session.vault);
+        String action = request.getParameter("mailSafetyAction");
+        if ("block".equals(action)) {
+            settings.block(mail.getSenderAddress(), true);
+            session.info = "This sender was added to your private blocklist.";
+        } else if ("release".equals(action)) {
+            if (mail.isBlockedSender()) throw new IOException("Remove the sender from your blocklist before releasing this message.");
+            settings.release(uidl);
+            session.info = "The spam restriction was removed for this message. Identity and integrity checks still apply.";
+        } else throw new IOException("Choose a valid message-safety action.");
+    }
 
-	
+	private static List<String> processSecurityAction(SessionObject session, RequestWrapper request) throws IOException {
+		String action = request.getParameter("securityAction");
+		if (action == null || action.length() > 40) throw new IOException("Choose a valid security action.");
+		AccountSecurity security = new AccountSecurity(session.vault);
+		long now = I2PAppContext.getGlobalContext().clock().now();
+		if (action.equals("blockSender") || action.equals("unblockSender")) {
+			security.block(request.getParameter("blockTarget"), action.equals("blockSender"));
+			session.info = _t("The private sender blocklist was updated.");
+		} else if (action.equals("saveSpam")) {
+			int threshold;
+			try { threshold = Integer.parseInt(request.getParameter("spamThreshold")); }
+			catch (NumberFormatException invalid) { throw new IOException("Choose a valid spam threshold."); }
+			security.spamSettings(request.getParameter("spamEnabled") != null, threshold);
+			session.info = _t("Mail-safety settings were saved.");
+		} else if (action.equals("cancelTOTP")) {
+			if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
+			session.pendingTOTP = null;
+		} else {
+			String rateKey = "security:" + session.vault.directory;
+			if (!LoginLimiter.allowed(rateKey, now)) throw new IOException("Wait one minute before trying another security change.");
+			if (!session.vault.matchesPassword(request.getParameter("securityPassword"))) {
+				LoginLimiter.failed(rateKey, now); throw new IOException("The encryption password was not accepted.");
+			}
+			String code = request.getParameter("securityCode");
+			try {
+				if (action.equals("startTOTP")) {
+					if (security.mfaEnabled()) throw new IOException("Two-factor protection is already enabled.");
+					if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
+					session.pendingTOTP = AccountSecurity.newSecret(); session.pendingTOTPCreated = now;
+				} else if (action.equals("enableTOTP")) {
+					if (session.pendingTOTP == null || now - session.pendingTOTPCreated > 300000) throw new IOException("Authenticator setup expired. Start setup again.");
+					List<String> codes = security.enable(session.pendingTOTP, code, now);
+					java.util.Arrays.fill(session.pendingTOTP, (byte) 0); session.pendingTOTP = null;
+					session.info = _t("Two-factor protection is enabled. Save the recovery codes shown below.");
+					LoginLimiter.succeeded(rateKey); return codes;
+				} else if (action.equals("regenerateRecovery")) {
+					List<String> codes = security.regenerate(code, now);
+					session.info = _t("New recovery codes replace all previous recovery codes.");
+					LoginLimiter.succeeded(rateKey); return codes;
+				} else if (action.equals("disableTOTP")) {
+					security.disable(code, now); session.info = _t("Optional two-factor protection is now off.");
+				} else if (action.equals("changeEncryptionPassword")) {
+					String password = request.getParameter("newEncryptionPassword");
+					if (password == null || password.length() < 8 || password.length() > 1024 || !password.equals(request.getParameter("repeatEncryptionPassword")))
+						throw new IOException("Enter matching encryption passwords of at least eight characters.");
+					if (security.mfaEnabled() && !security.verifyLogin(code, now)) throw new IOException("The authenticator or recovery code was not accepted.");
+					session.vault.changePassword(password);
+					session.info = _t("The encryption password was updated. Other open mail sessions have been locked.");
+				} else throw new IOException("Unknown security action.");
+				LoginLimiter.succeeded(rateKey);
+			} catch (IOException rejected) { LoginLimiter.failed(rateKey, now); throw rejected; }
+		}
+		return java.util.Collections.emptyList();
+	}
 
 	private static void showLinkWarning(HttpServletResponse response, String supplied) throws IOException {
 		String destination = SafeMailHTML.safeURL(supplied);
@@ -4527,75 +4597,5 @@ public class WebMail extends HttpServlet
      */
     private static String[] getThemes(I2PAppContext ctx) {
         return THEMES;
-    }
-private static List<String> processSecurityAction(SessionObject session, RequestWrapper request) throws IOException {
-		String action = request.getParameter("securityAction");
-		if (action == null || action.length() > 40) throw new IOException("Choose a valid security action.");
-		AccountSecurity security = new AccountSecurity(session.vault);
-		long now = I2PAppContext.getGlobalContext().clock().now();
-		if (action.equals("blockSender") || action.equals("unblockSender")) {
-			security.block(request.getParameter("blockTarget"), action.equals("blockSender"));
-			session.info = _t("The private sender blocklist was updated.");
-		} else if (action.equals("saveSpam")) {
-			int threshold;
-			try { threshold = Integer.parseInt(request.getParameter("spamThreshold")); }
-			catch (NumberFormatException invalid) { throw new IOException("Choose a valid spam threshold."); }
-			security.spamSettings(request.getParameter("spamEnabled") != null, threshold);
-			session.info = _t("Mail-safety settings were saved.");
-		} else if (action.equals("cancelTOTP")) {
-			if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
-			session.pendingTOTP = null;
-		} else {
-			String rateKey = "security:" + session.vault.directory;
-			if (!LoginLimiter.allowed(rateKey, now)) throw new IOException("Wait one minute before trying another security change.");
-			if (!session.vault.matchesPassword(request.getParameter("securityPassword"))) {
-				LoginLimiter.failed(rateKey, now); throw new IOException("The encryption password was not accepted.");
-			}
-			String code = request.getParameter("securityCode");
-			try {
-				if (action.equals("startTOTP")) {
-					if (security.mfaEnabled()) throw new IOException("Two-factor protection is already enabled.");
-					if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
-					session.pendingTOTP = AccountSecurity.newSecret(); session.pendingTOTPCreated = now;
-				} else if (action.equals("enableTOTP")) {
-					if (session.pendingTOTP == null || now - session.pendingTOTPCreated > 300000) throw new IOException("Authenticator setup expired. Start setup again.");
-					List<String> codes = security.enable(session.pendingTOTP, code, now);
-					java.util.Arrays.fill(session.pendingTOTP, (byte) 0); session.pendingTOTP = null;
-					session.info = _t("Two-factor protection is enabled. Save the recovery codes shown below.");
-					LoginLimiter.succeeded(rateKey); return codes;
-				} else if (action.equals("regenerateRecovery")) {
-					List<String> codes = security.regenerate(code, now);
-					session.info = _t("New recovery codes replace all previous recovery codes.");
-					LoginLimiter.succeeded(rateKey); return codes;
-				} else if (action.equals("disableTOTP")) {
-					security.disable(code, now); session.info = _t("Optional two-factor protection is now off.");
-				} else if (action.equals("changeEncryptionPassword")) {
-					String password = request.getParameter("newEncryptionPassword");
-					if (password == null || password.length() < 8 || password.length() > 1024 || !password.equals(request.getParameter("repeatEncryptionPassword")))
-						throw new IOException("Enter matching encryption passwords of at least eight characters.");
-					if (security.mfaEnabled() && !security.verifyLogin(code, now)) throw new IOException("The authenticator or recovery code was not accepted.");
-					session.vault.changePassword(password);
-					session.info = _t("The encryption password was updated. Other open mail sessions have been locked.");
-				} else throw new IOException("Unknown security action.");
-				LoginLimiter.succeeded(rateKey);
-			} catch (IOException rejected) { LoginLimiter.failed(rateKey, now); throw rejected; }
-		}
-		return java.util.Collections.emptyList();
-	}
-private static void processMailSafetyAction(SessionObject session, RequestWrapper request) throws IOException {
-        MailCache cache = getCurrentMailCache(session, request);
-        String uidl = Base64.decodeToString(request.getParameter(B64UIDL));
-        Mail mail = cache == null ? null : cache.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
-        if (mail == null) throw new IOException("Select an existing message first.");
-        AccountSecurity settings = new AccountSecurity(session.vault);
-        String action = request.getParameter("mailSafetyAction");
-        if ("block".equals(action)) {
-            settings.block(mail.getSenderAddress(), true);
-            session.info = "This sender was added to your private blocklist.";
-        } else if ("release".equals(action)) {
-            if (mail.isBlockedSender()) throw new IOException("Remove the sender from your blocklist before releasing this message.");
-            settings.release(uidl);
-            session.info = "The spam restriction was removed for this message. Identity and integrity checks still apply.";
-        } else throw new IOException("Choose a valid message-safety action.");
     }
 }

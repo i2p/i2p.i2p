@@ -66,5 +66,38 @@ button:disabled, input:disabled { opacity: .55; cursor: default; }
 .security-footer { text-align: center; font-size: .8rem; color: var(--mail-muted); margin-top: 2rem; }
 .link-destination { padding: 1rem; background: var(--mail-soft); border-radius: .6rem; overflow-wrap: anywhere; font-family: ui-monospace, monospace; }
 body > .security-card { max-width: 760px; margin: 8vh auto; }
+#mailsecurity { padding: 1rem 1.25rem; margin: 1rem 0; border: 1px solid var(--mail-line); border-inline-start: 4px solid var(--mail-accent); border-radius: .65rem; background: var(--mail-surface); }
+#mailsecurity p { margin: .4rem 0; font-size: .9rem; }
+#mailsecurity .info { color: var(--mail-muted); }
+#mailsecurity .error { color: var(--mail-bad); }
+#mailbox, #message_full, #newmail { background: var(--mail-surface); border: 1px solid var(--mail-line); border-radius: .7rem; box-shadow: none; width: 100%; }
+#mailbox th { background: var(--mail-soft); color: var(--mail-muted); padding: .8rem .65rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+#mailbox td { border-color: var(--mail-line); padding: .7rem .65rem; font-size: .9rem; background-image: none; }
+#mailbox tr:hover td { background-color: var(--mail-soft); }
+#mailbox td a { text-decoration: none; }
+.topbuttons, .bottombuttons, #pagenav { background: transparent; box-shadow: none; border-color: var(--mail-line); padding: .65rem 0; }
+#viewmail, #composemail, #dologin { padding: 1rem; }
+#dologin { max-width: 760px; margin: 3rem auto; background: var(--mail-surface); border: 1px solid var(--mail-line); border-radius: .9rem; }
+#dologin h1 { font-size: 1.7rem; letter-spacing: -.03em; }
+#dologin small { display: block; font-size: .8rem; margin-top: .4rem; color: var(--mail-muted); }
+#dologin details { text-align: start; padding: .75rem; }
+#dologin details label { display: block; margin: .6rem 0; }
+#dologin details input { display: block; width: 100%; }
+#new_text { min-height: 300px; line-height: 1.6; }
+.iframedsusi { border: 1px solid var(--mail-line); border-radius: .55rem; background: var(--mail-surface); min-height: 220px; }
+.mail-security-link { display: inline-block; margin: .25rem .5rem; font-weight: 600; }
+@media (max-width: 760px) {
+  .security-shell { padding: 1.2rem .8rem; }
+  .security-heading { align-items: start; flex-direction: column; }
+  .security-grid, .security-summary, .recovery-codes { grid-template-columns: 1fr; }
+  .security-summary > div + div { border-inline-start: 0; border-top: 1px solid var(--mail-line); }
+  .security-card { padding: 1.1rem; }
+  #dologin { margin: 1rem .5rem; }
+  #dologin table, #dologin tbody, #dologin tr, #dologin td { display: block; width: 100%; }
+  #dologin input { width: 100%; }
+  .topbuttons { display: flex; flex-wrap: wrap; align-items: center; }
+  #mailbox { display: block; overflow-x: auto; }
+}
 
-@media(max-width:760px) { .security-shell { padding:1rem; } .security-grid,.security-summary,.recovery-codes { grid-template-columns:1fr; } .security-heading { align-items:start; flex-direction:column; } }
+.risk-badge { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--mail-bad); background: var(--mail-soft); border: 1px solid currentColor; border-radius: 1rem; padding: .08rem .4rem; margin-inline-start: .3rem; }
+.message-safety-actions { margin: .5rem 1rem 1rem; }
