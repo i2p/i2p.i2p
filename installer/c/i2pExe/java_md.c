@@ -142,10 +142,18 @@ GetJVMPath(const char *jrepath, const char *jvmtype,
 	   char *jvmpath, jint jvmpathsize)
 {
     struct stat s;
+    int written;
+    if (jvmpathsize <= 0)
+        return JNI_FALSE;
     if (strchr(jvmtype, '/') || strchr(jvmtype, '\\')) {
-	sprintf(jvmpath, "%s\\" JVM_DLL, jvmtype);
+	written = _snprintf(jvmpath, jvmpathsize, "%s\\" JVM_DLL, jvmtype);
     } else {
-	sprintf(jvmpath, "%s\\bin\\%s\\" JVM_DLL, jrepath, jvmtype);
+	written = _snprintf(jvmpath, jvmpathsize, "%s\\bin\\%s\\" JVM_DLL, jrepath, jvmtype);
+    }
+    /* Older MS runtimes return a negative value and may omit the terminator. */
+    if (written < 0 || written >= jvmpathsize) {
+        jvmpath[0] = '\0';
+        return JNI_FALSE;
     }
     if (stat(jvmpath, &s) == 0) {
 	return JNI_TRUE;
