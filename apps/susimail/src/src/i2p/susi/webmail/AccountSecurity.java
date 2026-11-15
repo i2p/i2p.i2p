@@ -207,25 +207,82 @@ final class AccountSecurity {
         return result.toString();
     }
 
-    
+    List<String> blockedSenders() throws IOException {
+        synchronized (vault.lock) { return new ArrayList<String>(blocked(load())); }
+    }
 
-    
+    void block(String value, boolean add) throws IOException {
+        String entry = normalizeBlock(value);
+        synchronized (vault.lock) {
+            Properties properties = load();
+            TreeSet<String> blocked = blocked(properties);
+            if (add && blocked.size() >= 5000 && !blocked.contains(entry)) throw new IOException("The blocklist limit has been reached");
+            if (add) blocked.add(entry); else blocked.remove(entry);
+            properties.setProperty("blocked", String.join("\n", blocked));
+            save(properties);
+        }
+    }
 
-    
+    boolean isBlocked(String address) throws IOException {
+        SenderIdentity identity = SenderIdentity.parse(address);
+        if (identity == null) return false;
+        synchronized (vault.lock) {
+            TreeSet<String> blocked = blocked(load());
+            return blocked.contains(identity.address.toLowerCase(java.util.Locale.US)) || blocked.contains('@' + identity.domain);
+        }
+    }
 
-    
+    private static TreeSet<String> blocked(Properties properties) {
+        TreeSet<String> blocked = new TreeSet<String>();
+        for (String entry : properties.getProperty("blocked", "").split("\n")) if (!entry.isEmpty()) blocked.add(entry);
+        return blocked;
+    }
 
-    
+    private static String normalizeBlock(String input) throws IOException {
+        if (input == null || input.length() > 254 || SenderIdentity.hasInvisible(input)) throw new IOException("Enter one email address or @domain");
+        input = input.trim().toLowerCase(java.util.Locale.US);
+        if (input.startsWith("@")) {
+            String domain = input.substring(1);
+            if (!SenderIdentity.validDomain(domain)) throw new IOException("Enter a valid @domain");
+            return input;
+        }
+        SenderIdentity identity = SenderIdentity.parse(input);
+        if (identity == null) throw new IOException("Enter one complete email address");
+        return identity.address.toLowerCase(java.util.Locale.US);
+    }
 
-    
-    
-    
+    boolean spamEnabled() throws IOException { synchronized (vault.lock) { return Boolean.parseBoolean(load().getProperty("spam.enabled", "true")); } }
+    int spamThreshold() throws IOException { synchronized (vault.lock) { return (int) Math.max(3, Math.min(20, number(load(), "spam.threshold", 7))); } }
+    void spamSettings(boolean enabled, int threshold) throws IOException {
+        if (threshold < 3 || threshold > 20) throw new IOException("Choose a spam threshold between 3 and 20");
+        synchronized (vault.lock) {
+            Properties properties = load();
+            properties.setProperty("spam.enabled", Boolean.toString(enabled));
+            properties.setProperty("spam.threshold", Integer.toString(threshold));
+            save(properties);
+        }
+    }
 
-    
+    String revision() throws IOException {
+        java.nio.file.Path profile = vault.directory.resolve("security.profile");
+        return Files.size(profile) + ":" + Files.getLastModifiedTime(profile).toMillis() + ":"
+            + REVISIONS.computeIfAbsent(vault.directory, ignored -> new java.util.concurrent.atomic.AtomicLong()).get();
+    }
 
-    
-    
-    
+    boolean isReleased(String uidl) throws IOException {
+        synchronized (vault.lock) { return Boolean.parseBoolean(load().getProperty(releaseKey(uidl), "false")); }
+    }
+    void release(String uidl) throws IOException {
+        synchronized (vault.lock) {
+            Properties properties = load();
+            if (properties.size() >= 6000) throw new IOException("The saved mail-policy limit has been reached");
+            properties.setProperty(releaseKey(uidl), "true"); save(properties);
+        }
+    }
+    private static String releaseKey(String uidl) throws IOException {
+        try { return "allow." + java.util.HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(uidl.getBytes(StandardCharsets.UTF_8))); }
+        catch (GeneralSecurityException failure) { throw new IOException("Local policy hashing is unavailable", failure); }
+    }
 
     private static boolean equal(String first, String second) {
         return MessageDigest.isEqual(first.getBytes(StandardCharsets.US_ASCII), second.getBytes(StandardCharsets.US_ASCII));

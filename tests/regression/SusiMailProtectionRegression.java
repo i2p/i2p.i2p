@@ -39,7 +39,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 
 /** Synthetic local fixtures: cryptographic interoperability, failure recovery, policy and protocol limits. */
-public final class SusiMailVaultRegression {
+public final class SusiMailProtectionRegression {
     private static int checks, failures;
     private static final String PASSWORD = "Synthetic password with spaces é 123";
     private static final String HEADERS = "From: sender@example.test\r\nTo: user@mail.i2p\r\nSubject: ordinary message\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n";
@@ -169,9 +169,92 @@ public final class SusiMailVaultRegression {
         rejects(() -> vault("damaged-profile"), "tampered account security profile fails closed at unlock");
     }
 
-    
+    private static void authenticator() throws Exception {
+        byte[] secret = "12345678901234567890".getBytes(StandardCharsets.US_ASCII);
+        long[] times = {59,1111111109L,1111111111L,1234567890L,2000000000L,20000000000L};
+        String[] vectors = {"94287082","07081804","14050471","89005924","69279037","65353130"};
+        for (int i = 0; i < times.length; i++) check(AccountSecurity.hotp(secret, times[i] / 30, 8).equals(vectors[i]), "RFC 6238 SHA-1 test vector " + i);
+        check(AccountSecurity.base32(secret).equals("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ"), "manual enrollment uses standard Base32");
+        MailVault vault = vault("mfa"); AccountSecurity account = new AccountSecurity(vault);
+        check(!account.mfaEnabled() && account.verifyLogin(null, 59000), "TOTP is optional and off by default");
+        rejects(() -> account.enable(secret, "000000", 59000), "enrollment requires a valid current code");
+        check(!account.mfaEnabled(), "failed enrollment leaves optional protection off");
+        MailVault oldSession = MailVault.open(context, "mail.example.test", 110, "mfa", PASSWORD, false);
+        List<String> recovery = account.enable(secret, "287082", 59000);
+        check(account.mfaEnabled() && recovery.size() == 8 && new HashSet<String>(recovery).size() == 8, "confirmed enrollment returns eight distinct recovery codes");
+        check(!oldSession.isActive(), "enabling MFA revokes other open sessions"); oldSession.close();
+        check(!account.verifyLogin("287082", 59000), "accepted authenticator codes cannot be replayed");
+        check(!account.verifyLogin(null, 59000), "enabled protection refuses a missing code");
+        check(account.verifyLogin(recovery.get(0), 60000) && account.recoveryRemaining() == 7, "a recovery code authenticates once and is consumed");
+        check(!account.verifyLogin(recovery.get(0), 60000), "consumed recovery codes cannot be reused");
+        AtomicInteger accepted = new AtomicInteger(); CountDownLatch ready = new CountDownLatch(1); List<Thread> workers = new ArrayList<Thread>();
+        for (int i = 0; i < 2; i++) {
+            Thread thread = new Thread(() -> { try { ready.await(); if (account.verifyLogin(recovery.get(1), 61000)) accepted.incrementAndGet(); } catch (Exception failure) { throw new RuntimeException(failure); } });
+            workers.add(thread); thread.start();
+        }
+        ready.countDown(); for (Thread thread : workers) thread.join();
+        check(accepted.get() == 1 && account.recoveryRemaining() == 6, "concurrent sessions cannot spend the same recovery code twice");
+        byte[] ciphertext = Files.readAllBytes(vault.directory.resolve("security.profile")); String disk = new String(ciphertext, StandardCharsets.ISO_8859_1);
+        check(!disk.contains(AccountSecurity.base32(secret)) && !disk.contains(java.util.Base64.getEncoder().encodeToString(secret)) && recovery.stream().noneMatch(disk::contains), "TOTP secrets and recovery codes are absent from plaintext storage");
+        List<String> replacement = account.regenerate(recovery.get(2), 62000);
+        check(account.recoveryRemaining() == 8 && !account.verifyLogin(recovery.get(3), 62000), "regeneration invalidates every old recovery code");
+        for (int i = 0; i < 5; i++) account.verifyLogin("invalid", 63000);
+        check(!account.verifyLogin(replacement.get(0), 63000), "repeated failures temporarily lock even a correct code");
+        check(account.verifyLogin(replacement.get(0), 400000), "temporary lockout expires without losing unused recovery codes");
+        rejects(() -> account.disable("invalid", 401000), "disabling optional TOTP requires a valid second factor");
+        account.disable(replacement.get(1), 402000);
+        check(!account.mfaEnabled() && account.recoveryRemaining() == 0 && account.verifyLogin(null, 402000), "disable clears secret/recovery state and restores optional password-only login");
+        vault.close();
+    }
 
-    
+    private static void contentAndPolicy() throws Exception {
+        String attack = "<style>@font-face{font-family:lie;src:url(https://bad.test/font.woff);unicode-range:U+0-FFFF}</style>"
+            + "<div style='font-size:0' class='hidden' id='spoof'>Visible after cleanup</div><font face='lie'>pay</font>"
+            + "<script>steal()</script><form action='https://bad.test'><input type='password'></form>"
+            + "<svg onload='steal()'></svg><img src='https://bad.test/pixel'><img src='cid:local-image'>"
+            + "<a href='https://example.test/path?q=1&amp;x=2' target='_top'>safe destination</a><a href='javascript:steal()'>unsafe</a>";
+        String safe = SafeMailHTML.sanitize(attack, "fixture", "cur");
+        check(safe.contains("Visible after cleanup") && safe.contains("pay"), "font-smuggling cleanup preserves the readable semantic text");
+        for (String forbidden : new String[] {"@font-face", "unicode-range", "font-size", "<script", "<form", "<input", "<svg", "javascript:", "https://bad.test", "target=", "class=\"hidden\""})
+            check(!safe.contains(forbidden), "untrusted HTML removes " + forbidden);
+        check(safe.contains("cid=local-image") && safe.contains("data-safe-link=\"1\"") && safe.contains("?openLink="), "CID raster images and explicit destination-check links survive rebuilding");
+        for (String destination : new String[] {"javascript:alert(1)","data:text/html,hello","//example.test","https://user:pass@example.test/","http://127.0.0.1/","http://[::1]/","http://device.local/","https://example.test:0/","https://example.test:65536/","https://exam\u202eple.test/"})
+            check(SafeMailHTML.safeURL(destination) == null, "unsafe link is refused: " + destination);
+        check(SafeMailHTML.safeURL("https://example.test/path").equals("https://example.test/path"), "ordinary HTTPS link remains usable");
+        check(!SafeMailHTML.safeInlineType("image/svg+xml") && !SafeMailHTML.safeInlineType("font/woff2") && SafeMailHTML.safeInlineType("image/png"), "inline content excludes SVG and custom fonts");
+        rejects(() -> SafeMailHTML.sanitize("x".repeat(SafeMailHTML.MAX_HTML + 1), "a", "cur"), "HTML display is bounded");
+        String manyImages = SafeMailHTML.sanitize("<img src='cid:a'>".repeat(100), "a", "cur");
+        check(manyImages.split("<img ", -1).length - 1 == 20, "inline image count is bounded");
+        MailVault vault = vault("policy"); AccountSecurity settings = new AccountSecurity(vault);
+        VaultFileBuffer body = sealed(vault, vault.directory.resolve("safe.gz"), true, HEADERS + "Hello, this is an ordinary message.");
+        Mail mail = new Mail("safe-uidl"); mail.setBody(body);
+        check(!mail.isSpam() && mail.canReplySafely(), "ordinary unsigned mail remains readable and replyable");
+        settings.block("SENDER@example.test", true);
+        check(mail.isBlockedSender() && mail.isSpam() && mail.hasUnsafeContent() && !mail.canReplySafely(), "blocklist changes immediately restrict already-loaded messages");
+        settings.block("sender@example.test", false);
+        check(!mail.isBlockedSender() && !mail.isSpam(), "unblocking immediately updates loaded mail policy");
+        settings.block("@example.test", true);
+        check(mail.isBlockedSender() && !settings.isBlocked("sender@other.test"), "domain rules match exact domains without overmatching");
+        settings.block("@example.test", false);
+        rejects(() -> settings.block("@example.test\n@other.test", true), "blocklist entries cannot inject additional rules");
+        rejects(() -> settings.block(".*@example.test", true), "blocklist treats input as addresses rather than patterns");
+        String phishing = HEADERS.replace("text/plain", "text/html") + "<form><input type=password>Verify your password at https://bad.test immediately</form>";
+        Mail suspicious = new Mail("risk-uidl"); suspicious.setBody(sealed(vault, vault.directory.resolve("risk.gz"), true, phishing));
+        check(suspicious.isSpam() && suspicious.getSpamScore() >= 7 && !suspicious.getSecurityWarnings().isEmpty(), "credential collection is scored and restricted with explanations");
+        settings.release("risk-uidl");
+        check(!suspicious.isSpam(), "user can release a particular spam false positive");
+        settings.block("sender@example.test", true);
+        check(suspicious.isBlockedSender() && suspicious.isSpam(), "spam release cannot override a private sender block");
+        settings.spamSettings(false, 7);
+        check(suspicious.isSpam(), "disabling scoring does not disable sender blocks");
+        settings.block("sender@example.test", false);
+        String view = SecurityView.render("user<script>", "nonce\"<", settings, null, List.of(), "", "", false);
+        check(view.contains("Two-factor protection available") && view.contains("&lt;script&gt;") && !view.contains("user<script>"), "security UI clearly marks optional MFA and escapes account input");
+        check(view.contains("name=\"susiNonce\"") && view.contains("method=\"post\"") && !view.contains("https://fonts"), "settings forms carry CSRF tokens and use local assets");
+        mail.setHeader(null);
+        check(!mail.hasHeader() && mail.hasUnsafeContent() && !mail.canReplySafely(), "failed replacement headers cannot leave an old safe identity active");
+        vault.close();
+    }
 
     private static final class Wire extends Socket {
         private InputStream incoming;
@@ -263,8 +346,8 @@ public final class SusiMailVaultRegression {
         Path temporary = Files.createTempDirectory("susimail-protection-"); Properties properties = new Properties();
         properties.setProperty("i2p.dir.config", temporary.toString()); properties.setProperty("i2p.dir.base", temporary.toString());
         context = new I2PAppContext(properties);
-        encryption(); migration(); protocolLimits(); draftsAndCache(); composeValidation();
-        System.out.println("SUSIMAIL_VAULT_CHECKS=" + checks + "; FAILURES=" + failures);
+        encryption(); migration(); authenticator(); contentAndPolicy(); protocolLimits(); draftsAndCache(); composeValidation();
+        System.out.println("SUSIMAIL_PROTECTION_CHECKS=" + checks + "; FAILURES=" + failures);
         if (failures != 0) System.exit(1);
     }
 }

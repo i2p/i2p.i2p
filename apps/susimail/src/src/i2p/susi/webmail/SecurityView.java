@@ -9,7 +9,7 @@ final class SecurityView {
     static String render(String user, String nonce, AccountSecurity settings, String setupKey,
             List<String> recovery, String info, String error, boolean dark) throws IOException {
         boolean enabled = settings.mfaEnabled();
-        List<String> blocked = java.util.Collections.emptyList();
+        List<String> blocked = settings.blockedSenders();
         StringBuilder html = new StringBuilder(10000);
         html.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Mail security</title><link rel=\"stylesheet\" href=\"/susimail/themes/security.css\"></head><body class=\"security-page\" data-mail-theme=\"")
             .append(dark ? "dark" : "light").append("\"><main class=\"security-shell\"><header class=\"security-heading\"><div><p class=\"eyebrow\">SUSIMAIL · ACCOUNT PROTECTION</p><h1>Mail security</h1><p>Control access, reduce unwanted mail, and review your protections.</p></div><a class=\"secondary-action\" href=\"/susimail/\">Return to inbox</a></header>");
@@ -59,7 +59,29 @@ final class SecurityView {
         action(html, "changeEncryptionPassword", "Update encryption password", true);
         html.append("</form></section>");
 
-        html.append("</div>");
+        html.append("<section class=\"security-card\"><p class=\"eyebrow\">UNWANTED MAIL</p><h2>Sender blocklist</h2><p>Block one complete email address, or use @domain to block a domain. Sender addresses can be forged; check the actual address before adding a rule.</p>");
+        form(html, nonce);
+        input(html, "Email address or @domain", "text", "blockTarget", "off", true);
+        action(html, "blockSender", "Block sender", true);
+        action(html, "unblockSender", "Remove entry", false);
+        html.append("</form>");
+        if (blocked.isEmpty()) html.append("<p class=\"empty-state\">Your blocklist is empty.</p>");
+        else {
+            html.append("<ul class=\"blocklist\" aria-label=\"Blocked senders\">");
+            for (String address : blocked.subList(0, Math.min(200, blocked.size()))) html.append("<li><bdi dir=\"ltr\">").append(escape(address)).append("</bdi></li>");
+            html.append("</ul>");
+            if (blocked.size() > 200) html.append("<p>Showing the first 200 entries. Use the field above to remove any exact entry.</p>");
+        }
+        html.append("</section>");
+
+        html.append("<section class=\"security-card\"><p class=\"eyebrow\">MESSAGE SAFETY</p><h2>Spam and phishing checks</h2><p>Suspicious identity changes, credential forms, hidden fonts and deceptive links contribute to a local risk score. Checks run on this device.</p>");
+        form(html, nonce);
+        html.append("<label class=\"check-field\"><input type=\"checkbox\" name=\"spamEnabled\" value=\"1\"")
+            .append(settings.spamEnabled() ? " checked" : "").append("> Enable local spam scoring</label>");
+        html.append("<label>Flag messages at this score<input type=\"number\" name=\"spamThreshold\" min=\"3\" max=\"20\" required value=\"")
+            .append(settings.spamThreshold()).append("\"></label><p class=\"field-hint\">Lower values are stricter. Blocklists and failed integrity checks remain enforced.</p>");
+        action(html, "saveSpam", "Save mail-safety settings", true);
+        html.append("</form><div class=\"protection-list\"><p>✓ Custom fonts and hidden HTML formatting removed</p><p>✓ External links require a destination check</p><p>✓ Remote content and active message code blocked</p><p>✓ Bounded downloads and inbox fetch batches</p></div></section></div>");
 
         if (recovery != null && !recovery.isEmpty()) {
             html.append("<section class=\"security-card recovery-card\" role=\"status\"><p class=\"eyebrow\">SAVE THESE NOW</p><h2>Your new recovery codes</h2><p>Each code can replace an authenticator code once. Store them separately from this device. These values are shown once; only encrypted hashes are saved.</p><ul class=\"recovery-codes\">");

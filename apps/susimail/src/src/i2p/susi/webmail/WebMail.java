@@ -2486,7 +2486,10 @@ public class WebMail extends HttpServlet
 				}
 				try { new AccountSecurity(sessionObject.vault).mfaEnabled(); }
 				catch (IOException damaged) { httpSession.invalidate(); response.sendError(401, "Saved account security data failed an integrity check. Restore an intact backup before signing in."); return; }
-                
+                if (isPOST && request.getParameter("mailSafetyAction") != null) {
+                    try { processMailSafetyAction(sessionObject, request); }
+                    catch (IOException rejected) { sessionObject.error += rejected.getMessage() + '\n'; }
+                }
 
 				if (request.getParameter("security") != null) {
 					List<String> recovery = java.util.Collections.emptyList();
@@ -4052,7 +4055,7 @@ public class WebMail extends HttpServlet
 					out.println("</a>");
 				}
 			} else {
-				out.println(link + mail.shortSender + "</a>");
+				out.println(link + mail.shortSender + "</a>" + (mail.isSpam() ? " <span class=\"risk-badge\">" + (mail.isBlockedSender() ? "Blocked" : "Review") + "</span>" : ""));
 			}
 			out.println("</td><td " + jslink + ">" +
 					(mail.hasAttachment() ? "<img src=\"/susimail/icons/attach.png\" alt=\"\" title=\"" + _t("Message has an attachment") + "\">" : "&nbsp;") + "</td><td " + jslink + ">" +
@@ -4348,7 +4351,15 @@ public class WebMail extends HttpServlet
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
 		if (hasHeader) {
             showMessageSecurity(out, mail);
-
+            if (sessionObject.vault != null && !mc.getFolderName().equals(DIR_DRAFTS) && !mc.getFolderName().equals(DIR_SENT)) {
+                out.println("<div class=\"message-safety-actions\">");
+                if (mail.isBlockedSender()) out.println("<p class=\"notice\">This sender is blocked. <a href=\"/susimail/?security=1\">Manage your blocklist</a></p>");
+                else {
+                    if (mail.getSenderAddress().length() > 0) out.println("<button name=\"mailSafetyAction\" value=\"block\" type=\"submit\">Block this sender</button>");
+                    if (mail.isSpam()) out.println("<button name=\"mailSafetyAction\" value=\"release\" type=\"submit\">Review complete · release spam restriction</button>");
+                }
+                out.println("</div>");
+            }
         }
 		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		if (hasHeader) {
@@ -4375,7 +4386,9 @@ public class WebMail extends HttpServlet
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
 					"</table></td></tr>\n" );
-			 if( mail.hasPart()) {
+			if (mail.isBlockedSender()) {
+                out.println("<tr class=\"mailbody\"><td colspan=\"2\"><p class=\"notice\">Content from this blocked sender is restricted. Manage your blocklist to review it.</p></td></tr>");
+            } else if( mail.hasPart()) {
 				if (mail.isNew()) {
 					mail.setNew(false);
 					I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -4520,7 +4533,16 @@ private static List<String> processSecurityAction(SessionObject session, Request
 		if (action == null || action.length() > 40) throw new IOException("Choose a valid security action.");
 		AccountSecurity security = new AccountSecurity(session.vault);
 		long now = I2PAppContext.getGlobalContext().clock().now();
-		if (action.equals("cancelTOTP")) {
+		if (action.equals("blockSender") || action.equals("unblockSender")) {
+			security.block(request.getParameter("blockTarget"), action.equals("blockSender"));
+			session.info = _t("The private sender blocklist was updated.");
+		} else if (action.equals("saveSpam")) {
+			int threshold;
+			try { threshold = Integer.parseInt(request.getParameter("spamThreshold")); }
+			catch (NumberFormatException invalid) { throw new IOException("Choose a valid spam threshold."); }
+			security.spamSettings(request.getParameter("spamEnabled") != null, threshold);
+			session.info = _t("Mail-safety settings were saved.");
+		} else if (action.equals("cancelTOTP")) {
 			if (session.pendingTOTP != null) java.util.Arrays.fill(session.pendingTOTP, (byte) 0);
 			session.pendingTOTP = null;
 		} else {
@@ -4560,4 +4582,20 @@ private static List<String> processSecurityAction(SessionObject session, Request
 		}
 		return java.util.Collections.emptyList();
 	}
+private static void processMailSafetyAction(SessionObject session, RequestWrapper request) throws IOException {
+        MailCache cache = getCurrentMailCache(session, request);
+        String uidl = Base64.decodeToString(request.getParameter(B64UIDL));
+        Mail mail = cache == null ? null : cache.getMail(uidl, MailCache.FetchMode.HEADER_CACHE_ONLY);
+        if (mail == null) throw new IOException("Select an existing message first.");
+        AccountSecurity settings = new AccountSecurity(session.vault);
+        String action = request.getParameter("mailSafetyAction");
+        if ("block".equals(action)) {
+            settings.block(mail.getSenderAddress(), true);
+            session.info = "This sender was added to your private blocklist.";
+        } else if ("release".equals(action)) {
+            if (mail.isBlockedSender()) throw new IOException("Remove the sender from your blocklist before releasing this message.");
+            settings.release(uidl);
+            session.info = "The spam restriction was removed for this message. Identity and integrity checks still apply.";
+        } else throw new IOException("Choose a valid message-safety action.");
+    }
 }

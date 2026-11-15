@@ -95,6 +95,10 @@ class Mail {
 	private boolean bodyParseFailed;
 	private String verificationConfiguration = "";
 	private long verifiedFileLength, verifiedFileTime;
+	private MailVault policyVault;
+	private String policyConfiguration = "";
+	private MailPolicy.Signals policyBody = new MailPolicy.Signals();
+	private MailPolicy.Result policyResult = new MailPolicy.Result();
 	public String contentType;
 	public String messageID; // as received, trimmed only, probably enclosed with <>, not HTML escaped
 
@@ -134,6 +138,9 @@ class Mail {
 		try {
             if (rb == null) throw new IOException("Message header is unavailable");
 			setHeader(rb, rb.getInputStream(), true);
+			if (rb instanceof VaultFileBuffer) policyVault = ((VaultFileBuffer) rb).vault;
+			policyConfiguration = "";
+			refreshPolicy();
 		} catch (IOException ioe) {
 			header = body = null; part = null; headersParsed = false; bodyParseFailed = true;
             authentication = new DKIMVerifier.Result(DKIMVerifier.State.FAILED, "", "Saved message headers failed a read or integrity check.");
@@ -186,6 +193,9 @@ class Mail {
 		body = null;
 		part = null;
 		bodyParseFailed = false;
+		policyBody = new MailPolicy.Signals();
+		policyConfiguration = "";
+		policyResult = new MailPolicy.Result();
 		boolean success = false;
 		CountingInputStream in = null;
 		try {
@@ -206,7 +216,11 @@ class Mail {
 				verifiedFileLength = file.length();
 				verifiedFileTime = file.lastModified();
 			}
-			
+			if (rb instanceof VaultFileBuffer && !(this instanceof Draft)) {
+				policyVault = ((VaultFileBuffer) rb).vault;
+				policyBody = MailPolicy.inspect(part);
+				refreshPolicy();
+			}
 			success = true;
 		} catch (IOException de) {
 			_log.error("Decode error", de);
@@ -243,18 +257,20 @@ class Mail {
 	}
 
 	public synchronized boolean canReplySafely() {
-        refreshSecurity();
-        return headersParsed && !bodyParseFailed && !ambiguousHeaders && !changedHeaders && !invalidReplyTo && senderIdentity != null && authentication.state != DKIMVerifier.State.FAILED;
-    }
+		refreshSecurity();
+		return headersParsed && !bodyParseFailed && !policyResult.spam && !ambiguousHeaders && !changedHeaders && !invalidReplyTo && senderIdentity != null
+			&& authentication.state != DKIMVerifier.State.FAILED;
+	}
 
 	public synchronized boolean hasUnsafeContent() {
-        refreshSecurity(); return !headersParsed || bodyParseFailed || ambiguousHeaders || changedHeaders || authentication.state == DKIMVerifier.State.FAILED;
-    }
+		refreshSecurity();
+		return !headersParsed || bodyParseFailed || policyResult.spam || ambiguousHeaders || changedHeaders || authentication.state == DKIMVerifier.State.FAILED;
+	}
 
 	public synchronized DKIMVerifier.Result getAuthentication() { refreshSecurity(); return authentication; }
 
 	private void refreshSecurity() {
-        if (body == null || bodyParseFailed) return;
+		if (body == null || bodyParseFailed) { refreshPolicy(); return; }
 		if (body instanceof FileBuffer) {
 			java.io.File file = ((FileBuffer) body).getFile();
 			if (file.length() != verifiedFileLength || file.lastModified() != verifiedFileTime) {
@@ -268,14 +284,29 @@ class Mail {
 			verificationConfiguration = current;
 			authentication = DKIMVerifier.verify(body, parsedHeaders, senderIdentity, now, !locallySent && !(this instanceof Draft));
 		}
+		refreshPolicy();
 	}
 
-	
+	void setPolicyVault(MailVault vault) { policyVault = vault; policyConfiguration = ""; }
 
-	
+	private void refreshPolicy() {
+		if (policyVault == null || locallySent || this instanceof Draft) return;
+		try {
+			AccountSecurity settings = new AccountSecurity(policyVault);
+			String revision = settings.revision();
+			if (!revision.equals(policyConfiguration)) {
+				policyResult = MailPolicy.assess(this, settings, policyBody);
+				policyConfiguration = revision;
+			}
+		} catch (IOException damaged) {
+			policyResult.spam = true;
+			policyResult.reasons.clear();
+			policyResult.reasons.add("Local mail-safety settings could not be read securely.");
+		}
+	}
 
-	
-	
+	public synchronized int getSpamScore() { refreshPolicy(); return policyResult.score; }
+	public synchronized boolean isBlockedSender() { refreshPolicy(); return policyResult.blocked; }
 
 	/** Folder context comes from MailCache, never from an email header. */
 	synchronized void setLocallySent(boolean locallySent) { this.locallySent = locallySent; }
@@ -295,6 +326,7 @@ class Mail {
 			warnings.add("The message structure could not be read safely. Automatic replies and attachments are blocked.");
 		if (SenderIdentity.hasInvisible(sender) || SenderIdentity.hasInvisible(subject))
 			warnings.add("The sender or subject contains hidden formatting characters.");
+		if (policyResult.spam) warnings.addAll(policyResult.reasons);
 		return warnings;
 	}
 
@@ -311,7 +343,10 @@ class Mail {
 		this.size = size;
 	}
 
-	public synchronized boolean isSpam() { return isSpam; }
+	public synchronized boolean isSpam() {
+		refreshPolicy();
+		return policyVault == null ? isSpam : policyResult.spam;
+	}
 
 	public synchronized boolean isNew() {
 		return isNew;

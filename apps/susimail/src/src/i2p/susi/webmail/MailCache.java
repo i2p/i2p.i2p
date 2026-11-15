@@ -373,6 +373,7 @@ class MailCache {
 					return null;
 				if (mails.size() >= FetchBudget.MAX_MESSAGES) { fetchStatus = "Mail download paused: the local message limit has been reached."; return null; }
                 newMail = new Mail(uidl);
+                newMail.setPolicyVault(disk.getVault());
 				// TODO really?
 				mails.put( uidl, newMail );
 			}
@@ -417,7 +418,7 @@ class MailCache {
 			} else {
 				if (_log.shouldWarn()) _log.warn("We do not have body in disk cache for b64: " + Base64.encode(uidl));
 			}
-			if (mode == FetchMode.ALL && mailbox != null) {
+			if (mode == FetchMode.ALL && mailbox != null && !mail.isBlockedSender()) {
                 if (!allowDownload()) return mail;
 				if (_log.shouldInfo()) _log.info("Fetching mail body from server for b64: " + Base64.encode(uidl));
 				Buffer rb = mailbox.getBody(uidl, receiveBuffer());
@@ -476,6 +477,7 @@ class MailCache {
 				if( mail == null ) {
 					if (mails.size() >= FetchBudget.MAX_MESSAGES) { fetchStatus = "Mail download paused: the local message limit has been reached."; break; }
                     newMail = new Mail(uidl);
+                    newMail.setPolicyVault(disk.getVault());
 					mails.put( uidl, newMail );
 				}
 			}
@@ -485,7 +487,7 @@ class MailCache {
 			}
 			if (mail.markForDeletion)
 				continue;
-			if (disk.getFullFile(uidl).exists()) continue;
+			if (disk.getFullFile(uidl).exists() || mail.isBlockedSender()) continue;
             long sz = mail.getSize();
 			if (sz > 0 && sz <= FETCH_ALL_SIZE)
 				headerOnly = false;
