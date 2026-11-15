@@ -324,8 +324,8 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
 
                 buf.append(addr);
                 buf.append(" - ");
-                String user = request.getHttpURI().getUser();
-                buf.append((user == null)? " - " : user);
+                // URI user-info may contain a password; never log it as a username.
+                buf.append(" - ");
                 buf.append(" [");
                 if (_logDateCache!=null)
                     buf.append(_logDateCache.format(Request.getTimeStamp(request)));
@@ -375,6 +375,12 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                     buf.append(" - ");
 
 
+            // Request fields cannot create extra records, including Unicode line separators.
+            for (int i = 0; i < buf.length(); i++) {
+                char c = buf.charAt(i);
+                if (c < 0x20 || c == 0x7f || c == 0x2028 || c == 0x2029)
+                    buf.setCharAt(i, '_');
+            }
             if (!_extended && !_logCookies && !_logLatency)
             {
                 synchronized(_writer)
@@ -424,7 +430,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         else 
         {
             writer.write('"');
-            writer.write(referer);
+            writeQuotedField(writer, referer);
             writer.write("\" ");
         }
         
@@ -434,9 +440,17 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
         else
         {
             writer.write('"');
-            writer.write(agent);
+            writeQuotedField(writer, agent);
             writer.write('"');
         }          
+    }
+
+    private static void writeQuotedField(java.io.Writer writer, String value) throws IOException {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '"' || c == '\\') writer.write('\\');
+            writer.write(c < 0x20 || c == 0x7f || c == 0x2028 || c == 0x2029 ? '_' : c);
+        }
     }
 
     /* ------------------------------------------------------------ */
