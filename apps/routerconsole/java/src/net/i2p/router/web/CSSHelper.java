@@ -44,6 +44,13 @@ public class CSSHelper extends HelperBase {
     private static final String SESSION_CONSOLE_NONCE = "__router.console.nonce.queue__";
     private static final int NONCE_QUEUE_SIZE = 10;
 
+    /** A fresh 128-bit, standard Base64 nonce for one response's script policy. */
+    public static String getCSPNonce() {
+        byte[] nonce = new byte[16];
+        RandomSource.getInstance().nextBytes(nonce);
+        return java.util.Base64.getEncoder().encodeToString(nonce);
+    }
+
     /**
      *  Replaces static consoleNonce, updateNonce, reseedNonce, systemNonce
      *  @param session returns an invalid nonce if null
