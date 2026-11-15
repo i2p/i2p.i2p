@@ -98,6 +98,9 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     private UpdateManager _umgr;
     private UpdateHandler _uhandler;
     private SimpleTimer2.TimedEvent _idleChecker;
+    private Register _updateRegister;
+    private volatile ClientAppState _state = ClientAppState.INITIALIZED;
+    private static final long UPDATE_REGISTER_RETRY = 60*1000;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -317,8 +320,12 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     /** Caller _must_ call loadConfig(file) before this if setting new values
      *  for i2cp host/port or i2psnark.dir
      */
-    public void start() {
+    public synchronized void start() {
+        if (_running)
+            return;
         _running = true;
+        _stopping = false;
+        changeState(ClientAppState.STARTING);
         ClientAppManager cmgr = _context.clientAppManager();
         if ("i2psnark".equals(_contextName)) {
             // Register with the ClientAppManager so the rpc plugin can find us
@@ -338,9 +345,11 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         // only if default instance
-        if (_context.isRouterContext() && "i2psnark".equals(_contextName))
+        if (_context.isRouterContext() && "i2psnark".equals(_contextName)) {
             // delay until UpdateManager is there
-            _context.simpleTimer2().addEvent(new Register(), 4*60*1000);
+            _updateRegister = new Register();
+            _updateRegister.schedule(4*60*1000);
+        }
         // Not required, Jetty has a shutdown hook
         //_context.addShutdownTask(new SnarkManagerShutdown());
         _idleChecker = new IdleChecker(this, _peerCoordinatorSet);
@@ -352,6 +361,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
                 Translate.setLanguage(lang, country);
             }
         }
+        changeState(ClientAppState.RUNNING);
     }
 
     /**
@@ -365,22 +375,56 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     }
 
     /** @since 0.9.4 */
-    private class Register implements SimpleTimer.TimedEvent {
+    private class Register extends SimpleTimer2.TimedEvent {
+        Register() {
+            super(_context.simpleTimer2());
+        }
+
         public void timeReached() {
-            if (!_running)
-                return;
-            ClientAppManager cmgr = _context.clientAppManager();
-            if (cmgr != null)
-                _umgr = (UpdateManager) cmgr.getRegisteredApp(UpdateManager.APP_NAME);
-            if (_umgr != null) {
-                _uhandler = new UpdateHandler(_context, _umgr, SnarkManager.this);
-                _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);
-                _umgr.register(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT, 10);
-                _log.warn("Registering with update manager");
-            } else {
-                _log.warn("No update manager to register with");
+            synchronized(SnarkManager.this) {
+                if (!_running || _updateRegister != this)
+                    return;
+                ClientAppManager cmgr = _context.clientAppManager();
+                ClientApp app = cmgr != null ? cmgr.getRegisteredApp(UpdateManager.APP_NAME) : null;
+                UpdateManager current = app instanceof UpdateManager ? (UpdateManager) app : null;
+                if (current != _umgr) {
+                    unregisterUpdates();
+                    if (current != null) {
+                        UpdateHandler handler = new UpdateHandler(_context, current, SnarkManager.this);
+                        try {
+                            current.register(handler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT, 10);
+                            current.register(handler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT, 10);
+                            _umgr = current;
+                            _uhandler = handler;
+                            if (_log.shouldInfo())
+                                _log.info("Registered with update manager");
+                        } catch (RuntimeException failure) {
+                            current.unregister(handler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
+                            current.unregister(handler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT);
+                            _log.warn("Update manager registration failed; will retry", failure);
+                        }
+                    }
+                }
+                schedule(UPDATE_REGISTER_RETRY);
             }
         }
+    }
+
+    /** Caller holds this manager's lifecycle lock. */
+    private void unregisterUpdates() {
+        if (_umgr != null && _uhandler != null) {
+            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
+            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT);
+        }
+        _umgr = null;
+        _uhandler = null;
+    }
+
+    private void changeState(ClientAppState state) {
+        _state = state;
+        ClientAppManager cmgr = _context.clientAppManager();
+        if (cmgr != null)
+            cmgr.notify(this, state, null, null);
     }
     
     /**
@@ -402,15 +446,18 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
      *  Fix this so an individual webaapp stop will close the tunnel.
      *  Runs inline.
      */
-    public void stop() {
+    public synchronized void stop() {
+        if (!_running)
+            return;
         if (_log.shouldDebug())
             _log.debug("Snark stop() begin", new Exception("I did it"));
-        if (_umgr != null && _uhandler != null) {
-            //_uhandler.shutdown();
-            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED, UpdateMethod.TORRENT);
-            _umgr.unregister(_uhandler, UpdateType.ROUTER_SIGNED_SU3, UpdateMethod.TORRENT);
-        }
         _running = false;
+        changeState(ClientAppState.STOPPING);
+        if (_updateRegister != null) {
+            _updateRegister.cancel();
+            _updateRegister = null;
+        }
+        unregisterUpdates();
         _monitor.interrupt();
         _connectionAcceptor.halt();
         _idleChecker.cancel();
@@ -431,6 +478,7 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
             }
         }
         _bwManager.clear();
+        changeState(ClientAppState.STOPPED);
         if (_log.shouldWarn())
             _log.warn("Snark stop() end");
     }
@@ -439,27 +487,24 @@ public class SnarkManager implements CompleteListener, ClientApp, DisconnectList
     public boolean isStopping() { return _stopping; }
 
     /**
-     *  ClientApp method. Does nothing.
-     *  Doesn't matter, we are only registering.
+     *  ClientApp method. Start the configured manager.
      *  @since 0.9.30
      */
-    public void startup() {}
+    public void startup() { start(); }
 
     /**
-     *  ClientApp method. Does nothing.
-     *  Doesn't matter, we are only registering.
+     *  ClientApp method. Stop this manager and unregister its services.
      *  @since 0.9.30
      */
-    public void shutdown(String[] args) {}
+    public void shutdown(String[] args) { stop(); }
 
     /**
      *  ClientApp method.
-     *  Doesn't matter, we are only registering.
-     *  @return INITIALIZED always.
+     *  @return current lifecycle state
      *  @since 0.9.30
      */
     public ClientAppState getState() {
-        return ClientAppState.INITIALIZED;
+        return _state;
     }
 
     /**
