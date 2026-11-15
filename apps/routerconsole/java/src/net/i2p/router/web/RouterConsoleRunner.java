@@ -743,22 +743,17 @@ public class RouterConsoleRunner implements RouterApp {
         }
 
         // fix up the allowed hosts set (see HostCheckHandler)
-        if (listenHosts.contains("0.0.0.0") ||
-            listenHosts.contains("::") ||
-            listenHosts.contains("0:0:0:0:0:0:0:0")) {
-            // empty set says all are valid
-            listenHosts.clear();
-        } else {
-            listenHosts.add("localhost");
-            listenHosts.add("127.0.0.1");
-            listenHosts.add("::1");
-            listenHosts.add("0:0:0:0:0:0:0:1");
-            String allowed = _context.getProperty(PROP_ALLOWED_HOSTS);
-            if (allowed != null) {
-                StringTokenizer tok = new StringTokenizer(allowed, " ,");
-                while (tok.hasMoreTokens()) {
-                    listenHosts.add(tok.nextToken());
-                }
+        // Wildcard listeners must retain DNS rebinding protection. Numeric IP
+        // addresses are accepted by HostCheckHandler; other names need opt-in.
+        listenHosts.add("localhost");
+        listenHosts.add("127.0.0.1");
+        listenHosts.add("::1");
+        listenHosts.add("0:0:0:0:0:0:0:1");
+        String allowed = _context.getProperty(PROP_ALLOWED_HOSTS);
+        if (allowed != null) {
+            StringTokenizer tok = new StringTokenizer(allowed, " ,");
+            while (tok.hasMoreTokens()) {
+                listenHosts.add(tok.nextToken());
             }
         }
         chCollWrapper.setListenHosts(listenHosts);

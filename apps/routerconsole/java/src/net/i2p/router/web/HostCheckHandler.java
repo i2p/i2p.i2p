@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -15,6 +16,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.HostPort;
 
 /**
  * Block certain Host headers to prevent DNS rebinding attacks.
@@ -60,13 +62,15 @@ public class HostCheckHandler extends GzipHandler
     /**
      *  Set the legal hosts.
      *  Not synched. Call this BEFORE starting.
-     *  If empty, all are allowed.
+     *  Localhost and numeric IP addresses are always allowed.
      *
      *  @param hosts contains hostnames or IPs. But we allow all IPs anyway.
      */
     public void setListenHosts(Set<String> hosts) {
         _listenHosts.clear();
-        _listenHosts.addAll(hosts);
+        for (String host : hosts) {
+            _listenHosts.add(host.toLowerCase(Locale.US));
+        }
     }
 
     /**
@@ -81,7 +85,10 @@ public class HostCheckHandler extends GzipHandler
          throws Exception
     {
         String host = request.getHeaders().get("Host");
-        if (!allowHost(host)) {
+        String authority = request.getHttpURI().getAuthority();
+        boolean headerAllowed = allowHost(host);
+        if (!headerAllowed || !allowHost(authority)) {
+            if (headerAllowed) host = authority;
             Log log = _context.logManager().getLog(HostCheckHandler.class);
             host = DataHelper.stripHTML(getHost(host));
             String s = "Console request denied.\n" +
@@ -132,19 +139,12 @@ public class HostCheckHandler extends GzipHandler
     private boolean allowHost(String host) {
         if (host == null)
             return true;
-        // common cases
-        if (host.equals("127.0.0.1:7657") ||
-            host.equals("localhost:7657") ||
-            host.equals("[::1]:7657") ||
-            host.equals("127.0.0.1:7667") ||
-            host.equals("localhost:7667") ||
-            host.equals("[::1]:7667"))
-            return true;
-        // all allowed?
-        if (_listenHosts.isEmpty())
+        // Avoid reparsing the usual console authorities on every request.
+        if (host.equals("127.0.0.1:7657") || host.equals("localhost:7657") || host.equals("[::1]:7657") ||
+            host.equals("127.0.0.1:7667") || host.equals("localhost:7667") || host.equals("[::1]:7667"))
             return true;
         host = getHost(host);
-        if (_listenHosts.contains(host))
+        if (host.equals("localhost") || _listenHosts.contains(host))
             return true;
         // allow all IP addresses
         if (Addresses.isIPAddress(host))
@@ -159,17 +159,14 @@ public class HostCheckHandler extends GzipHandler
      *  @param host the HTTP Host header non-null
      */
     private static String getHost(String host) {
-        if (host.startsWith("[")) {
-            host = host.substring(1);
-            int brack = host.indexOf(']');
-            if (brack >= 0)
-                host = host.substring(0, brack);
-        } else {
-            int colon = host.indexOf(':');
-            if (colon >= 0)
-                host = host.substring(0, colon);
+        try {
+            host = new HostPort(host).getHost();
+            if (host.startsWith("[") && host.endsWith("]"))
+                host = host.substring(1, host.length() - 1);
+            return host.toLowerCase(Locale.US);
+        } catch (IllegalArgumentException invalid) {
+            return "";
         }
-        return host;
     }
 
     /**
