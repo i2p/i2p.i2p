@@ -81,8 +81,14 @@ class Draft extends Mail {
 				if (b == null)
 					continue;
 				String path = DataHelper.getUTF8(b);
-				Attachment a = new Attachment(name, type, enc, new File(path));
-
+				MailVault vault = rb instanceof VaultFileBuffer ? ((VaultFileBuffer) rb).vault : null;
+				File file = new File(path);
+				if (vault != null) {
+					java.nio.file.Path allowed = vault.directory.resolve(WebMail.DIR_DRAFTS).resolve(PersistentMailCache.DIR_ATTACHMENTS);
+					if (!file.toPath().toAbsolutePath().normalize().startsWith(allowed) || java.nio.file.Files.isSymbolicLink(file.toPath()))
+						continue;
+				}
+				Attachment a = new Attachment(name, type, enc, file, vault);
 				size += a.getSize();
 				attachments.add(a);
 			}

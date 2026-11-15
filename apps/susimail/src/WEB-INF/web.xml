@@ -20,7 +20,8 @@
       <!-- 7.27 MB. See SMTPClient for discussion -->
       <max-file-size>7629902</max-file-size>
       <max-request-size>7629902</max-request-size>
-      <file-size-threshold>131072</file-size-threshold>
+      <!-- Keep bounded uploads in memory until the application encrypts them. -->
+      <file-size-threshold>7629902</file-size-threshold>
     </multipart-config>
   </servlet>
 

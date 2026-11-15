@@ -76,6 +76,8 @@ class MailCache {
 	private boolean _isLoaded;
 	private final boolean _isDrafts;
 	private final Log _log;
+    private final FetchBudget fetchBudget;
+    private volatile String fetchStatus = "";
 	
 	/** Includes header, headers are generally 1KB to 1.5 KB,
 	 *  and bodies will compress well.
@@ -90,12 +92,18 @@ class MailCache {
 	 */
 	MailCache(I2PAppContext ctx, POP3MailBox mailbox, String folderName,
 		  String host, int port, String user, String pass) throws IOException {
+		this(ctx, mailbox, folderName, host, port, user, pass, null);
+	}
+
+	MailCache(I2PAppContext ctx, POP3MailBox mailbox, String folderName,
+		  String host, int port, String user, String pass, MailVault vault) throws IOException {
 		_log = ctx.logManager().getLog(MailCache.class);
 		this.mailbox = mailbox;
 		mails = new HashMap<String, Mail>();
-		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName);
+		disk = new PersistentMailCache(ctx, host, port, user, pass, folderName, vault);
 		_context = ctx;
-		Folder<String> folder = new Folder<String>();	
+        fetchBudget = FetchBudget.forAccount(disk.getVault().directory);
+			Folder<String> folder = new Folder<String>();	
 		// setElements() sorts, so configure the sorting first
 		//sessionObject.folder.addSorter( SORT_ID, new IDSorter( sessionObject.mailCache ) );
 		if (folderName.equals(WebMail.DIR_DRAFTS) || folderName.equals(WebMail.DIR_SENT))
@@ -134,6 +142,8 @@ class MailCache {
 	 * @since 0.9.35
 	 * @return non-null
 	 */
+	String getFetchStatus() { String damaged = disk.getLoadStatus(); return damaged.isEmpty() ? fetchStatus : damaged; }
+
 	public Folder<String> getFolder() {
 		return folder;
 	}
@@ -153,8 +163,9 @@ class MailCache {
 	 * @param buffer as received from getFullBuffer
 	 * @since 0.9.35
 	 */
-	public void writeComplete(String uidl, Buffer buffer, boolean success) {
+	public boolean writeComplete(String uidl, Buffer buffer, boolean success) {
 		buffer.writeComplete(success);
+		if (buffer instanceof VaultFileBuffer && !((VaultFileBuffer) buffer).isCommitted()) success = false;
 		if (success) {
 			Mail mail;
 			if (_isDrafts)
@@ -162,12 +173,17 @@ class MailCache {
 			else
 				mail = new Mail(uidl, folderName.equals(WebMail.DIR_SENT));
 			mail.setBody(buffer);
+			if (!mail.hasBody()) return false;
+            disk.saveMail(mail); // retain a small encrypted preview for startup
 			synchronized(mails) {
 				mails.put(uidl, mail);
 			}
 			folder.addElement(uidl);
 		}
+		return success;
 	}
+
+	MailVault getVault() { return disk.getVault(); }
 
 	/**
 	 * @return non-null only for Drafts
@@ -200,8 +216,12 @@ class MailCache {
 			File to = toPMC.getFullFile(uidl);
 			if (to.exists())
 				return false;
-			if (!FileUtil.rename(from, to))
+			if (!toPMC.saveMail(mail))
 				return false;
+			Mail verifyCopy = new Mail(uidl, toMC.folderName.equals(WebMail.DIR_SENT));
+			if (!toPMC.getMail(verifyCopy, false) || !verifyCopy.hasBody()) return false;
+			if (!from.delete()) return false;
+            disk.getHeaderFile(uidl).delete();
 			mails.remove(uidl);
 			folder.removeElement(uidl);
 		}
@@ -218,7 +238,7 @@ class MailCache {
 	private void movedTo(Mail mail) {
 		synchronized(mails) {
 			mail.setLocallySent(folderName.equals(WebMail.DIR_SENT));
-            // we must reset the body of the mail to the new FileBuffer
+			// we must reset the body of the mail to the new FileBuffer
 			Buffer body = disk.getFullBuffer(mail.uidl);
 			mail.setBody(body);
 			mails.put(mail.uidl, mail);
@@ -340,6 +360,7 @@ class MailCache {
         @SuppressWarnings({"unchecked", "rawtypes"})
 	public Mail getMail(String uidl, FetchMode mode) {
 		Mail mail = null, newMail = null;
+        if (uidl == null || uidl.length() > 128) return null;
 
 		/*
 		 * synchronize update to Map
@@ -348,9 +369,10 @@ class MailCache {
 			mail = mails.get( uidl );
 			if( mail == null ) {
 				// if not in inbox, we can't fetch, this is what we have
-				if (mailbox == null)
+				if (mailbox == null || mode == FetchMode.CACHE_ONLY || mode == FetchMode.HEADER_CACHE_ONLY)
 					return null;
-				newMail = new Mail(uidl);
+				if (mails.size() >= FetchBudget.MAX_MESSAGES) { fetchStatus = "Mail download paused: the local message limit has been reached."; return null; }
+                newMail = new Mail(uidl);
 				// TODO really?
 				mails.put( uidl, newMail );
 			}
@@ -369,9 +391,9 @@ class MailCache {
 		if (mode == FetchMode.HEADER) {
 			if (!mail.hasHeader() && mailbox != null) {
 				if (_log.shouldInfo()) _log.info("Fetching mail header from server for b64: " + Base64.encode(uidl));
-				Buffer buf = mailbox.getHeader(uidl);
-				if (buf != null)
-					mail.setHeader(buf);
+				if (!allowDownload()) return mail;
+                Buffer buf = mailbox.getHeader(uidl, headerBuffer());
+				if (buf != null) { mail.setHeader(buf); disk.saveMail(mail); }
 			}
 		} else if (mode == FetchMode.HEADER_CACHE_ONLY) {
 			if (!mail.hasHeader()) {
@@ -396,12 +418,12 @@ class MailCache {
 				if (_log.shouldWarn()) _log.warn("We do not have body in disk cache for b64: " + Base64.encode(uidl));
 			}
 			if (mode == FetchMode.ALL && mailbox != null) {
+                if (!allowDownload()) return mail;
 				if (_log.shouldInfo()) _log.info("Fetching mail body from server for b64: " + Base64.encode(uidl));
-				File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
-				Buffer rb = mailbox.getBody(uidl, new FileBuffer(file));
+				Buffer rb = mailbox.getBody(uidl, receiveBuffer());
 				if (rb != null) {
 					mail.setBody(rb);
-					if (disk.saveMail(mail) &&
+					if (mail.hasBody() && saveReceived(mail, rb) &&
 					    canDeleteFromServer(mail)) {
 						mailbox.queueForDeletion(mail.uidl);
 					}
@@ -433,6 +455,7 @@ class MailCache {
 			return false;
 		}
 		boolean hOnly = mode == FetchMode.HEADER;
+        fetchStatus = "";
 		
 		Collection<String> popKnown = mailbox.getUIDLs();
 		if (popKnown == null)
@@ -443,6 +466,7 @@ class MailCache {
 		for (String uidl : popKnown) {
 			Mail mail = null, newMail = null;
 			boolean headerOnly = hOnly;
+            if (fetches.size() >= FetchBudget.BATCH) { fetchStatus = "Mail is downloading in batches of 20. Check mail again to continue."; break; }
 
 			/*
 			 * synchronize update to Map
@@ -450,7 +474,8 @@ class MailCache {
 			synchronized(mails) {
 				mail = mails.get( uidl );
 				if( mail == null ) {
-					newMail = new Mail(uidl);
+					if (mails.size() >= FetchBudget.MAX_MESSAGES) { fetchStatus = "Mail download paused: the local message limit has been reached."; break; }
+                    newMail = new Mail(uidl);
 					mails.put( uidl, newMail );
 				}
 			}
@@ -460,7 +485,8 @@ class MailCache {
 			}
 			if (mail.markForDeletion)
 				continue;
-			long sz = mail.getSize();
+			if (disk.getFullFile(uidl).exists()) continue;
+            long sz = mail.getSize();
 			if (sz > 0 && sz <= FETCH_ALL_SIZE)
 				headerOnly = false;
 			if( headerOnly ) {
@@ -475,7 +501,8 @@ class MailCache {
 						}
 						continue;  // found on disk, woo
 					}
-					POP3Request pr = new POP3Request(mail, true, new MemoryBuffer(1024));
+					if (!allowDownload()) break;
+                    POP3Request pr = new POP3Request(mail, true, headerBuffer());
 					fetches.add(pr);
 				} else {
 					if (mail.hasBody() &&
@@ -495,8 +522,8 @@ class MailCache {
 						}
 						continue;  // found on disk, woo
 					}
-					File file = new File(_context.getTempDir(), "susimail-new-" + _context.random().nextLong());
-					POP3Request pr = new POP3Request(mail, false, new FileBuffer(file));
+					if (!allowDownload()) break;
+                    POP3Request pr = new POP3Request(mail, false, receiveBuffer());
 					fetches.add(pr);
 				} else {
 					if (canDeleteFromServer(mail)) {
@@ -535,11 +562,13 @@ class MailCache {
 					if (setAdditional)
 						additionalMsg = "\n\n" + mail.sender + '\n' + mail.subject;
 					rv = true;
-					if (disk.saveMail(mail) && mail.hasBody() &&
+					if ((pr.getHeaderOnly() ? disk.saveMail(mail) : mail.hasBody() && saveReceived(mail, pr.getBuffer())) && mail.hasBody() &&
 					    canDeleteFromServer(mail)) {
 						mailbox.queueForDeletion(mail.uidl);
 					}
-				}
+                }
+                if (pr.getBuffer() instanceof VaultFileBuffer && (!pr.getSuccess() || !pr.mail.hasBody()))
+                    ((VaultFileBuffer) pr.getBuffer()).getFile().delete();
 			}
 			if (newMail > 0) {
 				String msg = ngettext("{0} new message", "{0} new messages", newMail);
@@ -559,6 +588,36 @@ class MailCache {
 			}
 		}
 		return rv;
+	}
+
+	/** Keep the server copy when parsing or integrity checks fail. */
+	private static boolean canDeleteFromServer(Mail mail) {
+		return mail.hasBody() && !mail.hasUnsafeContent() &&
+			!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER));
+	}
+
+    private boolean allowDownload() {
+        if (!disk.getVault().storageAvailable()) { fetchStatus = "Mail download paused: local storage is full. Move or remove saved messages to continue."; return false; }
+        if (!fetchBudget.message()) { fetchStatus = "Mail download paused at the per-minute limit. Check mail again shortly."; return false; }
+        return true;
+    }
+    private Buffer headerBuffer() {
+        return new MemoryBuffer(1024) {
+            @Override public java.io.OutputStream getOutputStream() { return fetchBudget.limit(super.getOutputStream()); }
+        };
+    }
+
+	private Buffer receiveBuffer() {
+		File file = disk.getVault().directory.resolve("pending/receive-" + _context.random().nextLong()).toFile();
+		return new VaultFileBuffer(disk.getVault(), file, true).downloaded(fetchBudget);
+	}
+
+	private boolean saveReceived(Mail mail, Buffer incoming) {
+		if (!disk.saveMail(mail)) return false;
+		mail.setBody(disk.getFullBuffer(mail.uidl));
+		if (!mail.hasBody()) return false;
+		if (incoming instanceof VaultFileBuffer) ((VaultFileBuffer) incoming).getFile().delete();
+		return true;
 	}
 
 	/**
@@ -591,7 +650,7 @@ class MailCache {
 					continue;
 				mail.markForDeletion = true;
 				// now replace it with an empty one to save memory
-				mail = new Mail(uidl, folderName.equals(WebMail.DIR_SENT));
+				mail = new Mail(uidl);
 				mail.markForDeletion = true;
 				mails.put(uidl, mail);
 			}
@@ -655,7 +714,4 @@ class MailCache {
 	private static String ngettext(String s, String p, int n) {
 		return Messages.getString(n, s, p);
 	}
-private static boolean canDeleteFromServer(Mail mail) {
-        return mail.hasBody() && !mail.hasUnsafeContent() && !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER));
-    }
 }

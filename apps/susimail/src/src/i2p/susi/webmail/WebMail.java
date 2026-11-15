@@ -317,6 +317,8 @@ public class WebMail extends HttpServlet
 		/** Set by threaded connector. -1 if nothing to report, 0 or more after fetch complete */
 		int newMails = -1;
 		String user, pass, host, error = "", info = "";
+		MailVault vault;
+		boolean authenticating, cancelled;
 		// Just convenience to pass from PSCB to P-R-G
 		String draftUIDL;
 		// TODO Map of UIDL to List
@@ -348,7 +350,11 @@ public class WebMail extends HttpServlet
 		 * Close the POP3 socket if still open
 		 * @since 0.9.13
 		 */
-		public void valueUnbound(HttpSessionBindingEvent event) {
+		public synchronized void valueUnbound(HttpSessionBindingEvent event) {
+			cancelled = true;
+			if (vault != null) { vault.close(); vault = null; }
+			pass = null;
+			caches.clear();
 			if (log.shouldDebug()) log.debug("Mail session removed");
 			POP3MailBox mbox = mailbox;
 			if (mbox != null) {
@@ -364,7 +370,8 @@ public class WebMail extends HttpServlet
 		 *
 		 *  @since 0.9.13
 		 */
-		public void foundNewMail(boolean yes) {
+		public synchronized void foundNewMail(boolean yes) {
+            if (cancelled || vault == null || !vault.isActive()) return;
 			if (!yes)
 				return;
 			MailCache mc = caches.get(DIR_FOLDER);
@@ -849,6 +856,10 @@ public class WebMail extends HttpServlet
 					doContinue = false;
 				} else {
 					user = user.trim();
+					if (user.length() == 0 || user.length() > 64 || SenderIdentity.hasInvisible(user) || user.indexOf('/') >= 0 || user.indexOf('\\') >= 0) {
+						sessionObject.error += _t("Enter a valid account name.") + '\n';
+						doContinue = false;
+					}
 					if (user.endsWith("@mail.i2p")) {
 						sessionObject.error += _t("Do not include @mail.i2p in the username") + '\n';
 						doContinue = false;
@@ -857,8 +868,9 @@ public class WebMail extends HttpServlet
 				if( pass == null || pass.length() == 0 ) {
 					sessionObject.error += _t("Need password for authentication.") + '\n';
 					doContinue = false;
-				} else {
-					pass = pass.trim();
+				} else if (pass.length() > 1024) {
+					sessionObject.error += _t("The password is too long.") + '\n';
+					doContinue = false;
 				}
 				if( host == null || host.length() == 0 ) {
 					sessionObject.error += _t("Need hostname for connect.") + '\n';
@@ -875,8 +887,8 @@ public class WebMail extends HttpServlet
 					pop3Port = pop3Port.trim();
 					try {
 						pop3PortNo = Integer.parseInt( pop3Port );
-						if( pop3PortNo < 0 || pop3PortNo > 65535 ) {
-							sessionObject.error += _t("POP3 port number is not in range 0..65535.") + '\n';
+						if( pop3PortNo <= 0 || pop3PortNo > 65535 ) {
+							sessionObject.error += _t("POP3 port number is not in range 1..65535.") + '\n';
 							doContinue = false;
 						}
 					}
@@ -895,8 +907,8 @@ public class WebMail extends HttpServlet
 					smtpPort = smtpPort.trim();
 					try {
 						smtpPortNo = Integer.parseInt( smtpPort );
-						if( smtpPortNo < 0 || smtpPortNo > 65535 ) {
-							sessionObject.error += _t("SMTP port number is not in range 0..65535.") + '\n';
+						if( smtpPortNo <= 0 || smtpPortNo > 65535 ) {
+							sessionObject.error += _t("SMTP port number is not in range 1..65535.") + '\n';
 							doContinue = false;
 						}
 					}
@@ -909,12 +921,72 @@ public class WebMail extends HttpServlet
 				if( doContinue ) {
 					sessionObject.smtpPort = smtpPortNo;
 					sessionObject.smtpHost = smtphost;
-					state = threadedStartup(sessionObject, offline, state,
-					                        host, pop3PortNo, user, pass);
+					state = beginLogin(sessionObject, offline, host, pop3PortNo, user, pass,
+						request.getParameter("cachePassword"), request.getParameter("authCode"), request.getParameter("confirmPassword"));
 				}
 			}
 		}
 		return state;
+	}
+
+	private static State beginLogin(final SessionObject session, final boolean offline, final String host,
+		final int port, final String user, final String pass, String previousPassword, final String code, String confirmation) {
+		final I2PAppContext ctx = I2PAppContext.getGlobalContext();
+		final String account = host + ':' + port + ':' + user;
+		long now = ctx.clock().now();
+		if (!LoginLimiter.allowed(account, now) || !LoginLimiter.WORK.tryAcquire()) {
+			session.error += _t("Too many login attempts. Wait one minute and try again.") + '\n';
+			return State.AUTH;
+		}
+		boolean background = false;
+		try {
+			java.nio.file.Path directory = MailVault.accountDirectory(ctx, host, port, user);
+			final String localPassword = previousPassword != null && previousPassword.length() > 0 ? previousPassword : pass;
+			final POP3MailBox mailbox = new POP3MailBox(host, port, user, pass);
+			if (MailVault.exists(directory) || offline || java.nio.file.Files.exists(directory.resolve("vault.pending"))) {
+				boolean creating = !MailVault.exists(directory) && !java.nio.file.Files.exists(directory.resolve("vault.pending"));
+				if (creating && (!MailVault.hasLegacyMail(directory) || !localPassword.equals(confirmation)))
+					throw new IOException("For a first login, connect to the mail server. To encrypt an existing offline cache, repeat its password in the confirmation field.");
+				MailVault vault = MailVault.open(ctx, host, port, user, localPassword, creating);
+				if (!new AccountSecurity(vault).verifyLogin(code, now)) { vault.close(); throw new IOException("The authenticator or recovery code was not accepted. Wait for a new code if one was already used."); }
+				session.vault = vault;
+				LoginLimiter.succeeded(account);
+				return threadedStartup(session, offline, State.AUTH, host, port, user, pass, mailbox);
+			}
+			// A new vault is bound to a password only after the provider accepts that password.
+			session.authenticating = true;
+			session.mailbox = mailbox;
+			session.user = user; session.pass = pass; session.host = host;
+			new I2PAppThread(new Runnable() {
+				public void run() {
+					MailVault vault = null;
+					try {
+						if (!mailbox.blockingConnectToServer()) throw new IOException("The mail server did not accept the connection or login.");
+						vault = MailVault.open(ctx, host, port, user, pass, true);
+						if (!new AccountSecurity(vault).verifyLogin(code, ctx.clock().now())) throw new IOException("The authenticator or recovery code was not accepted.");
+						synchronized (session) {
+							if (session.cancelled) { vault.close(); mailbox.destroy(); return; }
+							session.vault = vault;
+							if (threadedStartup(session, false, State.AUTH, host, port, user, pass, mailbox) == State.AUTH)
+								throw new IOException("The encrypted mailbox could not be opened.");
+							session.authenticating = false;
+							LoginLimiter.succeeded(account);
+						}
+					} catch (IOException | RuntimeException failure) {
+						if (vault != null) vault.close();
+						mailbox.destroy();
+						synchronized (session) { session.authenticating = false; session.mailbox = null; session.pass = null; session.error += failure.getMessage() + '\n'; }
+						LoginLimiter.failed(account, ctx.clock().now());
+					} finally { LoginLimiter.WORK.release(); }
+				}
+			}, "SusiMail secure login").start();
+			background = true;
+			return State.LOADING;
+		} catch (IOException failure) {
+			session.error += failure.getMessage() + '\n';
+			LoginLimiter.failed(account, now);
+			return State.AUTH;
+		} finally { if (!background) LoginLimiter.WORK.release(); }
 	}
 
 	/**
@@ -932,30 +1004,34 @@ public class WebMail extends HttpServlet
 	 * @since 0.9.34
 	 */
 	private static State threadedStartup(SessionObject sessionObject, boolean offline, State state,
-	                                     String host, int pop3PortNo, String user, String pass) {
-		POP3MailBox mailbox = new POP3MailBox(host, pop3PortNo, user, pass);
+	                                     String host, int pop3PortNo, String user, String pass, POP3MailBox mailbox) {
 		I2PAppContext ctx = I2PAppContext.getGlobalContext();
 		Log log = sessionObject.log;
 		MailCache mc;
 		try {
 			mc = new MailCache(ctx, mailbox, DIR_FOLDER,
-			                   host, pop3PortNo, user, pass);
+			                   host, pop3PortNo, user, pass, sessionObject.vault);
 			sessionObject.caches.put(DIR_FOLDER, mc);
 			MailCache mc2 = new MailCache(ctx, null, DIR_DRAFTS,
-			                              host, pop3PortNo, user, pass);
+			                              host, pop3PortNo, user, pass, sessionObject.vault);
 			sessionObject.caches.put(DIR_DRAFTS, mc2);
 			mc2 = new MailCache(ctx, null, DIR_SENT,
-			                    host, pop3PortNo, user, pass);
+			                    host, pop3PortNo, user, pass, sessionObject.vault);
 			sessionObject.caches.put(DIR_SENT, mc2);
 			mc2 = new MailCache(ctx, null, DIR_TRASH,
-			                    host, pop3PortNo, user, pass);
+			                    host, pop3PortNo, user, pass, sessionObject.vault);
 			sessionObject.caches.put(DIR_TRASH, mc2);
 			mc2 = new MailCache(ctx, null, DIR_SPAM,
-			                    host, pop3PortNo, user, pass);
+			                    host, pop3PortNo, user, pass, sessionObject.vault);
 			sessionObject.caches.put(DIR_SPAM, mc2);
 		} catch (IOException ioe) {
-			log.error("Error creating disk cache", ioe);
-			sessionObject.error += ioe.toString() + '\n';
+			log.error("Error opening encrypted mail storage", ioe);
+			sessionObject.error += ioe.getMessage() + '\n';
+			sessionObject.caches.clear();
+			if (sessionObject.vault != null) sessionObject.vault.close();
+			sessionObject.vault = null;
+			sessionObject.mailbox = null;
+			mailbox.destroy();
 			return State.AUTH;
 		}
 
@@ -1012,6 +1088,7 @@ public class WebMail extends HttpServlet
 
 		public void foundNewMail(boolean yes) {
 			synchronized(_so) {
+                if (_so.cancelled) return;
 				// get through cache so we have the disk-only ones too
 				Folder<String> f = _mc.getFolder();
 				String[] uidls = _mc.getUIDLs();
@@ -1050,6 +1127,7 @@ public class WebMail extends HttpServlet
 				// we do this whether new mail was found or not,
 				// because we may already have UIDLs in the MailCache to fetch
 				synchronized(_so) {
+                    if (_so.cancelled || _so.mailbox != _mb) return;
 					mc = _so.caches.get(DIR_FOLDER);
 					if (mc == null) {
 						_so.error += "Internal error, no folder\n";
@@ -1071,6 +1149,7 @@ public class WebMail extends HttpServlet
 			}
 			if (log.shouldDebug()) log.debug("CW.FNM connected? " + connected + " found? " + found);
 			synchronized(_so) {
+                if (_so.cancelled || _so.mailbox != _mb) return;
 				if (!connected) {
 					String error = _mb.lastError();
 					if (error.length() > 0)
@@ -1160,6 +1239,7 @@ public class WebMail extends HttpServlet
 		state = processLogout(sessionObject, request, isPOST, state);
 		if (state == State.AUTH)
 			return state;
+		if (sessionObject.authenticating) return State.LOADING;
 		// if loading, we can't get to states LIST/SHOW or it will block
 		for (MailCache mc : sessionObject.caches.values()) {
 			if (mc.isLoading())
@@ -1314,7 +1394,7 @@ public class WebMail extends HttpServlet
 					 * extract original sender from Reply-To: or From:
 					 */
 					MailPart part = mail != null ? mail.getPart() : null;
-if (mail != null && (reply || replyAll)) {
+					if (mail != null && (reply || replyAll)) {
 						if (!mail.canReplySafely()) {
 							sessionObject.error += _t("Automatic replies are blocked because the message identity or integrity is unsafe.") + '\n';
 							return State.SHOW;
@@ -1407,12 +1487,16 @@ if (mail != null && (reply || replyAll)) {
 									} else {
 										f = new File(ctx.getTempDir(), temp);
 									}
-									Buffer out = new FileBuffer(f);
+									if (drafts == null) { sessionObject.error += _t("The encrypted Drafts folder is unavailable.") + '\n'; return State.SHOW; }
+									Buffer out = new VaultFileBuffer(drafts.getVault(), f, false);
 									boolean ok = false;
 									try {
 										mp.decode(0, out);
+										out.getOutputStream().close();
 										ok = true;
-										attachments.add(new Attachment(mp.name, mp.type, mp.encoding, f));
+										out.writeComplete(true);
+                                        if (!((VaultFileBuffer) out).isCommitted()) throw new IOException("Unable to save the encrypted attachment");
+                                        attachments.add(new Attachment(mp.name, mp.type, mp.encoding, f, drafts.getVault()));
 									} catch (IOException e) {
 										sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
 									} finally {
@@ -1430,12 +1514,16 @@ if (mail != null && (reply || replyAll)) {
 								} else {
 									f = new File(ctx.getTempDir(), temp);
 								}
-								Buffer out = new FileBuffer(f);
+								if (drafts == null) { sessionObject.error += _t("The encrypted Drafts folder is unavailable.") + '\n'; return State.SHOW; }
+								Buffer out = new VaultFileBuffer(drafts.getVault(), f, false);
 								boolean ok = false;
 								try {
 									part.decode(0, out);
+									out.getOutputStream().close();
 									ok = true;
-									attachments.add(new Attachment("email.html", part.type, part.encoding, f));
+									out.writeComplete(true);
+                                    if (!((VaultFileBuffer) out).isCommitted()) throw new IOException("Unable to save the encrypted attachment");
+                                    attachments.add(new Attachment("email.html", part.type, part.encoding, f, drafts.getVault()));
 								} catch (IOException e) {
 									sessionObject.error += _t("Error reading uploaded file: {0}", e.getMessage()) + '\n';
 								} finally {
@@ -1601,6 +1689,15 @@ if (mail != null && (reply || replyAll)) {
 	 * @param request
 	 * @return new state, or null if unknown
 	 */
+    private static void copyUpload(InputStream in, OutputStream out) throws IOException {
+        byte[] block = new byte[8192]; int count; long total = 0;
+        while ((count = in.read(block)) != -1) {
+            total += count;
+            if (total > 8L * 1024 * 1024) throw new IOException("Attachments are limited to 8 MiB each");
+            out.write(block, 0, count);
+        }
+    }
+
 	private static State processComposeButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		State state = null;
@@ -1614,7 +1711,8 @@ if (mail != null && (reply || replyAll)) {
 			i = filename.lastIndexOf('\\');
 			if( i != -1 )
 				filename = filename.substring( i + 1 );
-			if (filename.length() > 0) {
+			if (filename.length() > 200 || SenderIdentity.hasInvisible(filename)) { sessionObject.error += "Enter a filename without hidden characters, up to 200 characters.\n"; return State.NEW; }
+            if (filename.length() > 0) {
 				InputStream in = null;
 				OutputStream out = null;
 				I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -1631,9 +1729,16 @@ if (mail != null && (reply || replyAll)) {
 				        in = request.getInputStream( NEW_FILENAME );
 					if(in == null)
 						throw new IOException("no stream");
-					out = new SecureFileOutputStream(f);
-					DataHelper.copy(in, out);
+					if (drafts == null) throw new IOException("The encrypted Drafts folder is unavailable");
+					VaultFileBuffer encrypted = new VaultFileBuffer(drafts.getVault(), f, false);
+                    out = encrypted.getOutputStream();
+					copyUpload(in, out);
+					out.close();
+                    encrypted.writeComplete(true);
+                    if (!encrypted.isCommitted()) throw new IOException("Unable to save the encrypted attachment");
 					String contentType = request.getContentType( NEW_FILENAME );
+					if (contentType == null || contentType.length() > 256 || !contentType.matches("[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+(?:;[^\\r\\n,]*)?"))
+						contentType = "application/octet-stream";
 					String encodeTo;
 					String ctlc = contentType.toLowerCase(Locale.US);
 					if (ctlc.startsWith("text/")) {
@@ -1651,7 +1756,7 @@ if (mail != null && (reply || replyAll)) {
 						if (sessionObject.attachments == null)
 							sessionObject.attachments = new ArrayList<Attachment>();
 						sessionObject.attachments.add(
-							new Attachment(filename, contentType, encodeTo, f)
+							new Attachment(filename, contentType, encodeTo, f, drafts.getVault())
 						);
 						// Save the draft
 						String uidl = Base64.decodeToString(request.getParameter(NEW_UIDL));
@@ -1831,7 +1936,7 @@ if (mail != null && (reply || replyAll)) {
 	private static void processDraftAttachmentLink(SessionObject sessionObject,
 	                                               RequestWrapper request, HttpServletResponse response)
 	{
-        setNoCacheHeaders(response);
+		setNoCacheHeaders(response);
 		String str = request.getParameter(DRAFT_ATTACHMENT);
 		if (str != null) {
 			InputStream in = null;
@@ -2205,6 +2310,7 @@ if (mail != null && (reply || replyAll)) {
 					folderName = DIR_FOLDER;
 			}
 		}
+		if (session.authenticating) return null;
 		MailCache rv = session.caches.get(folderName);
 		if (rv == null) {
 			// only show error if logged in
@@ -2300,7 +2406,7 @@ if (mail != null && (reply || replyAll)) {
 		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
 
 		httpRequest.setCharacterEncoding("UTF-8");
-        setNoCacheHeaders(response);
+		setNoCacheHeaders(response);
 		response.setHeader("X-Frame-Options", "SAMEORIGIN");
 		// very strict CSP for HTML emails in iframes
 		if (httpRequest.getParameter(RAW_ATTACHMENT) != null ||
@@ -2368,8 +2474,25 @@ if (mail != null && (reply || replyAll)) {
 				}
 			}
 
-			if (sessionObject.mailbox != null && request.getParameter("openLink") != null) { showLinkWarning(response, request.getParameter("openLink")); return; }
-            //// Start state determination and button processing
+			if (sessionObject.vault != null) {
+				if (!sessionObject.vault.isActive()) {
+					httpSession.invalidate();
+					sendRedirect(httpRequest, response, null);
+					return;
+				}
+				try { new AccountSecurity(sessionObject.vault).mfaEnabled(); }
+				catch (IOException damaged) { httpSession.invalidate(); response.sendError(401, "Saved account security data failed an integrity check. Restore an intact backup before signing in."); return; }
+                
+
+				
+			}
+
+			if (sessionObject.mailbox != null && request.getParameter("openLink") != null) {
+				showLinkWarning(response, request.getParameter("openLink"));
+				return;
+			}
+
+			//// Start state determination and button processing
 
 			State state = null;
 			if (sessionObject.mailbox == null) {
@@ -2382,7 +2505,10 @@ if (mail != null && (reply || replyAll)) {
 			// This calls processLogout() which processes the logout button and invalidates sessionobject
 			State oldstate = state;
 			state = processStateChangeButtons(sessionObject, request, isPOST, state);
-            if (oldstate == State.AUTH && sessionObject.mailbox != null) httpRequest.changeSessionId();
+			if (oldstate == State.AUTH && sessionObject.mailbox != null) {
+				// Entering a mailbox must not retain a pre-login session identifier.
+				httpRequest.changeSessionId();
+			}
 			if (oldstate != State.AUTH && state == State.AUTH) {
 				if (_log.shouldDebug())
 					 _log.debug("OLD state is " + oldstate + " NEW state is AUTH, session invalidated");
@@ -2617,7 +2743,6 @@ if (mail != null && (reply || replyAll)) {
 				}
 			}
 
-
 			//// Begin output
 
 			PrintWriter out = response.getWriter();
@@ -2741,12 +2866,13 @@ if (mail != null && (reply || replyAll)) {
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
+				
 				out.println("<div class=\"page\" id=\"page\">");
 
 				if (state != State.LIST) {
 					// For all states except LIST, we have one big form for the whole page.
 					// LIST has several forms, we will output them in showFolder().
-					String nonce = Long.toString(ctx.random().nextLong());
+					String nonce = freshFormNonce(ctx);
 					sessionObject.addNonce(nonce);
 					out.println("<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n" +
 					            "<input type=\"hidden\" name=\"" + SUSI_NONCE + "\" value=\"" + nonce + "\">\n" +
@@ -2930,13 +3056,122 @@ if (mail != null && (reply || replyAll)) {
 		return Translate.getString(s, ctx, CONSOLE_BUNDLE_NAME);
 	}
 
+	private static String freshFormNonce(I2PAppContext context) {
+		byte[] token = new byte[16]; context.random().nextBytes(token);
+		return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(token);
+	}
+
+    
+
+	
+
+	private static void showLinkWarning(HttpServletResponse response, String supplied) throws IOException {
+		String destination = SafeMailHTML.safeURL(supplied);
+		response.setContentType("text/html; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Check link destination</title><link rel=\"stylesheet\" href=\"/susimail/themes/security.css\"></head><body><main class=\"security-card\"><h1>" + _t("Check link destination") + "</h1>");
+		if (destination == null) {
+			out.println("<p role=\"alert\">" + _t("This link uses an unsafe or unsupported destination and has been blocked.") + "</p>");
+		} else {
+			out.println("<p>" + _t("Check the complete address before opening it. A sender signature does not make a website trustworthy.") + "</p><p class=\"link-destination\"><bdi dir=\"ltr\">" + quoteHTML(destination) + "</bdi></p>");
+			out.println("<a class=\"primary-action\" href=\"" + quoteHTML(destination) + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + _t("Open this destination") + "</a>");
+		}
+		out.println("<p><a href=\"/susimail/\">" + _t("Return to mail") + "</a></p></main></body></html>");
+	}
+
+	/** Mail pages, downloads and errors all contain session-private data. */
+	private static void setNoCacheHeaders(HttpServletResponse response) {
+		response.setHeader("Cache-Control", "private, no-store, max-age=0");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", 0);
+	}
+
 	/**
 	 * @param sessionObject
 	 * @param response
 	 * @param isRaw if true, don't zip it
 	 * @return success
 	 */
-	
+	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
+						 HttpServletResponse response, boolean isRaw)
+	{
+		return sendAttachment(sessionObject, part, response, isRaw, DIR_FOLDER);
+	}
+
+	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
+						 HttpServletResponse response, boolean isRaw, String folder)
+	{
+		if (isRaw && part != null && !SafeMailHTML.safeInlineType(part.type))
+			return false;
+		setNoCacheHeaders(response);
+		boolean shown = false;
+		if(part != null) {
+			Log log = sessionObject.log;
+			String name = part.filename;
+			if (name == null) {
+				name = part.name;
+				if (name == null) {
+					name = part.description;
+					if (name == null)
+						name = "part" + part.getID();
+				}
+			}
+			String name2 = FilenameUtil.sanitizeFilename(name);
+			if (name2.length() == 0 || name2.equals(".") || name2.equals(".."))
+				name2 = "attachment";
+			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
+			if (isRaw) {
+				OutputStream out = null;
+				try {
+					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
+					                   "filename*=" + name3);
+					if (part.type != null)
+						response.setContentType(part.type);
+					if (part.charset != null)
+						response.setCharacterEncoding(part.charset);
+					out = response.getOutputStream();
+					if ("text/html".equals(part.type)) {
+						byte[] safe = SafeMailHTML.render(part, folder);
+						response.setCharacterEncoding("UTF-8");
+						response.setContentLength(safe.length);
+						out.write(safe);
+					} else {
+						if (part.decodedLength >= 0)
+							response.setContentLength(part.decodedLength);
+						part.decode(0, new OutputStreamBuffer(out));
+					}
+					shown = true;
+				} catch (IOException e) {
+					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
+				} finally {
+					if (out != null)
+						try { out.close(); } catch (IOException ioe) {}
+				}
+			} else {
+				ZipOutputStream zip = null;
+				try {
+					zip = new ZipOutputStream( response.getOutputStream() );
+					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
+					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
+					                   "filename*=" + name3 + ".zip");
+					// The name inside the archive must be safe too, not just the HTTP filename.
+					ZipEntry entry = new ZipEntry(name2);
+					zip.putNextEntry( entry );
+					// was 2
+					part.decode(0, new OutputStreamBuffer(zip));
+					zip.closeEntry();
+					zip.finish();
+					shown = true;
+				} catch (IOException e) {
+					log.error("Error sending zip attachment " + name + " length " + part.decodedLength, e);
+				} finally {
+					if ( zip != null)
+						try { zip.close(); } catch (IOException ioe) {}
+				}
+			}
+		}
+		return shown;
+	}
 
 	/**
 	 * Send the mail to be saved by the browser
@@ -2949,7 +3184,7 @@ if (mail != null && (reply || replyAll)) {
 	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
 						 HttpServletResponse response)
 	{
-        setNoCacheHeaders(response);
+		setNoCacheHeaders(response);
 		Buffer content = mail.getBody();
 		if(content == null)
 			return false;
@@ -3016,7 +3251,16 @@ if (mail != null && (reply || replyAll)) {
 	private static StringBuilder composeDraft(SessionObject sessionObject,
 	                                          String from, String to, String cc, String bcc,
 	                                          String subject, String text, List<Attachment> attachments) {
-		boolean ok = true;
+        boolean ok = true;
+        for (String value : new String[] { from, to, cc, bcc, subject }) {
+            if (value != null && (value.length() > 16384 || SenderIdentity.hasInvisible(value))) {
+                sessionObject.error += "Mail identity fields must be single-line text without hidden control characters.\n";
+                return null;
+            }
+        }
+        if (subject != null && subject.length() > 998) { sessionObject.error += "The subject is too long.\n"; return null; }
+        if (text == null) text = "";
+        if (text.length() > 65536) { sessionObject.error += "The message text is too long.\n"; return null; }
 		if (subject == null || subject.trim().length() <= 0)
 		    subject = _t("no subject");
 		else
@@ -3112,9 +3356,9 @@ if (mail != null && (reply || replyAll)) {
 			sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
 			if (log.shouldDebug()) log.debug("Unable to save as draft: " + uidl, ioe);
 		} finally {
-			if (wout != null) try { wout.close(); } catch (IOException ioe) {}
+			if (wout != null) try { wout.close(); } catch (IOException ioe) { ok = false; }
 			if (buffer != null)
-				toMC.writeComplete(uidl, buffer, ok);
+				ok = toMC.writeComplete(uidl, buffer, ok);
 		}
 		return ok;
 	}
@@ -3296,15 +3540,15 @@ if (mail != null && (reply || replyAll)) {
 								sessionObject.error += _t("Unable to save mail.") + ' ' + ioe.getMessage() + '\n';
 								if (log.shouldDebug()) log.debug("Sent email saved error", ioe);
 							} finally {
-								if (wout != null) try { wout.close(); } catch (IOException ioe) {}
-								if (buffer != null)
-									mc.writeComplete(uidl, buffer, copyOK);
+								if (wout != null) try { wout.close(); } catch (IOException ioe) { copyOK = false; }
+								if (buffer != null && !mc.writeComplete(uidl, buffer, copyOK))
+									sessionObject.error += _t("The message was sent, but its encrypted local copy could not be saved.") + '\n';
 							}
 						}
 					}
 				} else {
 					sessionObject.error += relay.error;
-					if (log.shouldWarn()) log.warn("Error sending mail: " + relay.error);
+					if (log.shouldWarn()) log.warn("Error sending mail; details are available in the authenticated session");
 				}
 				sessionObject.info = sessionObject.info.replace(_t("Sending mail.") + '\n', "");
 			}
@@ -3535,6 +3779,7 @@ if (mail != null && (reply || replyAll)) {
 
 
 		out.println("<tr><td align=\"right\" width=\"30%\">" + _t("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + "\"></td></tr>\n");
+		out.println("<tr><td colspan=\"2\"><details><summary>" + _t("Local encryption password options") + "</summary><p>" + _t("Saved mail uses your email password for local encryption. If your email password changed, enter the previous encryption password here.") + "</p><label>" + _t("Previous encryption password") + " <input type=\"password\" name=\"cachePassword\" maxlength=\"1024\" autocomplete=\"off\"></label><label>" + _t("Repeat password for first offline encryption") + " <input type=\"password\" name=\"confirmPassword\" maxlength=\"1024\" autocomplete=\"off\"></label></details></td></tr>");
 		// which is better?
 		out.println(
 			"<tr><td colspan=\"2\"><hr></td></tr>\n" +
@@ -3570,6 +3815,7 @@ if (mail != null && (reply || replyAll)) {
 	private static void showFolder( PrintWriter out, SessionObject sessionObject, MailCache mc, RequestWrapper request )
 	{
 		String folderName = mc.getFolderName();
+        if (!mc.getFetchStatus().isEmpty()) out.println("<p class=\"notice\" role=\"status\">" + quoteHTML(mc.getFetchStatus()) + "</p>");
 		// For all states except LIST, we have one big form for the whole page.
 		// Here, for LIST, we set up 4-5 forms
 		// to deal with html rules and have a search box that works right.
@@ -3582,7 +3828,7 @@ if (mail != null && (reply || replyAll)) {
 		//
 		// Create the common form header
 		I2PAppContext ctx = I2PAppContext.getGlobalContext();
-		String nonce = Long.toString(ctx.random().nextLong());
+		String nonce = freshFormNonce(ctx);
 		sessionObject.addNonce(nonce);
 		// for all but search
 		String form = "<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\" accept-charset=\"UTF-8\">\n";
@@ -4134,6 +4380,33 @@ if (mail != null && (reply || replyAll)) {
 		out.println( "</table></div>" );
 	}
 
+	private static void showMessageSecurity(PrintWriter out, Mail mail) {
+		out.println("<div id=\"mailsecurity\" role=\"status\">");
+		DKIMVerifier.Result authentication = mail.getAuthentication();
+		if (authentication.state == DKIMVerifier.State.VERIFIED) {
+			out.println("<p class=\"info\"><b>" + _t("Domain signature verified") + ":</b> <bdi dir=\"ltr\">" +
+				quoteHTML(authentication.domain) + "</bdi>. " + _t("The signed headers and complete body match a trusted domain key.") + "</p>");
+		} else if (authentication.state == DKIMVerifier.State.FAILED) {
+			out.println("<p class=\"error\" role=\"alert\"><b>" + _t("Signature check failed") + ":</b> " +
+				quoteHTML(_t(authentication.reason)) + "</p>");
+		} else {
+			out.println("<p class=\"info\"><b>" + _t("Sender signature unverified") + ".</b> " +
+				_t("A display name or an authentication claim in the message is not proof of identity.") + "</p>");
+		}
+		String sender = mail.getSenderAddress();
+		if (sender.length() > 0)
+			out.println("<p><b>" + _t("Sender address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(sender) + "</bdi></p>");
+		for (String warning : mail.getSecurityWarnings())
+			out.println("<p class=\"error\" role=\"alert\">" + quoteHTML(_t(warning)) + "</p>");
+		if (mail.reply != null) {
+			out.println("<p><b>" + _t("Reply address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(mail.reply) + "</bdi></p>");
+			if (mail.isReplyRedirected() && mail.canReplySafely())
+				out.println("<p class=\"error\"><label><input type=\"checkbox\" name=\"" + CONFIRM_REPLY_TO +
+					"\" value=\"1\"> " + _t("Replies go to a different address. I have checked the reply address.") + "</label></p>");
+		}
+		out.println("</div>");
+	}
+
 	/**
 	 *  TODO this is addresses only, we don't save the full line in Mail
 	 *
@@ -4219,127 +4492,4 @@ if (mail != null && (reply || replyAll)) {
     private static String[] getThemes(I2PAppContext ctx) {
         return THEMES;
     }
-private static void setNoCacheHeaders(HttpServletResponse response) {
-		response.setHeader("Cache-Control", "private, no-store, max-age=0");
-		response.setHeader("Pragma", "no-cache");
-		response.setDateHeader("Expires", 0);
-	}
-private static void showMessageSecurity(PrintWriter out, Mail mail) {
-		out.println("<div id=\"mailsecurity\" role=\"status\">");
-		DKIMVerifier.Result authentication = mail.getAuthentication();
-		if (authentication.state == DKIMVerifier.State.VERIFIED) {
-			out.println("<p class=\"info\"><b>" + _t("Domain signature verified") + ":</b> <bdi dir=\"ltr\">" +
-				quoteHTML(authentication.domain) + "</bdi>. " + _t("The signed headers and complete body match a trusted domain key.") + "</p>");
-		} else if (authentication.state == DKIMVerifier.State.FAILED) {
-			out.println("<p class=\"error\" role=\"alert\"><b>" + _t("Signature check failed") + ":</b> " +
-				quoteHTML(_t(authentication.reason)) + "</p>");
-		} else {
-			out.println("<p class=\"info\"><b>" + _t("Sender signature unverified") + ".</b> " +
-				_t("A display name or an authentication claim in the message is not proof of identity.") + "</p>");
-		}
-		String sender = mail.getSenderAddress();
-		if (sender.length() > 0)
-			out.println("<p><b>" + _t("Sender address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(sender) + "</bdi></p>");
-		for (String warning : mail.getSecurityWarnings())
-			out.println("<p class=\"error\" role=\"alert\">" + quoteHTML(_t(warning)) + "</p>");
-		if (mail.reply != null) {
-			out.println("<p><b>" + _t("Reply address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(mail.reply) + "</bdi></p>");
-			if (mail.isReplyRedirected() && mail.canReplySafely())
-				out.println("<p class=\"error\"><label><input type=\"checkbox\" name=\"" + CONFIRM_REPLY_TO +
-					"\" value=\"1\"> " + _t("Replies go to a different address. I have checked the reply address.") + "</label></p>");
-		}
-		out.println("</div>");
-	}
-private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
-						 HttpServletResponse response, boolean isRaw)
-	{
-		return sendAttachment(sessionObject, part, response, isRaw, DIR_FOLDER);
-	}
-private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
-						 HttpServletResponse response, boolean isRaw, String folder)
-	{
-		if (isRaw && part != null && !SafeMailHTML.safeInlineType(part.type))
-			return false;
-		setNoCacheHeaders(response);
-		boolean shown = false;
-		if(part != null) {
-			Log log = sessionObject.log;
-			String name = part.filename;
-			if (name == null) {
-				name = part.name;
-				if (name == null) {
-					name = part.description;
-					if (name == null)
-						name = "part" + part.getID();
-				}
-			}
-			String name2 = FilenameUtil.sanitizeFilename(name);
-			if (name2.length() == 0 || name2.equals(".") || name2.equals(".."))
-				name2 = "attachment";
-			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
-			if (isRaw) {
-				OutputStream out = null;
-				try {
-					response.addHeader("Content-Disposition", "inline; filename=\"" + name2 + "\"; " +
-					                   "filename*=" + name3);
-					if (part.type != null)
-						response.setContentType(part.type);
-					if (part.charset != null)
-						response.setCharacterEncoding(part.charset);
-					out = response.getOutputStream();
-					if ("text/html".equals(part.type)) {
-						byte[] safe = SafeMailHTML.render(part, folder);
-						response.setCharacterEncoding("UTF-8");
-						response.setContentLength(safe.length);
-						out.write(safe);
-					} else {
-						if (part.decodedLength >= 0)
-							response.setContentLength(part.decodedLength);
-						part.decode(0, new OutputStreamBuffer(out));
-					}
-					shown = true;
-				} catch (IOException e) {
-					log.error("Error sending raw attachment " + name + " length " + part.decodedLength, e);
-				} finally {
-					if (out != null)
-						try { out.close(); } catch (IOException ioe) {}
-				}
-			} else {
-				ZipOutputStream zip = null;
-				try {
-					zip = new ZipOutputStream( response.getOutputStream() );
-					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
-					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
-					                   "filename*=" + name3 + ".zip");
-					// The name inside the archive must be safe too, not just the HTTP filename.
-					ZipEntry entry = new ZipEntry(name2);
-					zip.putNextEntry( entry );
-					// was 2
-					part.decode(0, new OutputStreamBuffer(zip));
-					zip.closeEntry();
-					zip.finish();
-					shown = true;
-				} catch (IOException e) {
-					log.error("Error sending zip attachment " + name + " length " + part.decodedLength, e);
-				} finally {
-					if ( zip != null)
-						try { zip.close(); } catch (IOException ioe) {}
-				}
-			}
-		}
-		return shown;
-	}
-private static void showLinkWarning(HttpServletResponse response, String supplied) throws IOException {
-		String destination = SafeMailHTML.safeURL(supplied);
-		response.setContentType("text/html; charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Check link destination</title><link rel=\"stylesheet\" href=\"/susimail/themes/security.css\"></head><body><main class=\"security-card\"><h1>" + _t("Check link destination") + "</h1>");
-		if (destination == null) {
-			out.println("<p role=\"alert\">" + _t("This link uses an unsafe or unsupported destination and has been blocked.") + "</p>");
-		} else {
-			out.println("<p>" + _t("Check the complete address before opening it. A sender signature does not make a website trustworthy.") + "</p><p class=\"link-destination\"><bdi dir=\"ltr\">" + quoteHTML(destination) + "</bdi></p>");
-			out.println("<a class=\"primary-action\" href=\"" + quoteHTML(destination) + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + _t("Open this destination") + "</a>");
-		}
-		out.println("<p><a href=\"/susimail/\">" + _t("Return to mail") + "</a></p></main></body></html>");
-	}
 }
