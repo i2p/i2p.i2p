@@ -160,7 +160,7 @@ class MailCache {
 			if (_isDrafts)
 				mail = new Draft(uidl);
 			else
-				mail = new Mail(uidl);
+				mail = new Mail(uidl, folderName.equals(WebMail.DIR_SENT));
 			mail.setBody(buffer);
 			synchronized(mails) {
 				mails.put(uidl, mail);
@@ -217,7 +217,8 @@ class MailCache {
 	 */
 	private void movedTo(Mail mail) {
 		synchronized(mails) {
-			// we must reset the body of the mail to the new FileBuffer
+			mail.setLocallySent(folderName.equals(WebMail.DIR_SENT));
+            // we must reset the body of the mail to the new FileBuffer
 			Buffer body = disk.getFullBuffer(mail.uidl);
 			mail.setBody(body);
 			mails.put(mail.uidl, mail);
@@ -401,7 +402,7 @@ class MailCache {
 				if (rb != null) {
 					mail.setBody(rb);
 					if (disk.saveMail(mail) &&
-					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+					    canDeleteFromServer(mail)) {
 						mailbox.queueForDeletion(mail.uidl);
 					}
 				}
@@ -468,7 +469,7 @@ class MailCache {
 						if (_log.shouldDebug()) _log.debug("Loaded header from disk cache: " + uidl);
 						// note that disk loaded the full body if it had it
 						if (mail.hasBody() &&
-							!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+							canDeleteFromServer(mail)) {
 							// we already have it, send delete
 							mailbox.queueForDeletion(mail.uidl);
 						}
@@ -478,7 +479,7 @@ class MailCache {
 					fetches.add(pr);
 				} else {
 					if (mail.hasBody() &&
-						!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						canDeleteFromServer(mail)) {
 						// we already have it, send delete
 						mailbox.queueForDeletion(mail.uidl);
 					}
@@ -488,7 +489,7 @@ class MailCache {
 					if (disk.getMail(mail, false)) {
 						if (_log.shouldDebug()) _log.debug("Loaded body from disk cache: " + uidl);
 						// note that disk loaded the full body if it had it
-						if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+						if (canDeleteFromServer(mail)) {
 							// we already have it, send delete
 							mailbox.queueForDeletion(mail.uidl);
 						}
@@ -498,7 +499,7 @@ class MailCache {
 					POP3Request pr = new POP3Request(mail, false, new FileBuffer(file));
 					fetches.add(pr);
 				} else {
-					if (!Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+					if (canDeleteFromServer(mail)) {
 						// we already have it, send delete
 						mailbox.queueForDeletion(mail.uidl);
 					}
@@ -535,7 +536,7 @@ class MailCache {
 						additionalMsg = "\n\n" + mail.sender + '\n' + mail.subject;
 					rv = true;
 					if (disk.saveMail(mail) && mail.hasBody() &&
-					    !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER))) {
+					    canDeleteFromServer(mail)) {
 						mailbox.queueForDeletion(mail.uidl);
 					}
 				}
@@ -590,7 +591,7 @@ class MailCache {
 					continue;
 				mail.markForDeletion = true;
 				// now replace it with an empty one to save memory
-				mail = new Mail(uidl);
+				mail = new Mail(uidl, folderName.equals(WebMail.DIR_SENT));
 				mail.markForDeletion = true;
 				mails.put(uidl, mail);
 			}
@@ -654,4 +655,7 @@ class MailCache {
 	private static String ngettext(String s, String p, int n) {
 		return Messages.getString(n, s, p);
 	}
+private static boolean canDeleteFromServer(Mail mail) {
+        return mail.hasBody() && !mail.hasUnsafeContent() && !Boolean.parseBoolean(Config.getProperty(WebMail.CONFIG_LEAVE_ON_SERVER));
+    }
 }

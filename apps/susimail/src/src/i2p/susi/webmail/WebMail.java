@@ -173,6 +173,7 @@ public class WebMail extends HttpServlet
 	private static final String CONFIGURE = "configure";
 	private static final String NEW = "new";
 	private static final String REPLY = "reply";
+	private static final String CONFIRM_REPLY_TO = "confirmReplyTo";
 	private static final String REPLYALL = "replyall";
 	private static final String FORWARD = "forward";
 	private static final String DELETE = "delete";
@@ -1313,6 +1314,16 @@ public class WebMail extends HttpServlet
 					 * extract original sender from Reply-To: or From:
 					 */
 					MailPart part = mail != null ? mail.getPart() : null;
+if (mail != null && (reply || replyAll)) {
+						if (!mail.canReplySafely()) {
+							sessionObject.error += _t("Automatic replies are blocked because the message identity or integrity is unsafe.") + '\n';
+							return State.SHOW;
+						}
+						if (mail.isReplyRedirected() && !buttonPressed(request, CONFIRM_REPLY_TO)) {
+							sessionObject.error += _t("Confirm the different reply address before replying.") + '\n';
+							return State.SHOW;
+						}
+					}
 					if (part != null) {
 						StringBuilderWriter text = new StringBuilderWriter();
 						String to = null, cc = null, bcc = null, subject = null;
@@ -1775,6 +1786,10 @@ public class WebMail extends HttpServlet
 			try {
 				MailCache mc = getCurrentMailCache(sessionObject, request);
 				Mail mail = (mc != null) ? mc.getMail(showUIDL, MailCache.FetchMode.ALL) : null;
+				if (mail != null && mail.hasUnsafeContent()) {
+					response.sendError(403, "Attachment blocked because message identity or integrity is unsafe.");
+					return true;
+				}
 				MailPart part = null;
 				if (mail != null) {
 					if (isCID) {
@@ -1793,7 +1808,10 @@ public class WebMail extends HttpServlet
 					if (sendAttachment(sessionObject, part, response, isRaw))
 						return true;
 				}
-			} catch( NumberFormatException nfe ) {}
+			} catch( NumberFormatException nfe ) {
+			} catch (IOException ioe) {
+				return true;
+			}
 			// error if we get here
 			try {
 				response.sendError(404, _t("Attachment not found."));
@@ -3187,6 +3205,8 @@ public class WebMail extends HttpServlet
 		boolean ok = true;
 
 		String from = draft.sender;
+		if (Boolean.parseBoolean(Config.getProperty(CONFIG_SENDER_FIXED, "true")))
+			from = getDefaultSender(sessionObject);
 		String[] to = draft.to;
 		String[] cc = draft.cc;
 		String[] bcc = draft.getBcc();
@@ -3227,7 +3247,7 @@ public class WebMail extends HttpServlet
 		Encoding hl = EncodingFactory.getEncoding( "HEADERLINE" );
 
 		// Not perfectly accurate but close
-		long total = draft.getSize();
+		long total = draft.getBody().getLength(); // attachments are added once below
 		boolean multipart = attachments != null && !attachments.isEmpty();
 		if (multipart) {
 			for(Attachment a : attachments) {
@@ -3476,7 +3496,7 @@ public class WebMail extends HttpServlet
 
 		boolean fixed = Boolean.parseBoolean(Config.getProperty( CONFIG_SENDER_FIXED, "true" ));
 
-		if (from.length() <= 0 || !fixed) {
+		if (from.length() <= 0 || fixed) {
 			from = getDefaultSender(sessionObject);
 		}
 
@@ -3487,7 +3507,7 @@ public class WebMail extends HttpServlet
 				"<tr><td align=\"right\">" + _t("Cc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_CC + "\" value=\"" + quoteHTML(cc) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Bcc") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_BCC + "\" value=\"" + quoteHTML(bcc) + "\"></td></tr>\n" +
 				"<tr><td align=\"right\">" + _t("Subject") + ":</td><td align=\"left\"><input type=\"text\" size=\"80\" name=\"" + NEW_SUBJECT + "\" value=\"" + quoteHTML(subject) + "\"></td></tr>\n" +
-				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\" id=\"" + NEW_TEXT + "\">" + text + "</textarea></td></tr>" +
+				"<tr><td></td><td align=\"left\"><textarea cols=\"" + Config.getProperty( CONFIG_COMPOSER_COLS, 80 )+ "\" rows=\"" + Config.getProperty( CONFIG_COMPOSER_ROWS, 10 )+ "\" name=\"" + NEW_TEXT + "\" id=\"" + NEW_TEXT + "\">" + quoteHTML(text) + "</textarea></td></tr>" +
 				"<tr class=\"bottombuttons\"><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr class=\"bottombuttons\"><td align=\"right\">" + _t("Add Attachment") + ":</td><td id=\"addattach\" align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" id=\"" + NEW_FILENAME + "\" value=\"\">&nbsp;" + button(NEW_UPLOAD, _t("Add Attachment")) + "</td></tr>");
 
@@ -4065,7 +4085,7 @@ public class WebMail extends HttpServlet
 		out.println( button( NEW, _t("New") ) + spacer);
 		boolean hasHeader = mail != null && mail.hasHeader();
 		if (hasHeader) {
-			out.println(button(REPLY, _t("Reply")));
+			out.println(mail.canReplySafely() ? button(REPLY, _t("Reply")) : button2(REPLY, _t("Reply")));
 			// dedup sender/to/cc/us to get a true count of recipients
 			Set<String> rep = new HashSet<String>();
 			if (mail.to != null)
@@ -4076,7 +4096,7 @@ public class WebMail extends HttpServlet
 				rep.remove(mail.sender);
 			rep.remove('<' + sessionObject.user + '@' + Config.getProperty(CONFIG_SENDER_DOMAIN, "mail.i2p") + '>');
 			if (!rep.isEmpty())
-				out.println(button(REPLYALL, _t("Reply All")));
+				out.println(mail.canReplySafely() ? button(REPLYALL, _t("Reply All")) : button2(REPLYALL, _t("Reply All")));
 			out.println(button( FORWARD, _t("Forward") ) +
 				button( SAVE_AS, _t("Save As")));
 			if (sessionObject.reallyDelete)
@@ -4132,17 +4152,21 @@ public class WebMail extends HttpServlet
 		out.println("</div></div>");
 		//if (Config.hasConfigFile())
 		//	out.println(button( RELOAD, _t("Reload Config") ) + spacer);
+		if (hasHeader) {
+            showMessageSecurity(out, mail);
+
+        }
 		out.println( "<div id=\"viewmail\"><table id=\"message_full\" cellspacing=\"0\" cellpadding=\"5\">\n");
 		if (hasHeader) {
 			String subj = mail.subject;
 			if (subj.length() > 0)
-				subj = quoteHTML(subj);
+				subj = quoteHTML(SenderIdentity.display(subj));
 			else
 				subj = "<i>" + _t("no subject") + "</i>";
 			out.println("<tr><td colspan=\"2\"><table id=\"mailhead\">\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("From") +
-					":</td><td align=\"left\">" + quoteHTML( mail.sender ) + "</td></tr>\n" +
+					":</td><td align=\"left\">" + quoteHTML(SenderIdentity.display(mail.sender)) + "</td></tr>\n" +
 					"<tr><td align=\"right\">" + _t("Subject") +
 					":</td><td align=\"left\"><b>" + subj + "</b></td></tr>\n");
 			if (mail.to != null) {
@@ -4157,7 +4181,7 @@ public class WebMail extends HttpServlet
 					":</td><td align=\"left\">" + mail.quotedDate + "</td></tr>\n" +
 					"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>" +
 					"</table></td></tr>\n" );
-			if( mail.hasPart()) {
+			 if( mail.hasPart()) {
 				if (mail.isNew()) {
 					mail.setNew(false);
 					I2PAppContext ctx = I2PAppContext.getGlobalContext();
@@ -4167,13 +4191,13 @@ public class WebMail extends HttpServlet
 						if (nc > 0) {
 							nc--;
 							String msg = ngettext("{0} new message", "{0} new messages", nc);
-							cmgr.setBubble(PortMapper.SVC_SUSIMAIL, --nc, msg);
+							cmgr.setBubble(PortMapper.SVC_SUSIMAIL, nc, msg);
 						} else {
 							cmgr.setBubble(PortMapper.SVC_SUSIMAIL, 0, null);
 						}
 					}
 				}
-				showPart(out, mail.getPart(), 0, SHOW_HTML, allowHTML);
+				showPart(out, mail.getPart(), 0, SHOW_HTML, mail.hasUnsafeContent() ? HtmlMode.NONE : allowHTML);
 			}
 			else {
 				out.println( "<tr class=\"mailbody\"><td colspan=\"2\" align=\"center\"><p class=\"error\">" + _t("Could not fetch mail body.") + "</p></td></tr>\n" );
@@ -4274,5 +4298,31 @@ private static void setNoCacheHeaders(HttpServletResponse response) {
 		response.setHeader("Cache-Control", "private, no-store, max-age=0");
 		response.setHeader("Pragma", "no-cache");
 		response.setDateHeader("Expires", 0);
+	}
+private static void showMessageSecurity(PrintWriter out, Mail mail) {
+		out.println("<div id=\"mailsecurity\" role=\"status\">");
+		DKIMVerifier.Result authentication = mail.getAuthentication();
+		if (authentication.state == DKIMVerifier.State.VERIFIED) {
+			out.println("<p class=\"info\"><b>" + _t("Domain signature verified") + ":</b> <bdi dir=\"ltr\">" +
+				quoteHTML(authentication.domain) + "</bdi>. " + _t("The signed headers and complete body match a trusted domain key.") + "</p>");
+		} else if (authentication.state == DKIMVerifier.State.FAILED) {
+			out.println("<p class=\"error\" role=\"alert\"><b>" + _t("Signature check failed") + ":</b> " +
+				quoteHTML(_t(authentication.reason)) + "</p>");
+		} else {
+			out.println("<p class=\"info\"><b>" + _t("Sender signature unverified") + ".</b> " +
+				_t("A display name or an authentication claim in the message is not proof of identity.") + "</p>");
+		}
+		String sender = mail.getSenderAddress();
+		if (sender.length() > 0)
+			out.println("<p><b>" + _t("Sender address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(sender) + "</bdi></p>");
+		for (String warning : mail.getSecurityWarnings())
+			out.println("<p class=\"error\" role=\"alert\">" + quoteHTML(_t(warning)) + "</p>");
+		if (mail.reply != null) {
+			out.println("<p><b>" + _t("Reply address") + ":</b> <bdi dir=\"ltr\">" + quoteHTML(mail.reply) + "</bdi></p>");
+			if (mail.isReplyRedirected() && mail.canReplySafely())
+				out.println("<p class=\"error\"><label><input type=\"checkbox\" name=\"" + CONFIRM_REPLY_TO +
+					"\" value=\"1\"> " + _t("Replies go to a different address. I have checked the reply address.") + "</label></p>");
+		}
+		out.println("</div>");
 	}
 }
