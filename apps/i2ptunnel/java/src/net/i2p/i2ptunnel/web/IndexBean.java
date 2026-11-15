@@ -289,8 +289,6 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = controllers.get(_tunnel);
         controller.startTunnelBackground();
-        // give the messages a chance to make it to the window
-        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
         // FIXME name will be HTML escaped twice
         return _t("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "...";
@@ -303,8 +301,6 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = controllers.get(_tunnel);
         controller.stopTunnel();
-        // give the messages a chance to make it to the window
-        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
         // FIXME name will be HTML escaped twice
         return _t("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "...";
