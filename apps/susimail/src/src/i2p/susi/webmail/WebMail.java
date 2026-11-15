@@ -2937,6 +2937,8 @@ public class WebMail extends HttpServlet
 				}
 			}
 			String name2 = FilenameUtil.sanitizeFilename(name);
+			if (name2.length() == 0 || name2.equals(".") || name2.equals(".."))
+				name2 = "attachment";
 			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
 			if (isRaw) {
 				OutputStream out = null;
@@ -2975,7 +2977,7 @@ public class WebMail extends HttpServlet
 					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
 					                   "filename*=" + name3 + ".zip");
 					// The name inside the archive must be safe too, not just the HTTP filename.
-					ZipEntry entry = new ZipEntry( name );
+					ZipEntry entry = new ZipEntry(name2);
 					zip.putNextEntry( entry );
 					// was 2
 					part.decode(0, new OutputStreamBuffer(zip));
