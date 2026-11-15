@@ -2,7 +2,17 @@ package net.i2p.servlet.filters;
 
 import java.io.IOException;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.server.Request;
@@ -18,57 +28,96 @@ import net.i2p.data.PrivateKeyFile;
 import net.i2p.util.Log;
 
 /**
- * Adds a header, X-I2P-Location, to requests when they do **not** come in on an I2P hostname.
- * This header contains a URL that looks like: [scheme://][i2phostname.i2p][/path][?query]
- * and expresses the I2P-Equivalent URL of the clearnet query. Clients can use this to prompt
- * users to switch from a non-I2P host to an I2P host or to redirect them automatically. It
- * automatically enabled on the default I2P site located on port 7658 by default.
- *
- *  @since 0.9.51
+ * Advertises the I2P equivalent of a direct request. Configuration and private
+ * key reads run on one bounded background worker, never on an HTTP worker.
  */
 public class XI2PLocationFilter extends Handler.Wrapper {
-    private String X_I2P_Location = null;
-    private long lastFailure = -1;
-    private static final long failTimeout = 600000;
-    private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(XI2PLocationFilter.class);
+    private static final long RECHECK_MILLIS = 10 * 60 * 1000;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final ConcurrentMap<String, Location> _locations = new ConcurrentHashMap<String, Location>();
+    private volatile ThreadPoolExecutor _lookup;
 
-
-    private synchronized void setLocation(String xi2plocation) {
-        if (_log.shouldInfo())
-            _log.info("Checking X-I2P-Location header prefix: " + xi2plocation);
-        if (X_I2P_Location != null)
-            return;
-        if (xi2plocation == null)
-            return;
-        if (xi2plocation.equals(""))
-            return;
-        X_I2P_Location = xi2plocation;
-        if (_log.shouldInfo())
-            _log.info("Caching X-I2P-Location header prefix: " + X_I2P_Location);
+    private static class Location {
+        final AtomicBoolean checking = new AtomicBoolean();
+        volatile String host;
+        volatile long nextCheck;
     }
 
-    private synchronized boolean shouldRecheck(){
-        boolean settable = (X_I2P_Location == null);
-        if (!settable) return settable;
-        if (lastFailure == -1) {
-            lastFailure = System.currentTimeMillis();
-            if (_log.shouldDebug())
-                _log.debug("New instance, attempting to set X-I2P-Location header for the first time");
-            return settable;
-        }
-        if ((System.currentTimeMillis() - lastFailure) > failTimeout){
-            lastFailure = System.currentTimeMillis();
-            if (_log.shouldDebug())
-                _log.debug("More than ten minutes since failing attempt to re-check X-I2P-Location header");
-            return settable;
-        }
-        if (_log.shouldDebug())
-            _log.debug("Not attempting to re-check X-I2P-Location header");
-        return false;
+    public XI2PLocationFilter() { this(I2PAppContext.getGlobalContext()); }
+
+    public XI2PLocationFilter(I2PAppContext context) {
+        _context = context;
+        _log = context.logManager().getLog(XI2PLocationFilter.class);
     }
 
-    private synchronized String getXI2PLocation(String host, String port) {
-        File configDir = I2PAppContext.getGlobalContext().getConfigDir();
+    @Override
+    protected void doStart() throws Exception {
+        _locations.clear();
+        ThreadPoolExecutor lookup = new ThreadPoolExecutor(0, 1, 30, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<Runnable>(4), task -> {
+                Thread thread = new Thread(task, "I2P site metadata lookup");
+                thread.setDaemon(true);
+                return thread;
+            });
+        _lookup = lookup;
+        try {
+            super.doStart();
+        } catch (Exception failure) {
+            _lookup = null;
+            lookup.shutdownNow();
+            throw failure;
+        }
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        ThreadPoolExecutor lookup = _lookup;
+        _lookup = null;
+        if (lookup != null)
+            lookup.shutdownNow();
+        _locations.clear();
+        super.doStop();
+    }
+
+    private void refresh(Location location, String host, int port) {
+        ThreadPoolExecutor lookup = _lookup;
+        long now = System.currentTimeMillis();
+        if (lookup == null || now < location.nextCheck || !location.checking.compareAndSet(false, true))
+            return;
+        location.nextCheck = now + RECHECK_MILLIS;
+        try {
+            lookup.execute(() -> {
+                try {
+                    String name = getXI2PLocation(host, Integer.toString(port));
+                    location.host = validHost(name) ? name.toLowerCase(Locale.ROOT) : null;
+                } catch (RuntimeException failure) {
+                    if (_log.shouldWarn()) _log.warn("Unable to refresh I2P site metadata", failure);
+                } finally {
+                    location.checking.set(false);
+                }
+            });
+        } catch (RejectedExecutionException busyOrStopping) {
+            location.nextCheck = now + 1000;
+            location.checking.set(false);
+        }
+    }
+
+    private static boolean validHost(String name) {
+        if (name == null || name.length() > 253 || !name.toLowerCase(Locale.ROOT).endsWith(".i2p"))
+            return false;
+        try {
+            URI uri = new URI("http://" + name);
+            return name.equalsIgnoreCase(uri.getHost()) && uri.getRawUserInfo() == null &&
+                   uri.getPort() == -1 && "".equals(uri.getRawPath()) &&
+                   uri.getRawQuery() == null && uri.getRawFragment() == null;
+        } catch (URISyntaxException invalid) { return false; }
+    }
+
+    protected String getXI2PLocation(String host, String port) {
+        if (host == null)
+            return null;
+        File configDir = _context.getConfigDir();
         File tunnelConfig = new File(configDir, "i2ptunnel.config");
         boolean isSingleFile = tunnelConfig.exists();
         if (!isSingleFile) {
@@ -128,57 +177,30 @@ public class XI2PLocationFilter extends Handler.Wrapper {
         return null;
     }
 
-    /**
-     *  @return the value for the X-I2P-Location header, or null
-     */
-    private synchronized String headerContents(final Request request) {
+    private static String headerContents(Request request, String location) {
         HttpURI uri = request.getHttpURI();
-        if (X_I2P_Location != null) {
-            String scheme = uri.getScheme();
-            if (scheme == null)
-                return null;
-            // encoded
-            String path = uri.getPath();
-            if (path == null)
-                path = "/";
-            // encoded
-            String query = uri.getQuery();
-            int port = uri.getPort();
-            StringBuilder buf = new StringBuilder(256);
-            buf.append(scheme)
-               .append("://")
-               .append(X_I2P_Location);
-            if (port > 0)
-                buf.append(':').append(port);
-            buf.append(path);
-            if (query != null)
-                buf.append('?').append(query);
-            return buf.toString();
-        }
-        return null;
+        String path = uri.getPath();
+        StringBuilder value = new StringBuilder(256);
+        // A backend's local port is not the public I2P service port.
+        value.append(request.isSecure() ? "https://" : "http://").append(location)
+             .append(path == null ? "/" : path);
+        String query = uri.getQuery();
+        if (query != null) value.append('?').append(query);
+        return value.toString();
     }
 
     @Override
-    public boolean handle(final Request request, final Response response, Callback callback)
-    throws Exception {
-        final String hashHeader = request.getHeaders().get("X-I2P-DestHash");
-
-        if (hashHeader == null) {
-            if (shouldRecheck()) {
-                String xi2plocation = getXI2PLocation(Request.getLocalAddr(request), String.valueOf(Request.getLocalPort(request)));
-                if (_log.shouldInfo())
-                   _log.info("Checking X-I2P-Location header: IP " + Request.getLocalAddr(request) + " port " + Request.getLocalPort(request) + " prefix " + xi2plocation);
-                if (xi2plocation != null)
-                    setLocation(xi2plocation);
-            }
-            String headerURL = headerContents(request);
-            if (headerURL != null) {
-                if (_log.shouldInfo())
-                    _log.info("Setting X-I2P-Location header: " + headerURL);
-                response.getHeaders().put("X-I2P-Location", headerURL);
-            }
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        if (request.getHeaders().get("X-I2P-DestHash") == null) {
+            String host = Request.getLocalAddr(request);
+            int port = Request.getLocalPort(request);
+            String key = host + ":" + port;
+            Location location = _locations.computeIfAbsent(key, ignored -> new Location());
+            refresh(location, host, port);
+            String name = location.host;
+            if (name != null)
+                response.getHeaders().put("X-I2P-Location", headerContents(request, name));
         }
-
         return super.handle(request, response, callback);
     }
 }
