@@ -498,6 +498,17 @@ public final class Curve25519 {
 				// Just in case, we reduce the number modulo 2^255 - 19 to
 				// make sure that it is in range of the field before we start.
 				// This eliminates values between 2^255 - 19 and 2^256 - 1.
+
+				// AI notes on why there's two calls:
+				// The duplicate call is required. The 32-byte public key is unpacked without masking the top bit,
+				// so x_1 can be any value below 2^256, and reduceQuick performs only a single trial subtraction:
+				// for x - p it returns x >= p, which for a 256-bit input can still be as large as 2^255 + 18,
+				// i.e. still <= p. The second call drives that remainder (<= 37) fully into range,
+				// which is what the comment "eliminates values between 2^255 - 19 and 2^256 - 1" is claiming.
+				// One call alone would leave the top limb out of canonical form and the ladder would misbehave on high-bit inputs.
+				// So: correct as written, and the only inefficiency is the ~10-limb extra pass per eval,
+				// which could be saved only by masking publicKey[31] & 0x7f at unpack time (RFC 7748 permits that),
+				// not worth touching vendored crypto for.
 				state.reduceQuick(state.x_1);
 				state.reduceQuick(state.x_1);
 			} else {
