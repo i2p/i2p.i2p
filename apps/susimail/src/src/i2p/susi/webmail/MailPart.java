@@ -95,6 +95,13 @@ class MailPart {
 	 */
 	public MailPart(String uidl, AtomicInteger id, Buffer readBuffer, InputStream in, ReadCounter counter, String[] hdrlines) throws IOException
 	{
+		this(uidl, id, readBuffer, in, counter, hdrlines, 0);
+	}
+
+	private MailPart(String uidl, AtomicInteger id, Buffer readBuffer, InputStream in, ReadCounter counter, String[] hdrlines, int depth) throws IOException
+	{
+		if (depth > 32 || id.get() >= 1024)
+			throw new IOException("Message MIME structure exceeds the safety limit");
 		_log = I2PAppContext.getGlobalContext().logManager().getLog(MailPart.class);
 		this.uidl = uidl;
 		intID = id.getAndIncrement();
@@ -114,12 +121,10 @@ class MailPart {
 			// and \n-- below. If it's not multipart, we will swallow the
 			// \n below.
 			EOFOnMatchInputStream eofin = new EOFOnMatchInputStream(in, Mail.HEADER_MATCH);
-			MemoryBuffer decodedHeaders = new MemoryBuffer(4096);
-			EncodingFactory.getEncoding("HEADERLINE").decode(eofin, decodedHeaders);
+			MailHeaders headers = MailHeaders.read(eofin);
 			if (!eofin.wasFound())
-				if (_log.shouldDebug()) _log.debug("EOF hit before \\r\\n\\r\\n in MailPart");
-			// Fixme UTF-8 to bytes to UTF-8
-			headerLines = DataHelper.split(new String(decodedHeaders.getContent(), decodedHeaders.getOffset(), decodedHeaders.getLength()), "\r\n");
+				throw new IOException("Incomplete MIME part headers");
+			headerLines = headers.decodedLines();
 		}
 
 		String boundary = null;
@@ -244,7 +249,7 @@ class MailPart {
 					match = DataHelper.getASCII("\r\n--" + boundary);
 					eofin = new EOFOnMatchInputStream(in, counter, match);
 				}
-				MailPart newPart = new MailPart(uidl, id, buffer, eofin, eofin, null);
+				MailPart newPart = new MailPart(uidl, id, buffer, eofin, eofin, null, depth + 1);
 				parts.add( newPart );
 				tmpEnd = (int) eofin.getRead();
 				if (!eofin.wasFound()) {
@@ -258,7 +263,7 @@ class MailPart {
 			}
 		}
 		else if( message ) {
-			MailPart newPart = new MailPart(uidl, id, buffer, in, counter, null);
+			MailPart newPart = new MailPart(uidl, id, buffer, in, counter, null, depth + 1);
 			// TODO newPart doesn't save message headers we might like to display,
 			// like From, To, and Subject
 			parts.add( newPart );			
