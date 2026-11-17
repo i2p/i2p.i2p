@@ -1150,7 +1150,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                                                         String[] skipHeaders, I2PAppContext ctx, long initialTimeout) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
-        
+        RequestHeaders request = socket != null ? new RequestHeaders() : null;
+
         // slowloris / darkloris
         long expire = ctx.clock().now() + initialTimeout + HEADER_FINISH_TIMEOUT;
         if (socket != null) {
@@ -1185,7 +1186,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
             if ( (buf.length() == 0) || 
                  ((buf.charAt(0) == '\n') || (buf.charAt(0) == '\r')) ) {
-                // end of headers reached
+                // Validate before forwarding anything to the local server.
+                if (request != null)
+                    request.finish(headers, command.toString());
                 return headers;
             } else {
                 if (ctx.clock().now() > expire) {
@@ -1198,7 +1201,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 totalSize += buf.length();
                 if (totalSize > MAX_TOTAL_HEADER_SIZE)
                     throw new LineTooLongException("Req+headers too big");
-                String name = buf.substring(0, split).trim();
+                String rawName = buf.substring(0, split);
+                if (request != null)
+                    request.add(rawName, buf.substring(split + 1));
+                String name = rawName.trim();
                 String value = null;
                 if (buf.length() > split + 1)
                     value = buf.substring(split+1).trim(); // ":"
@@ -1206,7 +1212,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     value = "";
 
                 String lcName = name.toLowerCase(Locale.US);
-                if ("accept-encoding".equals(lcName))
+                if (request != null && "content-length".equals(lcName))
+                    name = "Content-Length";
+                else if (request != null && "transfer-encoding".equals(lcName))
+                    name = "Transfer-Encoding";
+                else if ("accept-encoding".equals(lcName))
                     name = "Accept-Encoding";
                 else if ("x-accept-encoding".equals(lcName))
                     name = "X-Accept-Encoding";
@@ -1247,10 +1257,94 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
+    /** Request-side syntax and framing checks, including headers that will be stripped. */
+    private static class RequestHeaders {
+        private long contentLength = -1;
+        private final StringBuilder transferEncoding = new StringBuilder();
+        private boolean chunked;
+        private boolean host;
+
+        void add(String name, String rawValue) throws BadRequestException {
+            if (!isToken(name))
+                throw new BadRequestException("Invalid HTTP header name");
+            for (int i = 0; i < rawValue.length(); i++) {
+                char c = rawValue.charAt(i);
+                if ((c < 32 && c != '\t') || c == 127)
+                    throw new BadRequestException("Invalid HTTP header value");
+            }
+            String value = rawValue.trim();
+            if ("Content-Length".equalsIgnoreCase(name)) {
+                for (String item : value.split(",", -1)) {
+                    item = item.trim();
+                    if (item.length() == 0)
+                        throw new BadRequestException("Empty Content-Length");
+                    for (int i = 0; i < item.length(); i++) {
+                        char c = item.charAt(i);
+                        if (c < '0' || c > '9')
+                            throw new BadRequestException("Invalid Content-Length");
+                    }
+                    long length;
+                    try {
+                        length = Long.parseLong(item);
+                    } catch (NumberFormatException bad) {
+                        throw new BadRequestException("Content-Length too large");
+                    }
+                    if (contentLength >= 0 && contentLength != length)
+                        throw new BadRequestException("Conflicting Content-Length headers");
+                    contentLength = length;
+                }
+            } else if ("Transfer-Encoding".equalsIgnoreCase(name)) {
+                for (String item : value.split(",", -1)) {
+                    item = item.trim().toLowerCase(Locale.US);
+                    // Only unambiguous coding names are forwarded. In particular,
+                    // chunked cannot have parameters or appear more than once.
+                    if (!isToken(item) || chunked)
+                        throw new BadRequestException("Invalid Transfer-Encoding");
+                    chunked = "chunked".equals(item);
+                    if (transferEncoding.length() > 0)
+                        transferEncoding.append(", ");
+                    transferEncoding.append(item);
+                }
+            } else if ("Host".equalsIgnoreCase(name)) {
+                if (host)
+                    throw new BadRequestException("Multiple Host headers");
+                host = true;
+            }
+        }
+
+        void finish(Map<String, List<String>> headers, String command) throws BadRequestException {
+            if (transferEncoding.length() > 0) {
+                if (command.trim().endsWith("HTTP/1.0"))
+                    throw new BadRequestException("Transfer-Encoding requires HTTP/1.1");
+                if (contentLength >= 0)
+                    throw new BadRequestException("Both Transfer-Encoding and Content-Length");
+                if (!chunked)
+                    throw new BadRequestException("Request Transfer-Encoding must end in chunked");
+                if (headers.containsKey("Transfer-Encoding"))
+                    setEntry(headers, "Transfer-Encoding", transferEncoding.toString());
+            }
+            if (contentLength >= 0 && headers.containsKey("Content-Length"))
+                setEntry(headers, "Content-Length", Long.toString(contentLength));
+        }
+
+        private static boolean isToken(String value) {
+            if (value.length() == 0)
+                return false;
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+                    continue;
+                if ("!#$%&'*+-.^_`|~".indexOf(c) < 0)
+                    return false;
+            }
+            return true;
+        }
+    }
+
     /**
      *  Read a line terminated by newline, with a total read timeout.
      *
-     *  Warning - strips \n and \r
+     *  Accepts CRLF or LF; rejects a CR anywhere else.
      *  Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      *  Warning - not UTF-8
      *
@@ -1265,29 +1359,35 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static void readLine(I2PSocket socket, StringBuilder buf, long timeout) throws IOException {
         if (timeout <= 0)
             throw new SocketTimeoutException();
-        long expires = System.currentTimeMillis() + timeout;
+        long started = System.nanoTime();
+        long timeoutNanos = java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(timeout);
         InputStream in = socket.getInputStream();
         int c;
         int i = 0;
+        boolean cr = false;
         socket.setReadTimeout(timeout);
         while ( (c = in.read()) != -1) {
             if (++i > MAX_LINE_LENGTH)
                 throw new LineTooLongException("Line too long - max " + MAX_LINE_LENGTH);
-            if (c == '\r')
-                continue;
+            long remaining = timeoutNanos - (System.nanoTime() - started);
+            if (remaining <= 0)
+                throw new SocketTimeoutException();
+            if (cr && c != '\n')
+                throw new BadRequestException("CR must be followed by LF");
             if (c == '\n')
                 break;
-            long newTimeout = expires - System.currentTimeMillis();
-            if (newTimeout <= 0)
-                throw new SocketTimeoutException();
-            buf.append((char)c);
+            if (c == '\r')
+                cr = true;
+            else
+                buf.append((char)c);
+            long newTimeout = Math.max(1, java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(remaining));
             if (newTimeout != timeout) {
                 timeout = newTimeout;
                 socket.setReadTimeout(timeout);
             }
         }
         if (c == -1) {
-            if (System.currentTimeMillis() >= expires)
+            if (System.nanoTime() - started >= timeoutNanos)
                 throw new SocketTimeoutException();
             else
                 throw new EOFException();
