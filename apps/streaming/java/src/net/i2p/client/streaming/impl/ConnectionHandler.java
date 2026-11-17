@@ -2,7 +2,7 @@ package net.i2p.client.streaming.impl;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayDeque;
 import java.util.concurrent.TimeUnit;
 
 import net.i2p.I2PAppContext;
@@ -27,11 +27,12 @@ class ConnectionHandler {
     private final Log _log;
     private final ByteCache _cache = ByteCache.getInstance(32, 4*1024);
     private final ConnectionManager _manager;
-    private final LinkedBlockingQueue<Packet> _synQueue;
+    // Queue and listen-state changes are guarded by this.
+    private final ArrayDeque<Packet> _synQueue;
     private final SimpleTimer2 _timer;
     private volatile boolean _active;
     private int _acceptTimeout;
-    private boolean _restartPending;
+    private ListenState _listenState = new ListenState();
     
     /** max time after receiveNewSyn() and before the matched accept() */
     private static final int DEFAULT_ACCEPT_TIMEOUT = 3*1000;
@@ -49,7 +50,7 @@ class ConnectionHandler {
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
         _timer = timer;
-        _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
+        _synQueue = new ArrayDeque<Packet>(MAX_QUEUE_SIZE);
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
@@ -60,18 +61,17 @@ class ConnectionHandler {
      * @since 0.9.34
      */
     public synchronized void setRestartPending() { 
-        _restartPending = true;
+        _listenState.restartPending = true;
         setActive(false);
     }
 
     public synchronized void setActive(boolean active) { 
-        // FIXME active=false this only kills for one thread in accept()
-        // if there are more, they won't get a poison packet.
         if (_log.shouldInfo())
             _log.info("setActive(" + active + ") called, previously " + _active, new Exception("I did it"));
-        // if starting, clear any old poison
+        // Each listening period has its own shutdown reason. Old acceptors
+        // must still see that reason even if we immediately start listening again.
         if (active && !_active) {
-            _restartPending = false;
+            _listenState = new ListenState();
             _synQueue.clear();
         }
         boolean wasActive = _active;
@@ -79,7 +79,7 @@ class ConnectionHandler {
         if (wasActive && !active) {
             // stopping, clear any pending sockets
             _synQueue.clear();
-            _synQueue.offer(new PoisonPacket());
+            notifyAll();
         }
     }
 
@@ -95,7 +95,11 @@ class ConnectionHandler {
      *
      */
     public void receiveNewSyn(Packet packet) {
-        if (!_active) {
+        final ListenState state;
+        synchronized (this) {
+            state = _active ? _listenState : null;
+        }
+        if (state == null) {
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropping new SYN request, as we're not listening");
@@ -114,12 +118,19 @@ class ConnectionHandler {
         if (_log.shouldLog(Log.INFO))
             _log.info("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
         // also check if expiration of the head is long past for overload detection with peek() ?
-        boolean success = _synQueue.offer(packet); // fail immediately if full
+        boolean success;
+        synchronized (this) {
+            success = _active && state == _listenState && _synQueue.size() < MAX_QUEUE_SIZE;
+            if (success) {
+                _synQueue.offer(packet);
+                notifyAll();
+            }
+        }
         if (success) {
             _timer.addEvent(new TimeoutSyn(packet), _acceptTimeout);
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping new SYN request, as the queue is full");
+                _log.warn("Dropping new SYN request, as we're not listening or the queue is full");
             if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
                 sendReset(packet);
         }
@@ -144,69 +155,46 @@ class ConnectionHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accept("+ timeoutMs+") called");
 
-        long expiration = timeoutMs + _context.clock().now();
+        final long started = System.nanoTime();
+        final long timeoutNanos = TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        final ListenState state;
+        synchronized (this) {
+            state = _listenState;
+        }
         while (true) {
-            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
-                throw new SocketTimeoutException("accept() timed out");
-            if (!_active) {
-                // fail all the ones we had queued up
-                while(true) {
-                    Packet packet = _synQueue.poll(); // fails immediately if empty
-                    if (packet == null || packet.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
-                        break;
-                    sendReset(packet);
-                }
-                if (_restartPending)
-                    throw new RouterRestartException();
-                throw new ConnectException("ServerSocket closed");
-            }
-            
-            Packet syn = null;
-            while ( _active && syn == null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Accept("+ timeoutMs+"): active=" + _active + " queue: " 
-                               + _synQueue.size());
-                if (timeoutMs <= 0) {
-                    try {
-                       syn = _synQueue.take(); // waits forever
-                    } catch (InterruptedException ie) {
-                       ConnectException ce = new ConnectException("Interrupted accept()");
-                       ce.initCause(ie);
-                       throw ce;
+            Packet syn;
+            synchronized (this) {
+                while (true) {
+                    if (!_active || state != _listenState) {
+                        if (state.restartPending)
+                            throw new RouterRestartException();
+                        throw new ConnectException("ServerSocket closed");
                     }
-                } else {
-                    long remaining = expiration - _context.clock().now();
-                    // (dont think this applies anymore for LinkedBlockingQueue)
-                    // BUGFIX
-                    // The specified amount of real time has elapsed, more or less. 
-                    // If timeout is zero, however, then real time is not taken into consideration 
-                    // and the thread simply waits until notified.
-                    if (remaining < 1)
+                    long remaining = timeoutNanos - (System.nanoTime() - started);
+                    if (timeoutMs > 0 && remaining <= 0)
+                        throw new SocketTimeoutException("accept() timed out");
+                    syn = _synQueue.poll();
+                    if (syn != null)
                         break;
                     try {
-                        syn = _synQueue.poll(remaining, TimeUnit.MILLISECONDS); // waits the specified time max
+                        if (timeoutMs <= 0)
+                            wait();
+                        else
+                            TimeUnit.NANOSECONDS.timedWait(this, remaining);
                     } catch (InterruptedException ie) {
-                       ConnectException ce = new ConnectException("Interrupted accept()");
-                       ce.initCause(ie);
-                       throw ce;
+                        ConnectException ce = new ConnectException("Interrupted accept()");
+                        ce.initCause(ie);
+                        throw ce;
                     }
-                    break;
                 }
             }
 
             if (syn != null) {
-                if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST) {
-                    if (_restartPending)
-                        throw new RouterRestartException();
-                    throw new ConnectException("ServerSocket closed");
-                }
-
                 // deal with forged / invalid syn packets in _manager.receiveConnection()
 
                 // Handle both SYN and non-SYN packets in the queue
                 if (syn.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
-                    // We are single-threaded here, so this is
-                    // a good place to check for dup SYNs and drop them
+                    // Check for duplicate SYNs before opening a connection.
                     Destination from = syn.getOptionalFrom();
                     if (from == null) {
                         if (_log.shouldLog(Log.WARN))
@@ -301,7 +289,10 @@ class ConnectionHandler {
         }
         
         public void timeReached() {
-            boolean removed = _synQueue.remove(_synPacket);
+            boolean removed;
+            synchronized (ConnectionHandler.this) {
+                removed = _synQueue.remove(_synPacket);
+            }
             
             if (removed) {
                 if (_synPacket.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
@@ -319,24 +310,8 @@ class ConnectionHandler {
         }
     }
 
-    /**
-     * Simple end-of-queue marker.
-     * The standard class limits the delay to POISON_MAX_DELAY_REQUEST so
-     * an evil user can't use this to shut us down
-     */
-    private static class PoisonPacket extends Packet {
-        public static final int POISON_MAX_DELAY_REQUEST = Packet.MAX_DELAY_REQUEST + 1;
-
-        public PoisonPacket() {
-            super(null);
-        }
-
-        @Override
-        public int getOptionalDelay() { return POISON_MAX_DELAY_REQUEST; }
-
-        @Override
-        public String toString() {
-            return "POISON";
-        }
+    /** Held by acceptors so a later start cannot hide their shutdown reason. */
+    private static class ListenState {
+        boolean restartPending;
     }
 }
