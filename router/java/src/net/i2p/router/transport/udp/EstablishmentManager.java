@@ -2227,10 +2227,20 @@ class EstablishmentManager {
         if (_log.shouldWarn())
             _log.warn("Expired: " + inboundState);
         RemoteHostId id = inboundState.getRemoteHostId();
-        _inboundStates.remove(id);
-        Long exp = Long.valueOf(_context.clock().now() + IB_BAN_TIME);
-        synchronized (_inboundBans) {
-            _inboundBans.put(id, exp);
+        _inboundStates.remove(id, inboundState);
+        switch (inboundState.getState()) {
+            case IB_STATE_TOKEN_REQUEST_RECEIVED:
+            case IB_STATE_REQUEST_BAD_TOKEN_RECEIVED:
+            case IB_STATE_RETRY_SENT:
+                // No DH has been done yet. A lost token exchange or a stale
+                // token after a NAT change must not block a fresh connection
+                // for 39 minutes. Admission/capacity limits still apply.
+                break;
+            default:
+                Long exp = Long.valueOf(_context.clock().now() + IB_BAN_TIME);
+                synchronized (_inboundBans) {
+                    _inboundBans.put(id, exp);
+                }
         }
         OutNetMessage msg;
         while ((msg = inboundState.getNextQueuedMessage()) != null) {
