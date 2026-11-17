@@ -351,14 +351,10 @@ class OutboundEstablishState {
     /** note that we just sent the RelayRequest packet */
     public synchronized void introSent() {
         _lastSend = _context.clock().now();
-        long delay;
-        if (_introSentCount == 0) {
-            delay = RETRANSMIT_DELAY;
+        if (_introSentTime == 0)
             _introSentTime = _lastSend;
-        } else {
-            delay = Math.min(RETRANSMIT_DELAY << _introSentCount,
-                             _introSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT - _lastSend);
-        }
+        long delay = Math.min(RETRANSMIT_DELAY << _introSentCount,
+                              _introSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT - _lastSend);
         _introSentCount++;
         _nextSend = _lastSend + delay;
         if (_currentState == OutboundState.OB_STATE_UNKNOWN)
@@ -366,7 +362,21 @@ class OutboundEstablishState {
     }
 
     /**
-     *  @return when we sent the first RelayRequest packet, or 0
+     *  Schedule a check for an asynchronous introducer lookup, connection or
+     *  relay response. Polling must not increase the RelayRequest backoff or
+     *  postpone the introduction deadline.
+     */
+    public synchronized void introductionPending() {
+        long now = _context.clock().now();
+        if (_introSentTime == 0)
+            _introSentTime = now;
+        _nextSend = Math.min(now + RETRANSMIT_DELAY,
+                             _introSentTime + EstablishmentManager.OB_MESSAGE_TIMEOUT);
+    }
+
+    /**
+     *  @return when the first introduction attempt started, including any
+     *          introducer lookup or connection, or 0
      *  @since 0.9.2
      */
     public long getIntroSentTime() { return _introSentTime; }

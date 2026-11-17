@@ -423,11 +423,11 @@ class EstablishmentManager {
                                 v2intros = true;
                                 break;
                             }
-                            if (!v2intros) {
-                                _transport.markUnreachable(toHash);
-                                _transport.failed(msg, "No v2 introducers");
-                                return;
-                            }
+                        }
+                        if (!v2intros) {
+                            _transport.markUnreachable(toHash);
+                            _transport.failed(msg, "No v2 introducers");
+                            return;
                         }
                     }
                     if (version >= 2 && version <= 4) {
@@ -1316,7 +1316,6 @@ class EstablishmentManager {
                 }
             }
             // Otherwise, look for ones we already have RIs for, attempt to connect to each.
-            boolean sent = false;
             for (int i = 0; i < count; i++) {
                 Hash h = addr.getIntroducerHash(i);
                 if (h != null) {
@@ -1344,6 +1343,7 @@ class EstablishmentManager {
                             if (oes != null) {
                                 if (_log.shouldDebug())
                                     _log.debug("Awaiting pending connection to introducer " + oes + " for " + state);
+                                istate = INTRO_STATE_CONNECTING;
                                 break;
                             }
                             int version = _transport.getSSUVersion(ra);
@@ -1373,12 +1373,8 @@ class EstablishmentManager {
                         state2.setIntroState(h, istate);
                 }
             }
-            if (sent) {
-                // not really
-                state.introSent();
-                return;
-            }
             // Otherwise, look up the RIs first.
+            boolean pending = false;
             for (int i = 0; i < count; i++) {
                 Hash h = addr.getIntroducerHash(i);
                 if (h != null) {
@@ -1390,13 +1386,25 @@ class EstablishmentManager {
                         state2.setIntroState(h, istate);
                         // TODO on success job
                         _context.netDb().lookupRouterInfo(h, null, null, 10*1000);
-                        sent = true;
+                    }
+                    // Lookups, connections and relay responses are asynchronous.
+                    // Keep the target alive while any introducer can still succeed;
+                    // handleOutbound() enforces the overall introduction timeout.
+                    switch (istate) {
+                        case INTRO_STATE_LOOKUP_SENT:
+                        case INTRO_STATE_HAS_RI:
+                        case INTRO_STATE_CONNECTING:
+                        case INTRO_STATE_CONNECTED:
+                        case INTRO_STATE_RELAY_REQUEST_SENT:
+                        case INTRO_STATE_RELAY_CHARLIE_ACCEPTED:
+                            pending = true;
+                            break;
                     }
                 }
             }
-            if (sent) {
-                // not really
-                state.introSent();
+            if (pending) {
+                // Schedule the next check without expiring asynchronous work.
+                state.introductionPending();
             } else {
                 if (_log.shouldDebug())
                     _log.debug("No valid introducers for " + state);
@@ -1436,7 +1444,11 @@ class EstablishmentManager {
             return false;
         }
         // Bob should already have our RI, especially if we just connected; we do not resend it here.
-        int ourPort = _transport.getRequestedPort();
+        // Sign the external endpoint so Charlie punches the NAT mapping,
+        // which may use a different port than our local socket.
+        int ourPort = ourra.getPort();
+        if (ourPort <= 0)
+            ourPort = _transport.getExternalPort(ourIP.length == 16);
         byte[] data = SSU2Util.createRelayRequestData(_context, bob.getRemotePeer(), charlie.getRemoteIdentity().getHash(),
                                                       charlie.getIntroNonce(), tag, ourIP, ourPort,
                                                       _context.keyManager().getSigningPrivateKey());
@@ -2342,7 +2354,8 @@ class EstablishmentManager {
      */
     public Token getInboundToken(RemoteHostId peer, long expiration, boolean force) {
         if (!force) {
-            if (_transport.isSymNatted())
+            byte[] ip = peer.getIP();
+            if (ip != null && ip.length == 4 && _transport.isSymNatted())
                 return null;
             if (!_transport.haveCapacity(95))
                 return null;
