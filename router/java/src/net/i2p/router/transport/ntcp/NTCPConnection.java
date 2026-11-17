@@ -1093,6 +1093,7 @@ public class NTCPConnection implements Closeable {
      */
     void recv(ByteBuffer buf) {
         if (isClosed()) {
+            EventPumper.releaseBuf(buf);
             if (_log.shouldWarn())
                 _log.warn("recv() on closed con");
             return;
