@@ -124,7 +124,8 @@ class AccessFilter implements StatefulConnectionFilter {
             knownDests.keySet().retainAll(tmp.keySet());
             for (Map.Entry<Hash, DestTracker> e : tmp.entrySet()) {
                 Hash newHash = e.getKey();
-                if (knownDests.containsKey(newHash)) 
+                DestTracker previous = knownDests.get(newHash);
+                if (previous != null && previous.hasSameThreshold(e.getValue()))
                     continue;
                 knownDests.put(newHash, e.getValue());
             }    

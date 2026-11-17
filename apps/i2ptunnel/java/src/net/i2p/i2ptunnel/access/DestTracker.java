@@ -23,6 +23,12 @@ class DestTracker {
         this.counter = new AccessCounter();
     }
 
+    boolean hasSameThreshold(DestTracker other) {
+        return (threshold == Threshold.ALLOW) == (other.threshold == Threshold.ALLOW) &&
+               threshold.getConnections() == other.threshold.getConnections() &&
+               threshold.getSeconds() == other.threshold.getSeconds();
+    }
+
     Hash getHash() {
         return hash;
     }
