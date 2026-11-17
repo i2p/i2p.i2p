@@ -61,6 +61,7 @@ import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserIdentity;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.AsyncRequestLogWriter;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.CustomRequestLog;
@@ -512,7 +513,7 @@ public class RouterConsoleRunner implements RouterApp {
             if (!logFile.isAbsolute())
                 logFile = new File(_context.getLogDir(), "logs/" + log);
             try {
-                _server.setRequestLog(new CustomRequestLog(logFile.toString(), CustomRequestLog.NCSA_FORMAT));
+                _server.setRequestLog(new CustomRequestLog(new AsyncRequestLogWriter(logFile.toString()), CustomRequestLog.NCSA_FORMAT));
             } catch (Exception ioe) {
                 System.err.println("ERROR: Unable to create Jetty log: " + ioe);
             }
