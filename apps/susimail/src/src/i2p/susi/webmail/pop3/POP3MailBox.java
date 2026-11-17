@@ -103,7 +103,7 @@ public class POP3MailBox implements NewMailListener {
 		_context = I2PAppContext.getGlobalContext();
 		_log = _context.logManager().getLog(POP3MailBox.class);
 		if (_log.shouldDebug())
-			_log.debug("Mailbox(" + host + "," + port + "," + user + ",password)");
+			_log.debug("Creating POP3 mailbox");
 		this.host = host;
 		this.port = port;
 		this.user = user;
@@ -138,7 +138,9 @@ public class POP3MailBox implements NewMailListener {
 	 * @param uidl
 	 * @return Byte buffer containing header data or null
 	 */
-	public Buffer getHeader( String uidl ) {
+	public Buffer getHeader(String uidl) { return getHeader(uidl, new MemoryBuffer(1024)); }
+
+    public Buffer getHeader(String uidl, Buffer destination) {
 		synchronized( synchronizer ) {
 			try {
 				// we must be connected to know the UIDL to ID mapping
@@ -150,7 +152,7 @@ public class POP3MailBox implements NewMailListener {
 			int id = getIDfromUIDL(uidl);
 			if (id < 0)
 				return null;
-			return getHeader(id);
+			return getHeader(id, destination);
 		}
 	}
 
@@ -161,7 +163,7 @@ public class POP3MailBox implements NewMailListener {
 	 * @param id message id
 	 * @return Byte buffer containing header data or null
 	 */
-	private Buffer getHeader( int id ) {
+	private Buffer getHeader(int id, Buffer destination) {
 			if (_log.shouldDebug()) _log.debug("getHeader(" + id + ")");
 			Buffer header = null;
 			if (id >= 1 && id <= mails) {
@@ -169,12 +171,12 @@ public class POP3MailBox implements NewMailListener {
 				/*
 				 * try 'TOP n 0' command
 				 */
-				header = sendCmdN("TOP " + id + " 0", new MemoryBuffer(1024));
+				header = sendCmdN("TOP " + id + " 0", destination);
 				if( header == null) {
 					/*
 					 * try 'RETR n' command
 					 */
-					header = sendCmdN("RETR " + id, new MemoryBuffer(2048));
+					header = sendCmdN("RETR " + id, destination);
 					if (header == null)
 						if (_log.shouldDebug()) _log.debug("RETR returned null" );
 				}
@@ -512,6 +514,7 @@ public class POP3MailBox implements NewMailListener {
 					i != -1
 						? response.substring(4, i)
 						: response.substring(4));
+            if (mails < 0 || mails > 50000) mails = 0;
 		} catch (NumberFormatException nfe) {
 			mails = 0;
 		}
@@ -522,8 +525,15 @@ public class POP3MailBox implements NewMailListener {
 	 * 
 	 * @throws IOException
 	 */
+    private static boolean validUIDL(String uidl) {
+        if (uidl.length() < 1 || uidl.length() > 70) return false;
+        for (int i = 0; i < uidl.length(); i++) if (uidl.charAt(i) < 33 || uidl.charAt(i) > 126) return false;
+        return true;
+    }
+
 	private void updateUIDLs(List<String> lines) {
 			uidlToID.clear();
+            java.util.Set<Integer> ids = new java.util.HashSet<Integer>();
 			if (lines != null) {
 				for (String line : lines) {
 					int j = line.indexOf(' ');
@@ -531,7 +541,8 @@ public class POP3MailBox implements NewMailListener {
 						try {
 							int n = Integer.parseInt( line.substring( 0, j ) );
 							String uidl = line.substring(j + 1).trim();
-							uidlToID.put( uidl, Integer.valueOf( n ) );
+							if (n > 0 && validUIDL(uidl) && !uidlToID.containsKey(uidl) && ids.add(Integer.valueOf(n)))
+                                uidlToID.put(uidl, Integer.valueOf(n));
 						} catch (NumberFormatException nfe) {
 							if (_log.shouldDebug()) _log.debug("UIDL error", nfe);
 						} catch (IndexOutOfBoundsException ioobe) {
@@ -562,7 +573,7 @@ public class POP3MailBox implements NewMailListener {
 					try {
 						int key = Integer.parseInt(line.substring(0, j));
 						int value = Integer.parseInt(line.substring(j + 1).trim());
-						sizes.put(Integer.valueOf(key), Integer.valueOf(value));
+						if (key > 0 && value >= 0) sizes.put(Integer.valueOf(key), Integer.valueOf(value));
 					} catch (NumberFormatException nfe) {
 						if (_log.shouldDebug()) _log.debug("LIST error", nfe);
 					}
@@ -707,7 +718,7 @@ public class POP3MailBox implements NewMailListener {
 	 * @return true if connected
 	 * @since 0.9.13
 	 */
-	boolean blockingConnectToServer() {
+	public boolean blockingConnectToServer() {
 		synchronized( synchronizer ) {
 			if (isConnected())
 				return true;
@@ -947,24 +958,20 @@ public class POP3MailBox implements NewMailListener {
 		boolean result = false;
 		sendCmd1aNoWait(cmd);
 		socket.getOutputStream().flush();
-		String foo = DataHelper.readLine(socket.getInputStream());
+		String foo = DataHelper.readLine(new i2p.susi.util.TimedResponseInputStream(socket, 120000));
 		updateActivity();
 		// if (_log.shouldDebug()) _log.debug("sendCmd1a: read " + read + " bytes");
 		if (foo != null) {
 			lastLine = foo;
 			if (lastLine.startsWith("+OK")) {
-				if (cmd.startsWith("PASS"))
-					cmd = "PASS provided";
-				if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") success: \"" + lastLine.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 command succeeded");
 				result = true;
 			} else {
-				if (cmd.startsWith("PASS"))
-					cmd = "PASS provided";
-				if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") FAIL: \"" + lastLine.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 command failed");
 				lastError = lastLine;
 			}
 		} else {
-			if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") NO RESPONSE");
+			if (_log.shouldDebug()) _log.debug("No response to POP3 command");
 			lastError = _t("No response from server");
 			throw new IOException(lastError);
 		}
@@ -994,7 +1001,7 @@ public class POP3MailBox implements NewMailListener {
 			}
 		} // else we will do it below
 		socket.getOutputStream().flush();
-		InputStream in = socket.getInputStream();
+		InputStream in = new i2p.susi.util.TimedResponseInputStream(socket, 120000);
 		int i = 0;
 		for (SendRecv sr : cmds) {
 			if (!pipe) {
@@ -1013,13 +1020,13 @@ public class POP3MailBox implements NewMailListener {
 			sr.response = foo.trim();
 			i++;
 			if (!foo.startsWith("+OK")) {
-				if (_log.shouldDebug()) _log.debug("Fail after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 failure after " + i + " of " + cmds.size() + " responses");
 				if (result)
 				    lastError = foo;   // actually the first error, for better info to the user
 				result = false;
 				sr.result = false;
 			} else {
-				if (_log.shouldDebug()) _log.debug("OK after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 success after " + i + " of " + cmds.size() + " responses");
 				switch (sr.mode) {
 				    case A1:
 					sr.result = true;
@@ -1059,6 +1066,7 @@ public class POP3MailBox implements NewMailListener {
 				}
 			}
 			lastLine = foo;
+            if (socket == null) break;
 		}
 		return result;
 	}
@@ -1072,13 +1080,14 @@ public class POP3MailBox implements NewMailListener {
          * @since 0.9.13
 	 */
 	private void sendCmd1aNoWait(String cmd) throws IOException {
-		/*
-		 * dont log password
-		 */
-		String msg = cmd;
-		if (msg.startsWith("PASS"))
-			msg = "PASS provided";
-		if (_log.shouldDebug()) _log.debug("sendCmd1a(" + msg + ")");
+		// Credentials must not introduce additional commands or appear in logs.
+		// getASCII() truncates to eight bits, so validate the actual wire bytes.
+		for (int i = 0; i < cmd.length(); i++) {
+			int c = cmd.charAt(i) & 0xff;
+			if (c < 32 || c == 127)
+				throw new IOException("Invalid POP3 command");
+		}
+		if (_log.shouldDebug()) _log.debug("Sending POP3 command");
 		cmd += "\r\n";
 		socket.getOutputStream().write(DataHelper.getASCII(cmd));
 		updateActivity();
@@ -1169,39 +1178,39 @@ public class POP3MailBox implements NewMailListener {
 	 * @param buffer non-null
 	 * @throws IOException
 	 */
-	private void getResultNa(Buffer buffer) throws IOException
-	{
-		InputStream input = socket.getInputStream();
-		OutputStream out = null;
-		boolean success = false;
-		try {
-			out = buffer.getOutputStream();
-			StringBuilder buf = new StringBuilder(512);
-			while (DataHelper.readLine(input, buf)) {
-				updateActivity();
-				int len = buf.length();
-				if (len == 0)
-					break; // huh? no \r?
-				if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
-					break;
-				String line;
-				// RFC 1939 sec. 3 de-byte-stuffing
-				if (buf.charAt(0) == '.')
-					line = buf.substring(1);
-				else
-					line = buf.toString();
-				out.write(DataHelper.getASCII(line));
-				if (buf.charAt(len - 1) != '\r')
-					out.write('\n');
-				out.write('\n');
-				buf.setLength(0);
-			}
-			success = true;
-		} finally {
-			if (out != null) try { out.close(); } catch (IOException ioe) {}
-			buffer.writeComplete(success);
-		}
-	}
+	private void getResultNa(Buffer buffer) throws IOException {
+        InputStream input = new i2p.susi.util.TimedResponseInputStream(socket, 120000);
+        OutputStream out = null;
+        boolean success = false, terminated = false;
+        long start = System.nanoTime(), total = 0;
+        try {
+            out = buffer.getOutputStream();
+            StringBuilder line = new StringBuilder(512);
+            while (DataHelper.readLine(input, line)) {
+                updateActivity();
+                int length = line.length();
+                if (length > 0 && line.charAt(length - 1) == '\r') line.setLength(--length);
+                if (line.toString().equals(".")) { terminated = true; break; }
+                if (System.nanoTime() - start > 120000000000L) throw new IOException("Mail download timed out");
+                int offset = length > 0 && line.charAt(0) == '.' ? 1 : 0;
+                total += length - offset + 2;
+                if (total > 16L * 1024 * 1024 || (buffer instanceof i2p.susi.util.MemoryBuffer && total > 256 * 1024))
+                    throw new IOException("Mail response exceeds the download limit");
+                out.write(DataHelper.getASCII(line.substring(offset)));
+                out.write('\r'); out.write('\n');
+                line.setLength(0);
+            }
+            if (!terminated) throw new IOException("Incomplete mail response: missing POP3 terminator");
+            out.close();
+            out = null;
+            success = true;
+        } finally {
+            // Mark failure before closing: encrypted buffers preserve the previous file.
+            if (!success) buffer.writeComplete(false);
+            if (out != null) try { out.close(); } catch (IOException ignored) {}
+            if (success) buffer.writeComplete(true);
+        }
+    }
 
 	/**
 	 * Like getResultNa but returns a list of strings, one per line.
@@ -1213,33 +1222,24 @@ public class POP3MailBox implements NewMailListener {
 	 * @throws IOException on timeout
          * @since 0.9.13
 	 */
-	private List<String> getResultNl() throws IOException
-	{
-		List<String> rv = new ArrayList<String>(16);
-		long timeOut = 120*1000;
-		InputStream input = socket.getInputStream();
-		long startTime = System.currentTimeMillis();
-		StringBuilder buf = new StringBuilder(512);
-		while (DataHelper.readLine(input, buf)) {
-			updateActivity();
-			int len = buf.length();
-			if (len == 0)
-				break; // huh? no \r?
-			if (len == 2 && buf.charAt(0) == '.' && buf.charAt(1) == '\r')
-				break;
-			if( System.currentTimeMillis() - startTime > timeOut )
-				throw new IOException(_t("No response from server"));
-			String line;
-			// RFC 1939 sec. 3 de-byte-stuffing
-			if (buf.charAt(0) == '.')
-				line = buf.substring(1);
-			else
-				line = buf.toString();
-			rv.add(line);
-			buf.setLength(0);
-		}
-		return rv;
-	}
+	private List<String> getResultNl() throws IOException {
+        List<String> result = new ArrayList<String>(16);
+        InputStream input = new i2p.susi.util.TimedResponseInputStream(socket, 120000);
+        long start = System.nanoTime(), total = 0;
+        StringBuilder line = new StringBuilder(512);
+        while (DataHelper.readLine(input, line)) {
+            updateActivity();
+            int length = line.length();
+            if (length > 0 && line.charAt(length - 1) == '\r') length--;
+            if (length == 1 && line.charAt(0) == '.') return result;
+            total += line.length() + 1;
+            if (System.nanoTime() - start > 120000000000L || total > 8 * 1024 * 1024 || result.size() >= 50000)
+                throw new IOException("Mail server listing exceeds the safety limit");
+            result.add(line.length() > 0 && line.charAt(0) == '.' ? line.substring(1) : line.toString());
+            line.setLength(0);
+        }
+        throw new IOException("Incomplete mail server listing");
+    }
 
 	/**
 	 * Warning - forces a connection.

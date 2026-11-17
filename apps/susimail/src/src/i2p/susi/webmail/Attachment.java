@@ -35,12 +35,18 @@ import java.io.InputStream;
 public class Attachment {
 	private final String fileName, contentType, transferEncoding;
 	private final File data;
+	private final MailVault vault;
 
 	/**
 	 * @param type the content type
 	 * @param encoding the transfer encoding, non-null
 	 */
 	Attachment(String name, String type, String encoding, File data) {
+		this(name, type, encoding, data, null);
+	}
+
+	Attachment(String name, String type, String encoding, File data, MailVault vault) {
+		this.vault = vault;
 		fileName = name;
 		contentType = type;
 		transferEncoding = encoding;
@@ -69,6 +75,7 @@ public class Attachment {
 	 * @return Returns the data.
 	 */
 	public InputStream getData() throws IOException {
+		if (vault != null) return new VaultFileBuffer(vault, data, false).getInputStream();
 		return new FileInputStream(data);
 	}
 
@@ -85,7 +92,13 @@ public class Attachment {
 	 * @since 0.9.33
 	 */
 	public long getSize() {
-		return data.length();
+		if (vault == null) return data.length();
+		try {
+			byte[] plain = vault.read(data.toPath(), MailVault.MAX_BLOB);
+			int length = plain.length;
+			java.util.Arrays.fill(plain, (byte) 0);
+			return length;
+		} catch (IOException failure) { return MailVault.MAX_BLOB + 1L; }
 	}
 
 	/**
