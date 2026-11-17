@@ -1,0 +1,121 @@
+{
+  "baselineRef": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+  "candidateRef": "HEAD",
+  "runnerSha256": "039dab26da74a1bad6d29f8d2319fa25a5cf493b99d38ba69acf06f79cb68246",
+  "harnessSha256": "af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41",
+  "specification": "https://i2p.net/en/docs/specs/ssu2/",
+  "scope": "Real encrypted transport sessions on network 222 using loopback-only addresses and dummy overlay services; no public I2P peers or tunnel performance claims",
+  "variants": {
+    "baseline": {
+      "source": {
+        "ref": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "commit": "53002765a300547a2c663ac3c8d50a1b7c56cf1e",
+        "workingTree": false,
+        "javaSources": 1009,
+        "sourceTreeSha256": "c7f297657b2879b1eb42b9674fa7b2a80c727a222f18481937fde3c91b694e66",
+        "harnessSha256": "af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41",
+        "dependencySha256": {
+          "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+          "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+        }
+      },
+      "runs": [
+        {
+          "scenario": "nat-port-change",
+          "seed": 1,
+          "warmupMs": 98,
+          "recoveryMs": 45003,
+          "faultWindowMs": 45504,
+          "deadlineMs": 45000,
+          "pendingEstablishments": 0,
+          "inboundBans": 0,
+          "connectionIdEntries": 0,
+          "endpointEntries": 2,
+          "droppedPackets": 0,
+          "forwardedPackets": 23,
+          "reorderedPackets": 0,
+          "blockedUDPPackets": 0,
+          "expiredMappingPackets": 0,
+          "peerEndpointMigrated": false,
+          "connectionIdsRetained": true,
+          "warmupSSUVersionA": 3,
+          "warmupSSUVersionB": 3,
+          "recoveredSSUVersionA": 3,
+          "recoveredSSUVersionB": 3,
+          "udpSessions": 2,
+          "tcpFallback": false,
+          "passed": false,
+          "failure": "recovery-deadline;peer-endpoint-not-migrated",
+          "shutdownConfirmed": true,
+          "exitCode": 1,
+          "wallSeconds": 48.428
+        }
+      ]
+    },
+    "candidate": {
+      "source": {
+        "ref": "HEAD",
+        "commit": "c9e44e9c6c2dc39d177c55a576f9d820e57c1fdb",
+        "workingTree": false,
+        "javaSources": 1009,
+        "sourceTreeSha256": "c7f297657b2879b1eb42b9674fa7b2a80c727a222f18481937fde3c91b694e66",
+        "harnessSha256": "af2a678da60d88f3a0f668f3131986779c629eacbb9c8461e524ea0cf8c82e41",
+        "dependencySha256": {
+          "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+          "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+        }
+      },
+      "runs": [
+        {
+          "scenario": "nat-port-change",
+          "seed": 1,
+          "warmupMs": 103,
+          "recoveryMs": 45012,
+          "faultWindowMs": 45514,
+          "deadlineMs": 45000,
+          "pendingEstablishments": 0,
+          "inboundBans": 0,
+          "connectionIdEntries": 0,
+          "endpointEntries": 2,
+          "droppedPackets": 0,
+          "forwardedPackets": 22,
+          "reorderedPackets": 0,
+          "blockedUDPPackets": 0,
+          "expiredMappingPackets": 0,
+          "peerEndpointMigrated": false,
+          "connectionIdsRetained": true,
+          "warmupSSUVersionA": 3,
+          "warmupSSUVersionB": 3,
+          "recoveredSSUVersionA": 3,
+          "recoveredSSUVersionB": 3,
+          "udpSessions": 2,
+          "tcpFallback": false,
+          "passed": false,
+          "failure": "recovery-deadline;peer-endpoint-not-migrated",
+          "shutdownConfirmed": true,
+          "exitCode": 1,
+          "wallSeconds": 48.358
+        }
+      ]
+    }
+  },
+  "measurementsComplete": true,
+  "invalidMeasurements": [],
+  "candidatePassed": false,
+  "noRegressions": true,
+  "regressions": [],
+  "gate": "regressions",
+  "passed": true,
+  "comparison": [
+    {
+      "scenario": "nat-port-change",
+      "seed": 1,
+      "baselinePassed": false,
+      "candidatePassed": false,
+      "baselineRecoveryMs": 45003,
+      "candidateRecoveryMs": 45012,
+      "baselinePendingEstablishments": 0,
+      "candidatePendingEstablishments": 0
+    }
+  ]
+}

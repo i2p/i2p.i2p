@@ -1,0 +1,16 @@
+{
+  "mode": "normal",
+  "durationSeconds": 360,
+  "jarSha256": {
+    "i2p.jar": "f607baefa9af2f4e378085095b3ac818608a7bfcf16e07f7b640f21b2b6af7d8",
+    "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee",
+    "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+    "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+    "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+    "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+  },
+  "verification": "connectivity",
+  "minRoundtrips": 1,
+  "minTwoHopSamples": 1,
+  "processExitCode": 0
+}
