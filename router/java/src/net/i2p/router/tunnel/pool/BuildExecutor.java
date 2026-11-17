@@ -105,8 +105,10 @@ class BuildExecutor implements Runnable {
         synchronized (_recentBuildIds) { 
             _recentBuildIds.clear();
         }
-        _currentlyBuildingMap.clear();
-        _recentlyBuildingMap.clear();
+        synchronized (_currentlyBuilding) {
+            _currentlyBuildingMap.clear();
+            _recentlyBuildingMap.clear();
+        }
     }
 
     /**
@@ -169,9 +171,16 @@ class BuildExecutor implements Runnable {
         for (Iterator<PooledTunnelCreatorConfig> iter = _currentlyBuildingMap.values().iterator(); iter.hasNext(); ) {
             PooledTunnelCreatorConfig cfg = iter.next();
             if (cfg.getExpiration() <= expireBefore) {
-                // save them for another minute
-                _recentlyBuildingMap.putIfAbsent(Long.valueOf(cfg.getReplyMessageId()), cfg);
-                iter.remove();
+                // Claim this exact entry before recording a timeout. A reply
+                // may already have removed it while this iterator was in flight.
+                synchronized (_currentlyBuilding) {
+                    Long key = Long.valueOf(cfg.getReplyMessageId());
+                    if (!_currentlyBuildingMap.remove(key, cfg))
+                        continue;
+                    // Keep the move atomic with removeFromBuilding(), so a
+                    // late reply cannot fall between the two maps.
+                    _recentlyBuildingMap.putIfAbsent(key, cfg);
+                }
                 if (expired == null)
                     expired = new ArrayList<PooledTunnelCreatorConfig>();
                 expired.add(cfg);
@@ -643,10 +652,13 @@ class BuildExecutor implements Runnable {
     PooledTunnelCreatorConfig removeFromBuilding(long id) {
         //_log.error("Removing ID: " + id + "; size was: " + _currentlyBuildingMap.size());
         Long key = Long.valueOf(id);
-        PooledTunnelCreatorConfig rv = _currentlyBuildingMap.remove(key);
-        if (rv != null)
-            return rv;
-        rv = _recentlyBuildingMap.remove(key);
+        PooledTunnelCreatorConfig rv;
+        synchronized (_currentlyBuilding) {
+            rv = _currentlyBuildingMap.remove(key);
+            if (rv != null)
+                return rv;
+            rv = _recentlyBuildingMap.remove(key);
+        }
         if (rv != null) {
             long requestedOn = rv.getExpiration() - 10*60*1000;
             long rtt = _context.clock().now() - requestedOn;
