@@ -804,6 +804,11 @@ class PeerTestManager {
      */
     private void receiveTest(RemoteHostId from, PeerState2 fromPeer, int msg, int status, Hash h, byte[] data,
                              byte[] addrBlockIP, int addrBlockPort) {
+        if (data == null || data.length < 10) {
+            if (_log.shouldWarn())
+                _log.warn("Truncated peer test from " + from);
+            return;
+        }
         if (data[0] != 2) {
             if (_log.shouldWarn())
                 _log.warn("Bad version " + (data[0] & 0xff) + " from " + from + ' ' + fromPeer);
@@ -815,6 +820,11 @@ class PeerTestManager {
         if (iplen != 0 && iplen != 6 && iplen != 18) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Bad IP length " + iplen);
+            return;
+        }
+        if (data.length < 10 + iplen) {
+            if (_log.shouldWarn())
+                _log.warn("Truncated peer test address from " + from);
             return;
         }
         boolean isIPv6 = iplen == 18;
@@ -1743,7 +1753,7 @@ class PeerTestManager {
         if (siv == null)
             return null;
         byte[] ik = Base64.decode(siv);
-        if (ik == null)
+        if (ik == null || ik.length != SessionKey.KEYSIZE_BYTES)
             return null;
         return new SessionKey(ik);
     }
