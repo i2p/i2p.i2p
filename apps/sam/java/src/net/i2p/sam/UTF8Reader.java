@@ -33,6 +33,7 @@ public class UTF8Reader extends Reader {
     private ByteBuffer _bb;
     private CharBuffer _cb;
     private CharsetDecoder _dc;
+    private int _pendingChar = -1;
 
     // Charset.forName("UTF-8").newDecoder().replacement().charAt(0) & 0xffff
     private static final int REPLACEMENT = 0xfffd;
@@ -50,6 +51,11 @@ public class UTF8Reader extends Reader {
      */
     @Override
     public int read() throws IOException {
+        if (_pendingChar >= 0) {
+            int c = _pendingChar;
+            _pendingChar = -1;
+            return c;
+        }
         int b = _in.read();
         if (b < 0)
             return b;
@@ -58,7 +64,7 @@ public class UTF8Reader extends Reader {
             return b;
         if (_bb == null) {
             _bb = ByteBuffer.allocate(6);
-            _cb = CharBuffer.allocate(1);
+            _cb = CharBuffer.allocate(2);
             _dc = Charset.forName("UTF-8").newDecoder();
         } else {
             ((Buffer)_bb).clear();
@@ -98,8 +104,12 @@ public class UTF8Reader extends Reader {
         ((Buffer)_cb).flip();
         if (result.isError() || !_cb.hasRemaining())
             return REPLACEMENT;
-        // let underflow and overflow go, return first
-        return _cb.get() & 0xffff;
+        int c = _cb.get() & 0xffff;
+        // Supplementary code points decode to two UTF-16 chars. Return the
+        // second on the next call without reading ahead in the input stream.
+        if (_cb.hasRemaining())
+            _pendingChar = _cb.get() & 0xffff;
+        return c;
     }
 
     @Override
