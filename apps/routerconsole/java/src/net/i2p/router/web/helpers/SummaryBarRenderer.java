@@ -804,13 +804,21 @@ class SummaryBarRenderer {
             default:
                 buf.append("testing");
         }
+        String message = reachability.getMessage();
+        String detail = null;
+        if (reachability.getState() == SummaryHelper.NetworkState.FIREWALLED && _helper.getActivePeers() > 0) {
+            message = _t("Connected ({0})", message);
+            detail = _t("Incoming connections are restricted.");
+        }
         buf.append("\"><a href=\"/help#reachabilityhelp\" target=\"_top\" title=\"")
            .append(_t("Information about the network status"))
            .append("\">")
            .append(_t("Network"))
            .append(": ")
-           .append(reachability.getMessage())
-           .append("</a></span></h4>\n");
+           .append(message);
+        if (detail != null)
+            buf.append("<span class=\"sb_netstatus_detail\">").append(detail).append("</span>");
+        buf.append("</a></span></h4>\n");
         if (!SystemVersion.isJava(17)) {
             buf.append("<hr><h4><span class=\"warn\">")
                .append(_t("Warning: Java version {0} is no longer supported by I2P.", System.getProperty("java.version")))

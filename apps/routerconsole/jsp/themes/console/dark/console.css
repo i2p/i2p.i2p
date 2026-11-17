@@ -6818,6 +6818,14 @@ form[action="events"] {
 
 /* network status */
 
+.sb_netstatus_detail {
+    display: block;
+    margin-top: 4px;
+    font-weight: normal;
+    line-height: 1.3;
+    white-space: normal;
+}
+
 .routersummary h4 a {
     width: auto !important;
     vertical-align: middle;
