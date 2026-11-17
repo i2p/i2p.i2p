@@ -370,7 +370,7 @@ class BuildHandler implements Runnable {
                             if (_log.shouldWarn())
                                 _log.warn(msg.getUniqueId() + ": peer replied available: " + avail + "KBps");
                             try {
-                                int av = Integer.parseInt(avail) * 1000;
+                                int av = parseBandwidth(avail);
                                 if (av > 0 && (allocated == 0 || av < allocated))
                                     allocated = av;
                             } catch (NumberFormatException nfe) {}
@@ -939,7 +939,7 @@ class BuildHandler implements Runnable {
                 String smin = props.getProperty(BuildRequestor.PROP_MIN_BW);
                 if (smin != null) {
                     try {
-                        min = 1000 * Integer.parseInt(smin);
+                        min = parseBandwidth(smin);
                     } catch (NumberFormatException nfe) {
                         response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                     }
@@ -947,7 +947,7 @@ class BuildHandler implements Runnable {
                 String sreq = props.getProperty(BuildRequestor.PROP_REQ_BW);
                 if (sreq != null) {
                     try {
-                        rqu = 1000 * Integer.parseInt(sreq);
+                        rqu = parseBandwidth(sreq);
                     } catch (NumberFormatException nfe) {
                         response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                     }
@@ -956,7 +956,7 @@ class BuildHandler implements Runnable {
                     String smax = props.getProperty(BuildRequestor.PROP_MAX_BW);
                     if (smax != null) {
                         try {
-                            ibgwmax = 1000 * Integer.parseInt(smax);
+                            ibgwmax = parseBandwidth(smax);
                         } catch (NumberFormatException nfe) {
                             response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                         }
@@ -1177,6 +1177,14 @@ class BuildHandler implements Runnable {
         }
     }
     
+    /** Mapping bandwidth values are decimal KB/s; the internal value is a nonnegative int in B/s. */
+    private static int parseBandwidth(String value) throws NumberFormatException {
+        int kbps = Integer.parseInt(value);
+        if (kbps < 0 || kbps > Integer.MAX_VALUE / 1000)
+            throw new NumberFormatException("Tunnel bandwidth out of range");
+        return kbps * 1000;
+    }
+
     public int getInboundBuildQueueSize() {
             return _inboundBuildMessages.size();
     }
