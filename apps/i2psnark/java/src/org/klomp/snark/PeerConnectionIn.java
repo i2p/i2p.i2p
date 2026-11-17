@@ -100,6 +100,7 @@ class PeerConnectionIn implements Runnable
               }
             
             byte b = din.readByte();
+            checkLength(b, i);
             switch (b)
               {
               case Message.CHOKE:
@@ -257,5 +258,45 @@ class PeerConnectionIn implements Runnable
       {
         peer.disconnect();
       }
+  }
+
+  /** Reject malformed frames before reading fields from the following message. */
+  private static void checkLength(byte type, int length) throws IOException {
+    int expected;
+    switch (type) {
+      case Message.CHOKE:
+      case Message.UNCHOKE:
+      case Message.INTERESTED:
+      case Message.UNINTERESTED:
+      case Message.HAVE_ALL:
+      case Message.HAVE_NONE:
+        expected = 1;
+        break;
+      case Message.HAVE:
+      case Message.SUGGEST:
+      case Message.ALLOWED_FAST:
+        expected = 5;
+        break;
+      case Message.REQUEST:
+      case Message.CANCEL:
+      case Message.REJECT:
+        expected = 13;
+        break;
+      case Message.PORT:
+        expected = 3;
+        break;
+      case Message.PIECE:
+        if (length <= 9)
+          throw new IOException("Piece frame has no data");
+        return;
+      case Message.EXTENSION:
+        if (length < 2)
+          throw new IOException("Extension frame has no message ID");
+        return;
+      default:
+        return;
+    }
+    if (length != expected)
+      throw new IOException("Invalid frame length " + length + " for message " + type);
   }
 }

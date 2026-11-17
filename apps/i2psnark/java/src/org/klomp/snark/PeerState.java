@@ -315,7 +315,8 @@ class PeerState implements DataLoader
         || begin < 0
         || begin > metainfo.getPieceLength(piece)
         || length <= 0
-        || length > MAX_PARTSIZE)
+        || length > MAX_PARTSIZE
+        || length > metainfo.getPieceLength(piece) - begin)
       {
         // XXX - Protocol error -> disconnect?
         if (_log.shouldLog(Log.WARN))
