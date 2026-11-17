@@ -13,9 +13,10 @@
     // CSSHelper is also pulled in by css.jsi below...
     boolean testIFrame = tester.allowIFrame(request.getHeader("User-Agent"));
     boolean embedApp = tester.embedApps();
+    String snarkURL = net.i2p.router.web.helpers.TorrentHelper.getSnarkURLFromRequest(request);
     if (!testIFrame || !embedApp) {
         response.setStatus(307);
-        response.setHeader("Location", "/i2psnark/");
+        response.setHeader("Location", snarkURL);
         // force commitment
         response.getOutputStream().close();
         return;
@@ -44,11 +45,11 @@
 </script>
 </head><body>
 <%@include file="summary.jsi" %>
-<h1><%=intl._t("I2P Torrent Manager")%> <span class="newtab"><a href="/i2psnark/" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
+<h1><%=intl._t("I2P Torrent Manager")%> <span class="newtab"><a href="<%=snarkURL%>" target="_blank" title="<%=intl._t("Open in new tab")%>"><img src="<%=intl.getTheme(request.getHeader("User-Agent"))%>images/newtab.png" /></a></span></h1>
 <div class="main" id="torrents">
-<iframe src="/i2psnark/" width="100%" height="100%" frameborder="0" border="0" name="i2psnarkframe" id="i2psnarkframe" allowtransparency="true">
+<iframe src="<%=snarkURL%>" width="100%" height="100%" frameborder="0" border="0" name="i2psnarkframe" id="i2psnarkframe" allowtransparency="true">
 <%=intl._t("Your browser does not support iFrames.")%>
-&nbsp;<a href="/i2psnark/"><%=intl._t("Click here to continue.")%></a>
+&nbsp;<a href="<%=snarkURL%>"><%=intl._t("Click here to continue.")%></a>
 </iframe>
 </div></body></html>
 <%
