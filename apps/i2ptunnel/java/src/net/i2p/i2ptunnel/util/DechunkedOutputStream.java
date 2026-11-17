@@ -18,8 +18,13 @@ public class DechunkedOutputStream extends LimitOutputStream {
     // During main part, how much is remaining in the chunk
     // During the trailer, counts the trailer header size
     private int _remaining;
+    private boolean _gotChunkLength;
+    private boolean _trailerCR;
+    private int _chunkHeaderBytes;
+    private int _trailerBytes;
 
     private static final byte[] CRLF = DataHelper.getASCII("\r\n");
+    private static final int MAX_METADATA_SIZE = 64 * 1024;
     
     private enum State { LEN, CR, LF, DATA, DATACR, DATALF, TRAILER, DONE }
 
@@ -34,6 +39,13 @@ public class DechunkedOutputStream extends LimitOutputStream {
             return;
 
         for (int i = 0; i < len; i++) {
+            if (_state == State.LEN || _state == State.CR || _state == State.LF) {
+                if (++_chunkHeaderBytes > MAX_METADATA_SIZE)
+                    throw new IOException("Chunk header too big");
+            } else if (_state == State.TRAILER) {
+                if (++_trailerBytes > MAX_METADATA_SIZE)
+                    throw new IOException("Chunk trailers too big");
+            }
             // _state is what we are expecting next
             //System.err.println("State: " + _state + " i=" + i + " len=" + len + " remaining=" + _remaining + " char=0x" + Integer.toHexString(buf[off + i] & 0xff));
             switch (_state) {
@@ -45,21 +57,30 @@ public class DechunkedOutputStream extends LimitOutputStream {
                             throw new IOException("Chunk length too big");
                         _remaining <<= 4;
                         _remaining |= c - '0';
+                        _gotChunkLength = true;
                     } else if (c >= 'a' && c <= 'f') {
-                        if (_remaining >= 0x800000)
+                        if (_remaining >= 0x8000000)
                             throw new IOException("Chunk length too big");
                         _remaining <<= 4;
                         _remaining |= 10 + c - 'a';
+                        _gotChunkLength = true;
                     } else if (c >= 'A' && c <= 'F') {
-                        if (_remaining >= 0x800000)
+                        if (_remaining >= 0x8000000)
                             throw new IOException("Chunk length too big");
                         _remaining <<= 4;
                         _remaining |= 10 + c - 'A';
+                        _gotChunkLength = true;
                     } else if (c == ';') {
+                        if (!_gotChunkLength)
+                            throw new IOException("Missing chunk length");
                         _state = State.CR;
                     } else if (c == '\r') {
+                        if (!_gotChunkLength)
+                            throw new IOException("Missing chunk length");
                         _state = State.LF;
                     } else if (c == '\n') {
+                        if (!_gotChunkLength)
+                            throw new IOException("Missing chunk length");
                         if (_remaining > 0)
                             _state = State.DATA;
                         else
@@ -113,8 +134,11 @@ public class DechunkedOutputStream extends LimitOutputStream {
                     // loop will increment
                     i += towrite - 1;
                     _remaining -= towrite;
-                    if (_remaining <= 0)
+                    if (_remaining <= 0) {
                         _state = State.DATACR;
+                        _gotChunkLength = false;
+                        _chunkHeaderBytes = 0;
+                    }
                     break;
                 }
 
@@ -125,7 +149,8 @@ public class DechunkedOutputStream extends LimitOutputStream {
                         _state = State.DATALF;
                     else if (c == '\n')
                         _state = State.LEN;
-                    // else no CRLF?
+                    else
+                        throw new IOException("Missing CRLF after chunk data");
                     if (!_strip)
                         out.write(buf, off + i, 1);
                     break;
@@ -136,7 +161,8 @@ public class DechunkedOutputStream extends LimitOutputStream {
                     int c = buf[off + i] & 0xff;
                     if (c == '\n')
                         _state = State.LEN;
-                    // else no CRLF?
+                    else
+                        throw new IOException("no LF after chunk data CR");
                     if (!_strip)
                         out.write(buf, off + i, 1);
                     break;
@@ -147,9 +173,12 @@ public class DechunkedOutputStream extends LimitOutputStream {
                 // we reuse _remaining here to count the size of the header
                 case TRAILER: {
                     int c = buf[off + i] & 0xff;
+                    if (_trailerCR && c != '\n')
+                        throw new IOException("no LF after trailer CR");
                     if (c == '\r') {
-                        // stay here
+                        _trailerCR = true;
                     } else if (c == '\n') {
+                        _trailerCR = false;
                         if (_remaining <= 0) {
                             // that's it!
                             if (!_strip)
