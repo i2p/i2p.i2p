@@ -362,16 +362,22 @@ class MessageInputStream extends InputStream {
                 }
                 _dataLock.notifyAll();
             } else {
+                Long id = Long.valueOf(messageId);
+                if (_notYetReadyBlocks.containsKey(id)) {
+                    if (_log.shouldInfo())
+                        _log.info("ignoring dup message " + messageId);
+                    return false;
+                }
                 // _notYetReadyBlocks size is limited in canAccept()
                 if (_locallyClosed) {
                     if (_log.shouldInfo())
                         _log.info("Message received on closed stream: " + messageId);
                     // dont need the payload, just the msgId in order
-                    _notYetReadyBlocks.put(Long.valueOf(messageId), DUMMY_BA);
+                    _notYetReadyBlocks.put(id, DUMMY_BA);
                 } else {
                     if (_log.shouldInfo())
                         _log.info("Message is out of order: " + messageId);
-                    _notYetReadyBlocks.put(Long.valueOf(messageId), payload);
+                    _notYetReadyBlocks.put(id, payload);
                 }
             }
         }
