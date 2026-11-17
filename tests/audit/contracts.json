@@ -1,0 +1,29 @@
+{
+  "StreamingQueueRegression": {
+    "ADMISSION_SHA256": "4fd49f9bdb750657b15e232707d8a60711b26d00a9875aa77faf67a6480fa8ea"
+  },
+  "NTCPFrameBoundsRegression": {
+    "WIRE_TRACE_SHA256": "bb29226ba1777dae98dd23c1b940d051096f8a725607b676fffbf8a0fb525374"
+  },
+  "HTTPRequestLogRegression": {
+    "REQUEST_SHA256": "26bf9ba204ea69c39c86b8ce3a3a1033238218c5f0d1ded1becf1763bba28cce"
+  },
+  "HTTPPostLengthRegression": {
+    "REQUEST_SHA256": "a0ab27308d3305f1dacca1af1b10223deb44bdb001d11ac09b22c75193842acb"
+  },
+  "ParserFuzz": {
+    "NTCP_FUZZ_CASES": "3000"
+  },
+  "StreamingParserFuzz": {
+    "STREAMING_FUZZ_CASES": "3000"
+  },
+  "I2PSocketRequestLogRegression": {
+    "REQUEST_SHA256": "e21d8c36b94448c2e8bf2b44926e85cefd4c1b67607730c113f34f650299cffd"
+  },
+  "TunnelFragmentRegression": {
+    "TUNNEL_DELIVERY_SHA256": "788d2f52053b0e7eaf3e4833adf0de38fecdbf0cfece9f3494ff4b240f15686a"
+  },
+  "HTTPRemainingLengthRegression": {
+    "VALID_BODY_SHA256": "194078fcea8deade9f6e37c3b41da417745ce942b453ca00c6d2657b68772106"
+  }
+}
