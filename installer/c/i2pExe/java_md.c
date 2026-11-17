@@ -122,7 +122,7 @@ GetJREPath(char *path, jint pathsize)
 			newPath = MemAlloc(strlen(oldPath) + strlen(path) + 6 + 6 + 1); // PATH=<new>\bin;<old>
 			sprintf(newPath, "PATH=%s\\bin;%s", path, oldPath);
 		} else {
-			newPath = MemAlloc(strlen(path) + 6 + 1);
+			newPath = MemAlloc(strlen(path) + sizeof("PATH=\\bin"));
 			sprintf(newPath, "PATH=%s\\bin", path);
 		}
 		_putenv(newPath);
