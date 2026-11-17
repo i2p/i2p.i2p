@@ -90,7 +90,7 @@ static struct vmdesc *knownVMs = NULL;
 static int knownVMsCount = 0;
 static int knownVMsLimit = 0;
 
-static void GrowKnownVMs();
+static void GrowKnownVMs(int minimum);
 static int  KnownVMIndex(const char* name);
 static void FreeKnownVMs();
 
@@ -900,6 +900,7 @@ ReadKnownVMs(const char *jrepath, char * arch, jboolean speculative)
     int cnt = 0;
     int lineno = 0;
     int vmType;
+    size_t length;
     char *tmpPtr;
     char *altVMName;
 	struct stat s;
@@ -923,6 +924,11 @@ ReadKnownVMs(const char *jrepath, char * arch, jboolean speculative)
     while (fgets(line, sizeof(line), jvmCfg) != NULL) {
         vmType = VM_UNKNOWN;
         lineno++;
+        length = strlen(line);
+        while (length > 0 && (line[length - 1] == '\n' || line[length - 1] == '\r'))
+            line[--length] = '\0';
+        if (line[strspn(line, whiteSpace)] == '\0')
+            continue;
         if (line[0] == '#')
             continue;
         if (line[0] != '-') {
@@ -932,7 +938,6 @@ ReadKnownVMs(const char *jrepath, char * arch, jboolean speculative)
         if (cnt >= knownVMsLimit) {
             GrowKnownVMs(cnt);
         }
-        line[strlen(line)-1] = '\0'; /* remove trailing newline */
         tmpPtr = line + strcspn(line, whiteSpace);
         if (*tmpPtr == 0) {
             fprintf(stderr, "Warning: missing VM type on line %d of `%s'\n",
