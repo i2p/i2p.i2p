@@ -916,12 +916,12 @@ public class EepGet {
             pusher.start();
         }
 
-        int remaining = (int)_bytesRemaining;
+        long remaining = _bytesRemaining;
         byte buf[] = new byte[16*1024];
         while (_keepFetching && ( (remaining > 0) || !strictSize ) && !_aborted) {
             int toRead = buf.length;
             if (strictSize && toRead > remaining)
-                toRead = remaining;
+                toRead = (int) remaining;
             int read = _proxyIn.read(buf, 0, toRead);
             if (read == -1)
                 break;
@@ -937,7 +937,7 @@ public class EepGet {
                 if (char1 == '\r') {
                     int char2 = _proxyIn.read();
                     if (char2 == '\n') {
-                        remaining = (int) readChunkLength();
+                        remaining = readChunkLength();
                     } else {
                         _out.write(char1);
                         _out.write(char2);
