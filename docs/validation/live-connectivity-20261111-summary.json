@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-11",
+  "scope": "Public normal-mode run of the connectivity harness against the previously validated combined production build; not a standalone live test of this tooling branch",
+  "live": {
+    "processExitCode": 0,
+    "mode": "normal",
+    "verdict": {
+      "event": "verification",
+      "passed": true,
+      "checks": {
+        "artifactHashesRecorded": true,
+        "artifactHashesMatch": true,
+        "processExitedSuccessfully": true,
+        "durationCompleted": true,
+        "shutdownCompleted": true,
+        "successfulRoundtrips": true,
+        "twoHopTunnelsBothDirections": true
+      },
+      "failures": [],
+      "requirements": {
+        "minRoundtrips": 1,
+        "minTwoHopSamples": 1
+      },
+      "evidence": {
+        "jarSha256": {
+          "i2p.jar": "f607baefa9af2f4e378085095b3ac818608a7bfcf16e07f7b640f21b2b6af7d8",
+          "router.jar": "432b86d07065ea4ba321d90356864bd4faa47a2b7f1cb64bd85c513d8b17b9ee"
+        },
+        "durationSeconds": 360,
+        "elapsedSeconds": 361,
+        "successfulRoundtrips": 33,
+        "twoHopSamplesBothDirections": 24
+      },
+      "verification": "connectivity"
+    },
+    "metricsFile": "live-connectivity-20261111-metrics.jsonl",
+    "metricsSha256": "e25ddac97fbeb922c0c0a46aa1081bfdb8fa8cad5c5ffb48db4fb38be31a44f1",
+    "launchManifestFile": "live-connectivity-20261111-launch.json"
+  }
+}
