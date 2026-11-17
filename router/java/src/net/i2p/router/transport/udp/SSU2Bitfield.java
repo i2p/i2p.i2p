@@ -263,7 +263,7 @@ class SSU2Bitfield {
                     cb.bitSet(bit);
             }
             // portion that is strictly newer
-            for (long bit = bf2Highest + 1; bit <= highest; bit++) {
+            for (long bit = Math.max(start, bf2Highest + 1); bit <= highest; bit++) {
                 if (get(bit)) {
                     bf2.set(bit);
                     cb.bitSet(bit);
