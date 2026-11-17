@@ -68,7 +68,7 @@ class FragmentedMessage {
                 _log.warn("Length is impossible (" + length + ") for messageId " + _messageId);
             return false;
         }
-        if (offset + length > payload.length) {
+        if (offset < 0 || offset > payload.length - length) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
@@ -114,7 +114,7 @@ class FragmentedMessage {
                 _log.warn("Length is impossible (" + length + ") for messageId " + _messageId);
             return false;
         }
-        if (offset + length > payload.length) {
+        if (offset < 0 || offset > payload.length - length) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + _messageId);
             return false;
