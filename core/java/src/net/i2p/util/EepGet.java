@@ -1276,6 +1276,8 @@ public class EepGet {
                     buf.append((char)cur);
             }
             
+            if (buf.length() > 4096)
+                throw new IOException("Chunk length line too long");
             if (nl >= 2)
                 break;
         }
@@ -1283,6 +1285,8 @@ public class EepGet {
         String len = buf.toString().trim();
         try {
             long bytes = Long.parseLong(len, 16);
+            if (bytes < 0)
+                throw new IOException("Negative chunk length");
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Chunked length: " + bytes);
             return bytes;
