@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -15,7 +14,6 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
-import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleTimer2;
@@ -243,9 +241,8 @@ class FragmentHandler {
             if (offset+paddingEnd >= length) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("cannot verify, going past the end [off=" 
-                              + offset + " len=" + length + " paddingEnd=" 
-                              + paddingEnd + " data: "
-                              + Base64.encode(preprocessed, offset, length));
+                              + offset + " len=" + length + " paddingEnd="
+                              + paddingEnd + ']');
                 return false;
             }
         }
@@ -266,11 +263,9 @@ class FragmentHandler {
         boolean eq = DataHelper.eq(v, 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
         if (!eq) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Corrupt tunnel message - verification fails: " + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
-                           + " != " + Base64.encode(v, 0, 4));
-                _log.warn("No matching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
-                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd + ' '
-                           + Base64.encode(preprocessed, offset, length), new Exception("trace"));
+                _log.warn("Corrupt tunnel message - verification fails: padding="
+                           + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
+                           + " offset=" + offset + " length=" + length);
             }
         }
         SimpleByteCache.release(v);
@@ -342,7 +337,7 @@ class FragmentHandler {
         long messageId = -1;
         
         if (type == TYPE_TUNNEL) {
-            if (offset + 4 >= preprocessed.length)
+            if (offset + 4 >= length)
                 return -1;
             long id = DataHelper.fromLong(preprocessed, offset, 4);
             // i2pd 2.19 bug? 0 will throw IAE.
@@ -353,7 +348,7 @@ class FragmentHandler {
             offset += 4;
         }
         if ( (type == TYPE_ROUTER) || (type == TYPE_TUNNEL) ) {
-            if (offset + Hash.HASH_LENGTH >= preprocessed.length)
+            if (offset + Hash.HASH_LENGTH >= length)
                 return -1;
             //byte h[] = new byte[Hash.HASH_LENGTH];
             //System.arraycopy(preprocessed, offset, h, 0, Hash.HASH_LENGTH);
@@ -362,7 +357,7 @@ class FragmentHandler {
             offset += Hash.HASH_LENGTH;
         }
         if (fragmented) {
-            if (offset + 4 >= preprocessed.length)
+            if (offset + 4 >= length)
                 return -1;
             messageId = DataHelper.fromLong(preprocessed, offset, 4);
             if (_log.shouldLog(Log.DEBUG))
@@ -373,15 +368,22 @@ class FragmentHandler {
             offset += 4;
         }
         if (extended) {
+            if (offset >= length)
+                return -1;
             int extendedSize = preprocessed[offset] & 0xff;
             offset++;
             offset += extendedSize; // we don't interpret these yet, but skip them for now
         }
         
-        if (offset + 2 >= preprocessed.length)
+        if (offset + 2 >= length)
             return -1;
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
+
+        // Validate before creating reassembly state. A rejected first fragment
+        // would otherwise occupy a slot without ever scheduling its timeout.
+        if (size <= 0 || size > length - offset)
+            return -1;
         
         if (type == TYPE_UNDEF) {
             // do this after the above since we have to return offset
@@ -461,6 +463,8 @@ class FragmentHandler {
      * @throws RuntimeException
      */
     private int receiveSubsequentFragment(byte preprocessed[], int offset, int length) {
+        if (length - offset < 7)
+            return -1;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("subsequent begins at " + offset + " for " + length);
         int fragmentNum = ((preprocessed[offset] & MASK_FRAGMENT_NUM) >>> 1);
@@ -472,6 +476,11 @@ class FragmentHandler {
         
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
+
+        // Fragment zero uses the initial-fragment encoding. Reject invalid
+        // follow-ons before inserting an unscheduled FragmentedMessage.
+        if (fragmentNum <= 0 || size <= 0 || size > length - offset)
+            return -1;
         
         if (messageId < 0)
             throw new RuntimeException("Preprocessed message was invalid [messageId =" + messageId + " size=" 
@@ -552,11 +561,7 @@ class FragmentHandler {
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (I2NPMessageException ime) {
             if (_log.shouldWarn()) {
-                _log.warn("Error receiving fragmented message (corrupt?): " + msg, ime);
-                if (_log.shouldInfo()) {
-                    _log.info("DUMP:\n" + HexDump.dump(data));
-                    _log.info("RAW:\n" + Base64.encode(data));
-                }
+                _log.warn("Error receiving fragmented message (corrupt?): " + msg);
             }
         }
     }
@@ -590,9 +595,7 @@ class FragmentHandler {
             _receiver.receiveComplete(m, router, tunnelId);
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Error receiving unfragmented message (corrupt?)", ime);
-                _log.warn("DUMP:\n" + HexDump.dump(data, offset, len));
-                _log.warn("RAW:\n" + Base64.encode(data, offset, len));
+                _log.warn("Error receiving unfragmented message (corrupt?), size=" + len);
             }
         }
     }
