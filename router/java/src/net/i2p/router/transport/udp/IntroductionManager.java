@@ -464,7 +464,7 @@ class IntroductionManager {
             if (_log.shouldDebug())
                 _log.debug("Relay tag not found " + tag + " from " + alice);
             rcode = SSU2Util.RELAY_REJECT_BOB_NO_TAG;
-        } else if (charlie.getVersion() != 2) {
+        } else if (!(charlie instanceof PeerState2)) {
             if (_log.shouldWarn())
                 _log.warn("Receive SSU2 relay request from " + alice  + " for SSU1 " + charlie);
             // add a code for this?

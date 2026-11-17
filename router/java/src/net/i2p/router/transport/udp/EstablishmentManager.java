@@ -1281,7 +1281,7 @@ class EstablishmentManager {
                         case INTRO_STATE_CONNECTING:
                             bob = _transport.getPeerState(h);
                             if (bob != null) {
-                                if (bob.getVersion() == 2) {
+                                if (bob.getVersion() >= 2 && bob.getVersion() <= 4) {
                                     istate = INTRO_STATE_CONNECTED;
                                     state2.setIntroState(h, istate);
                                 } else {
@@ -1480,7 +1480,7 @@ class EstablishmentManager {
                 _log.debug("Dup or unknown RelayResponse: " + nonce);
             return; // already established, or we were Bob and got a dup from Charlie
         }
-        if (charlie.getVersion() != 2)
+        if (charlie.getVersion() < 2 || charlie.getVersion() > 4)
             return;
         OutboundEstablishState2 charlie2 = (OutboundEstablishState2) charlie;
         long token;
@@ -1701,7 +1701,7 @@ class EstablishmentManager {
                 return;
             }
         }
-        if (state.getVersion() != 2)
+        if (state.getVersion() < 2 || state.getVersion() > 4)
             return;
         OutboundEstablishState2 state2 = (OutboundEstablishState2) state;
         Hash charlieHash = state.getRemoteIdentity().getHash();

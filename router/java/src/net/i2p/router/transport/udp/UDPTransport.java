@@ -1925,7 +1925,7 @@ public class UDPTransport extends TransportImpl {
             }
         }
 
-        if (peer.getVersion() == 2) {
+        if (peer instanceof PeerState2) {
             PeerState2 state2 = (PeerState2) peer;
             _peersByConnID.put(Long.valueOf(state2.getRcvConnID()), state2);
         }
@@ -1947,7 +1947,7 @@ public class UDPTransport extends TransportImpl {
                      _introManager.remove(oldPeer2);
                 }
             }
-            if (oldPeer != peer && oldPeer.getVersion() == 2) {
+            if (oldPeer != peer && oldPeer instanceof PeerState2) {
                 PeerState2 state2 = (PeerState2) oldPeer;
                 Long id = Long.valueOf(state2.getRcvConnID());
                 PeerStateDestroyed newPSD = new PeerStateDestroyed(_context, this, state2);
@@ -2207,7 +2207,7 @@ public class UDPTransport extends TransportImpl {
             altByIdent = _peersByIdent.remove(peer.getRemotePeer());
         }
 
-        if (peer.getVersion() == 2) {
+        if (peer instanceof PeerState2) {
             PeerState2 state2 = (PeerState2) peer;
             Long id = Long.valueOf(state2.getRcvConnID());
             PeerStateDestroyed newPSD = new PeerStateDestroyed(_context, this, state2);
