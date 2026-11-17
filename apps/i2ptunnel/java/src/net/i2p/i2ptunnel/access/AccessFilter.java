@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
@@ -54,7 +53,8 @@ class AccessFilter implements StatefulConnectionFilter {
     private final FilterDefinition definition;
     private final I2PAppContext context;
 
-    private final AtomicBoolean timersRunning = new AtomicBoolean();
+    // Lifecycle and timer identities are guarded by this.
+    private boolean timersRunning;
 
     /**
      * Trackers for known destinations defined in access lists
@@ -65,7 +65,8 @@ class AccessFilter implements StatefulConnectionFilter {
      */
     private final Map<Hash, DestTracker> unknownDests = new HashMap<Hash, DestTracker>();
 
-    private volatile Syncer syncer;
+    private Purger purger;
+    private Syncer syncer;
 
     /**
      * @param context the context, used for scheduling and timer purposes
@@ -80,17 +81,27 @@ class AccessFilter implements StatefulConnectionFilter {
     }
 
     @Override
-    public void start() {
-        if (timersRunning.compareAndSet(false, true)) {
-            new Purger();
+    public synchronized void start() {
+        if (!timersRunning) {
+            timersRunning = true;
+            purger = new Purger();
             syncer = new Syncer();
+            purger.schedule(PURGE_INTERVAL);
+            syncer.schedule(SYNC_INTERVAL);
         }
     }
 
     @Override
-    public void stop() {
-        timersRunning.set(false);
-        syncer = null;
+    public synchronized void stop() {
+        timersRunning = false;
+        if (purger != null) {
+            purger.cancel();
+            purger = null;
+        }
+        if (syncer != null) {
+            syncer.cancel();
+            syncer = null;
+        }
     }
 
     @Override
@@ -201,45 +212,54 @@ class AccessFilter implements StatefulConnectionFilter {
 
     private class Purger extends SimpleTimer2.TimedEvent {
         Purger() {
-            super(context.simpleTimer2(), PURGE_INTERVAL);
+            super(context.simpleTimer2());
         }
         public void timeReached() {
-            if (!timersRunning.get()) {
-                synchronized(knownDests) {
-                    knownDests.clear();
-                }
-                synchronized(unknownDests) {
-                    unknownDests.clear();
-                }
-                return;
+            synchronized (AccessFilter.this) {
+                if (!timersRunning || purger != this)
+                    return;
+                purge();
+                schedule(PURGE_INTERVAL);
             }
-            purge();
-            schedule(PURGE_INTERVAL);
         }
     }
 
     private class Syncer extends SimpleTimer2.TimedEvent {
         Syncer() {
-            super(context.simpleTimer2(), SYNC_INTERVAL);
+            super(context.simpleTimer2());
         }
         public void timeReached() {
-            if (!timersRunning.get())
-                return;
-            DISK_WRITER.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        record();
-                        reload();
-                        Syncer syncer = AccessFilter.this.syncer;
-                        if (syncer != null) 
-                            syncer.schedule(SYNC_INTERVAL);
-                    } catch (IOException bad) {
-                        Log log = context.logManager().getLog(AccessFilter.class);
-                        log.error("syncing access list failed", bad);
+            synchronized (AccessFilter.this) {
+                if (!timersRunning || syncer != this)
+                    return;
+                DISK_WRITER.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (AccessFilter.this) {
+                            if (!timersRunning || syncer != Syncer.this)
+                                return;
+                        }
+                        try {
+                            try {
+                                record();
+                            } catch (IOException bad) {
+                                context.logManager().getLog(AccessFilter.class).error("recording access list failed", bad);
+                            }
+                            // A failed recorder must not prevent blocklist reloads.
+                            try {
+                                reload();
+                            } catch (IOException bad) {
+                                context.logManager().getLog(AccessFilter.class).error("reloading access list failed", bad);
+                            }
+                        } finally {
+                            synchronized (AccessFilter.this) {
+                                if (timersRunning && syncer == Syncer.this)
+                                    schedule(SYNC_INTERVAL);
+                            }
+                        }
                     }
-                }
-            });
-         }   
+                });
+            }
+        }
     }
 }
