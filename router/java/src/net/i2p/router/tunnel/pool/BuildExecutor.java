@@ -116,6 +116,7 @@ class BuildExecutor implements Runnable {
     public synchronized void shutdown() {
         _isRunning = false;
         restart();
+        repoll();
     }
 
     private int allowed() {
@@ -339,7 +340,9 @@ class BuildExecutor implements Runnable {
         while (_isRunning && !_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();
             try {
-                _repoll = false; // resets repoll to false unless there are inbound requeusts pending
+                synchronized (_currentlyBuilding) {
+                    _repoll = false;
+                }
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
                     TunnelPool pool = pools.get(i);
@@ -400,12 +403,16 @@ class BuildExecutor implements Runnable {
                             DataHelper.sort(wanted, new TunnelPoolComparator(preferEmpty));
                         }
 
-                        // force the loops to be short, since 3 consecutive tunnel build requests can take
-                        // a long, long time
-                        if (allowed > 2)
-                            allowed = 2;
-                        
-                        for (int i = 0; (i < allowed) && (!wanted.isEmpty()); i++) {
+                        // Fill the available slots when crypto/peer selection is
+                        // fast, but keep batches short on slower routers. Retain
+                        // the existing minimum of two attempts per pass.
+                        long batchStart = System.nanoTime();
+                        long batchBudget = (LOOP_TIME / 2) * 1000000L;
+                        int attempts = 0;
+                        for (int i = 0; (i < allowed) && (!wanted.isEmpty()) && _isRunning; i++) {
+                            if (attempts >= 2 && System.nanoTime() - batchStart >= batchBudget)
+                                break;
+                            attempts++;
                             TunnelPool pool = wanted.remove(0);
                             //if (pool.countWantedTunnels() <= 0)
                             //    continue;
@@ -581,9 +588,8 @@ class BuildExecutor implements Runnable {
         long now = _context.clock().now();
         long buildTime = now + 10*60*1000 - cfg.getExpiration();
         if (buildTime > 250) {
-            synchronized (_currentlyBuilding) { 
-                _currentlyBuilding.notifyAll();
-            }
+            // Remember the completion if it arrives before run2() enters wait.
+            repoll();
         } else {
             if (cfg.getLength() > 1 && _log.shouldLog(Log.INFO))
                 _log.info("Build complete really fast (" + buildTime + " ms) for tunnel: " + cfg);
