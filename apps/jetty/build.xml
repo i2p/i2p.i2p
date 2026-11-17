@@ -30,7 +30,7 @@
     </condition>
 
     <property name="jetty.base" value="jetty-home-${jetty.ver.build}" />
-    <property name="jetty.sha1" value="bb0ce8db30693fa4c1450983434029e7441b8d4f" />
+    <property name="jetty.sha1" value="493fb817447bfb43b3a72ec8a72cdcf8c6b0338c" />
     <property name="jetty.filename" value="${jetty.base}.zip" />
     <property name="jetty.url" value="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${jetty.ver.build}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
