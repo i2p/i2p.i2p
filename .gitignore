@@ -59,6 +59,15 @@ sloccount.sc
 # Gradle
 .gradle
 
+# Python validation tools
+__pycache__/
+*.py[cod]
+
+# Runtime files emitted by the JVM regression suites
+/core/logger.config
+/core/logs/
+/router/logs/
+
 # TODO: why does this file appear?
 apps/routerconsole/jsp/favicon.ico
 .tx
