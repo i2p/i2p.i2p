@@ -305,6 +305,7 @@ class BasicServlet extends HttpServlet
                             return true;
                         }
                         response.setStatus(304);
+                        writeFileSecurityHeaders(response, content);
                         response.getOutputStream().close();
                         return false;
                     }
@@ -403,6 +404,7 @@ class BasicServlet extends HttpServlet
                 response.setCharacterEncoding("ISO-8859-1");
         }
         response.setHeader("X-Content-Type-Options", "nosniff");
+        writeFileSecurityHeaders(response, content);
         long lml = content.getLastModified();
         if (lml > 0)
             response.setDateHeader("Last-Modified",lml);
@@ -418,8 +420,35 @@ class BasicServlet extends HttpServlet
         }
 
         long ct = content.getCacheTime();
-        if (ct>=0)
+        if (ct>=0 && !(content instanceof FileContent))
             response.setHeader("Cache-Control", "public, max-age=" + ct);
+    }
+
+    /** Downloaded documents must not execute with the console's origin privileges. */
+    private void writeFileSecurityHeaders(HttpServletResponse response, HttpContent content) {
+        if (!(content instanceof FileContent))
+            return;
+        response.setHeader("X-Content-Type-Options", "nosniff");
+        response.setHeader("Referrer-Policy", "no-referrer");
+        response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+        response.setHeader("Cache-Control", "private, max-age=" + Math.max(0, content.getCacheTime()));
+        response.setHeader("Content-Security-Policy", "sandbox; default-src 'none'; script-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; frame-ancestors 'self'");
+        String type = response.getContentType();
+        if (type == null)
+            type = content.getContentType();
+        if (type == null) {
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment");
+        } else {
+            type = type.toLowerCase(java.util.Locale.US);
+            if (type.startsWith("text/html") || type.contains("+xml") || type.startsWith("text/xml") ||
+                type.startsWith("application/xml") || type.contains("javascript") || type.contains("ecmascript")) {
+                // CSP on a script response does not restrict its use as a subresource.
+                // Pair an inert MIME type with nosniff, even if attachment is ignored.
+                response.setContentType("application/octet-stream");
+                response.setHeader("Content-Disposition", "attachment");
+            }
+        }
     }
 
     /* ------------------------------------------------------------ */
