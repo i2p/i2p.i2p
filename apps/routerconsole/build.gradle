@@ -32,7 +32,7 @@ dependencies {
     implementation 'org.apache.ant:ant:1.10.14'
     api fileTree("../jetty/apache-tomcat-${tomcatVersion}")
     // don't use 2.12.4, stack overflow: https://github.com/sbt/zinc/issues/1010
-    testImplementation "org.scala-lang:scala-library:2.12.5"
+    testImplementation "org.scala-lang:scala-library:2.12.20"
     testImplementation 'org.scalatest:scalatest_2.12:3.0.4'
 }
 
