@@ -4,25 +4,27 @@
 // called from iframed.js
 
 function setupFrame() {
-	var frames = document.getElementsByClassName("iframedsusi");
-	for (var index = 0; index < frames.length; index++)
-	{
-		var frame = frames[index];
+	const frames = document.getElementsByClassName("iframedsusi");
+	for (let index = 0; index < frames.length; index++) {
+		const frame = frames[index];
+		// Mail is sandboxed without scripts. Resize it from the trusted parent.
+		function resizeMailFrame() {
+			try {
+				if (frame.contentDocument && frame.contentDocument.body)
+					resizeFrame(frame);
+			} catch (e) {
+				// A link may navigate the frame to another origin.
+			}
+		}
 		frame.addEventListener("load", function() {
-			// old way, iframed.js. we use this as a backup in case
-			// the js injection didn't work
-
-			resizeFrame(frame);
-
-			// new way, iframe-resizer
-
-			// By default the height of the iFrame is calculated by converting the margin of the body to px and then adding the top and bottom figures to the offsetHeight of the body tag.
-			// In cases where CSS styles causes the content to flow outside the body you may need to change this setting to one of the following options.
-			// If the default option doesn't work then the best solutions is to use either taggedElement, or lowestElement.
-			// The **lowestElement** option is the most reliable way of determining the page height.
-			// However, it does have a performance impact, as it requires checking the position of every element on the page.
-			iFrameResize({ log: false, heightCalculationMethod: 'lowestElement' }, frame)
+			resizeMailFrame();
+			try {
+				if (frame.contentDocument)
+					frame.contentDocument.addEventListener("load", resizeMailFrame, true);
+			} catch (e) {}
 		}, true);
+		window.addEventListener("resize", resizeMailFrame);
+		resizeMailFrame();
 	}
 }
 
