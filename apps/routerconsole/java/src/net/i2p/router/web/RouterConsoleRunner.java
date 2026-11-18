@@ -32,6 +32,7 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
+import net.i2p.jetty.Http3Support;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
@@ -542,6 +543,7 @@ public class RouterConsoleRunner implements RouterApp {
         List<Connector> connectors = new ArrayList<Connector>(4);
         try {
             int boundAddresses = 0;
+            int quicSelectors = 0;
             SortedSet<String> addresses = Addresses.getAllAddresses();
             boolean hasIPV4 = addresses.contains("0.0.0.0");
             boolean hasIPV6 = addresses.contains("0:0:0:0:0:0:0:0");
@@ -684,6 +686,19 @@ public class RouterConsoleRunner implements RouterApp {
                             connectors.add(ssll);
                             boundAddresses++;
                             hosts.add(host);
+                            if (_context.getBooleanProperty("routerconsole.http3.enable")) {
+                                try {
+                                    org.eclipse.jetty.server.AbstractNetworkConnector http3 = Http3Support.createConnector(
+                                            _server, sslFactory, host, sslPort,
+                                            new File(_context.getConfigDir(), "keystore/quic").getAbsolutePath(),
+                                            _context.getProperty("routerconsole.http3.maxSessions", 128));
+                                    connectors.add(http3);
+                                    Http3Support.advertise(_server, http3);
+                                    quicSelectors++;
+                                } catch (IllegalStateException unavailable) {
+                                    System.err.println("Console HTTP/3 unavailable: " + unavailable.getMessage());
+                                }
+                            }
                         } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                             if (SystemVersion.isGNU())
@@ -711,8 +726,8 @@ public class RouterConsoleRunner implements RouterApp {
             }
             // Each address spawns a Connector and an Acceptor thread
             // If the min is less than this, we have no thread for the handlers or the expiration thread.
-            qtp.setMinThreads(MIN_THREADS + (2 * boundAddresses));
-            qtp.setMaxThreads(MAX_THREADS + (2 * boundAddresses));
+            qtp.setMinThreads(MIN_THREADS + (2 * boundAddresses) + quicSelectors);
+            qtp.setMaxThreads(MAX_THREADS + (2 * boundAddresses) + quicSelectors);
 
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
