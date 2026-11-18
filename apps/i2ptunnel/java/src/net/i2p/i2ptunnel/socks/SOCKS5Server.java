@@ -125,7 +125,7 @@ class SOCKS5Server extends SOCKSServer {
                 meth == Method.USERNAME_PASSWORD) {
                 // That's fine, we do support this method
                 method  = meth;
-                break;
+                // keep first supported match, keep consuming
             }
         }
 
