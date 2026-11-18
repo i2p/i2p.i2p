@@ -67,7 +67,7 @@ subprojects {
     apply plugin: 'jacoco'
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {

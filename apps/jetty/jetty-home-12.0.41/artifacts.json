@@ -1,0 +1,102 @@
+{
+  "jetty_version": "12.0.41",
+  "release": "https://github.com/jetty/jetty.project/releases/tag/jetty-12.0.41",
+  "provenance": "Existing Gradle Maven cache; original cache content hashes verified before copying.",
+  "artifacts": [
+    {
+      "path": "lib/jetty-deploy-12.0.41.jar",
+      "sha256": "1ea47dcf5e1307219cb2ec670d6383e3330aa770f6e5247b5543942717f78f84",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-deploy/12.0.41/jetty-deploy-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee-12.0.41.jar",
+      "sha256": "aba7d76865f4067272b14789358e112c689926af883b00565de9423f6b72cbd2",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-ee/12.0.41/jetty-ee-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-http-12.0.41.jar",
+      "sha256": "34c7d495529ad3f771ea5097fd123635222a8eed87a142028aaf56d0b05e04f6",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-http/12.0.41/jetty-http-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-io-12.0.41.jar",
+      "sha256": "d1f5af592f5833facebd5799b88ec818a86feace9fe0b9093a7609c945f62cbc",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-io/12.0.41/jetty-io-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-jmx-12.0.41.jar",
+      "sha256": "0e107ade482e83fe9150920ea714b3db6bef58f39354530e295700843d10ba27",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-jmx/12.0.41/jetty-jmx-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-rewrite-12.0.41.jar",
+      "sha256": "9b50078023a1dfd650c8e17b857fd11b8187a993a7a78cfdfc58872e488d0674",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-rewrite/12.0.41/jetty-rewrite-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-security-12.0.41.jar",
+      "sha256": "804e42eae8d309c4fcff5ffb0d13c874ecf8cda98f5ca86db11555f5f1f8422f",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-security/12.0.41/jetty-security-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-server-12.0.41.jar",
+      "sha256": "23b8983fa92cc386ff509ad494f7ebe09c35c42487d1c119aadedadad9f41091",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-server/12.0.41/jetty-server-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-session-12.0.41.jar",
+      "sha256": "3255985c356ffbad5e77b1ca75c8dd03efc5c824db466ef8f4e62e1eefc77383",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-session/12.0.41/jetty-session-12.0.41.jar"
+    },
+    {
+      "path": "start.jar",
+      "sha256": "476a6321f7594c1fb3312955b52f6c09a3625a00452f622464b3c6c992e85e9b",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-start/12.0.41/jetty-start-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-util-12.0.41.jar",
+      "sha256": "2f301ac9fb613ad21b6b4cc0d5659f4663ba953a779ed8abc670f84cb196775a",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-util/12.0.41/jetty-util-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-xml-12.0.41.jar",
+      "sha256": "d6ebce2a1b6c8994feb2d304d331fe735753a2e68d88c4d6d34f63f4dc18f4a2",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-xml/12.0.41/jetty-xml-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-apache-jsp-12.0.41.jar",
+      "sha256": "787f0ab11b3a469a20ecf0eeab276d226958038bd7afe193410afb465e3f0215",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-apache-jsp/12.0.41/jetty-ee8-apache-jsp-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-nested-12.0.41.jar",
+      "sha256": "f9c65050a4fbc91db89a923f3ab1c721b4b054a7f228e502e7664a69250d0c1f",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-nested/12.0.41/jetty-ee8-nested-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-security-12.0.41.jar",
+      "sha256": "de2c73a0062056b9d369e5f8a24d6cb2dc94c81114cf3f85f103b33747af06bc",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-security/12.0.41/jetty-ee8-security-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-servlet-12.0.41.jar",
+      "sha256": "509923ffbfddfc976de847dca083eb60aa0eae16d44d90a41f3b0d7eb93531b9",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-servlet/12.0.41/jetty-ee8-servlet-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-servlets-12.0.41.jar",
+      "sha256": "dbaafbc51f89086a0a1f5c5dbaaebdb23d701ae8f2835101d6d85e53e1a3388c",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-servlets/12.0.41/jetty-ee8-servlets-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-webapp-12.0.41.jar",
+      "sha256": "ff85dccd67fbbf945b8ec29a6eb3907f1114be084f976407e3422f37b1268174",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-webapp/12.0.41/jetty-ee8-webapp-12.0.41.jar"
+    },
+    {
+      "path": "lib/logging/slf4j-api-2.0.17.jar",
+      "sha256": "7b751d952061954d5abfed7181c1f645d336091b679891591d63329c622eb832",
+      "source": "https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar"
+    }
+  ]
+}

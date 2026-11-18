@@ -1,0 +1,17 @@
+{
+  "jetty_version": "12.0.41",
+  "release": "https://github.com/jetty/jetty.project/releases/tag/jetty-12.0.41",
+  "provenance": "Existing Gradle Maven cache; original cache content hashes verified before copying.",
+  "artifacts": [
+    {
+      "path": "lib/jetty-ee8-nested-12.0.41.jar",
+      "sha256": "f9c65050a4fbc91db89a923f3ab1c721b4b054a7f228e502e7664a69250d0c1f",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-nested/12.0.41/jetty-ee8-nested-12.0.41.jar"
+    },
+    {
+      "path": "lib/jetty-ee8-security-12.0.41.jar",
+      "sha256": "de2c73a0062056b9d369e5f8a24d6cb2dc94c81114cf3f85f103b33747af06bc",
+      "source": "https://repo.maven.apache.org/maven2/org/eclipse/jetty/ee8/jetty-ee8-security/12.0.41/jetty-ee8-security-12.0.41.jar"
+    }
+  ]
+}
