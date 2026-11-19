@@ -90,8 +90,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final String _proxyNonce;
 
     public static final String AUTH_REALM = "I2P HTTP Proxy";
+    // Use one common browser User-Agent for every user and every destination,
+    // I2P eepsites and clearnet alike. The old distinctive "MYOB/6.66 (AN/ON)"
+    // string sent to eepsites flagged the request as coming from the I2P HTTP
+    // proxy and placed I2P users in their own fingerprinting bucket, separate
+    // from the rest of the web. A single shared value that matches the Firefox
+    // ESR / Tor Browser string (DNSOverHTTPS.UA_CLEARNET) instead puts every
+    // I2P user in the largest common anonymity set, and means the User-Agent no
+    // longer reveals whether a request is bound for I2P or for the clearnet.
+    // The per-tunnel overrides (PROP_UA_I2P / PROP_UA_CLEARNET) still apply.
+    // ESR version of Firefox, same as Tor Browser
     private static final String UA_I2P = "User-Agent: " +
-                                         "MYOB/6.66 (AN/ON)" +
+                                         DNSOverHTTPS.UA_CLEARNET +
                                          "\r\n";
     // ESR version of Firefox, same as Tor Browser
     private static final String UA_CLEARNET = "User-Agent: " +
