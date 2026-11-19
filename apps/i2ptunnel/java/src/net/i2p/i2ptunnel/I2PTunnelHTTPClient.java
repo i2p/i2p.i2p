@@ -1266,7 +1266,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     if (_log.shouldWarn())
                         _log.warn(getPrefix(requestId) +
                                   "Blocked cross-network sub-resource request to " + host +
-                                  " (clearnet target? " + targetIsClearnet + ", referer=" + referer +
+                                  " (clearnet target? " + targetIsClearnet + ", referer-network=" + refererNetworkForLog(referer) +
                                   ", sec-fetch-dest=" + secFetchDest + ", sec-fetch-mode=" + secFetchMode + ')');
                     try {
                         out.write(getErrorPage("crossnet", ERR_CROSS_NETWORK).getBytes("UTF-8"));
@@ -1861,6 +1861,29 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         boolean targetIsI2P = !targetIsClearnet;
         // Block only when the sub-resource crosses the I2P/clearnet boundary.
         return refererIsI2P != targetIsI2P;
+    }
+
+    /**
+     *  The network a Referer belongs to - "i2p", "clearnet", "relative", "none"
+     *  or "unparseable" - for diagnostics only. Deliberately never returns the
+     *  raw Referer, whose path and query would retain the user's browsing
+     *  activity in the logs - the very correlation this block exists to prevent.
+     *
+     *  @param referer the raw Referer header value, or null
+     *  @since 0.9.67
+     */
+    private static String refererNetworkForLog(String referer) {
+        if (referer == null)
+            return "none";
+        String host;
+        try {
+            host = new URI(referer.trim()).getHost();
+        } catch (URISyntaxException use) {
+            return "unparseable";
+        }
+        if (host == null)
+            return "relative";
+        return host.toLowerCase(Locale.US).endsWith(".i2p") ? "i2p" : "clearnet";
     }
 
     public static final String DEFAULT_JUMP_SERVERS =
