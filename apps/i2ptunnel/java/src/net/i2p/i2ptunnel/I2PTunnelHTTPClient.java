@@ -85,6 +85,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final ConcurrentHashMap<String, String> addressHelpers = new ConcurrentHashMap<String, String>(8);
 
     /**
+     *  Per-eepsite destination isolation (RFC GH #319), phase 1, opt-in.
+     *  Maps an eepsite site key (host or b32) to a distinct I2PSocketManager
+     *  (a separate destination) so that different eepsites cannot correlate a
+     *  visitor by a shared destination. Bounded by MAX_ISOLATED_DESTS.
+     *  @since 0.9.72
+     */
+    private final ConcurrentHashMap<String, I2PSocketManager> _isolatedDests = new ConcurrentHashMap<String, I2PSocketManager>(8);
+
+    /**
      *  Used to protect actions via http://proxy.i2p/
      */
     private final String _proxyNonce;
@@ -371,6 +380,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private static final boolean DEFAULT_GZIP = true;
     /** all default to false */
     public static final String PROP_REFERER = "i2ptunnel.httpclient.sendReferer";
+    /**
+     *  Opt-in per-eepsite destination isolation (RFC GH #319). When true, each
+     *  eepsite is reached from a distinct, per-site destination so it cannot be
+     *  correlated with other eepsites by a shared client destination.
+     *  @since 0.9.72
+     */
+    public static final String PROP_ISOLATE_DESTS = "i2ptunnel.httpclient.isolateDestinations";
+    /** Bound on the number of per-site isolated destinations. @since 0.9.72 */
+    private static final int MAX_ISOLATED_DESTS = 32;
     public static final String PROP_USER_AGENT = "i2ptunnel.httpclient.sendUserAgent";
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
@@ -1489,7 +1507,24 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 }
                 if (remotePort > 0)
                     sktOpts.setPort(remotePort);
-                i2ps = createI2PSocket(clientDest, sktOpts);
+                // RFC GH #319: optionally reach each eepsite from a distinct,
+                // per-site destination so it cannot be correlated with other
+                // eepsites. Falls back to the shared destination on opt-out,
+                // no site key, cache full, or build failure.
+                I2PSocketManager isoMgr =
+                    Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ISOLATE_DESTS)) ?
+                    isolatedManager(destination) : null;
+                if (isoMgr != null) {
+                    I2PSocketOptions isoOpts = isoMgr.buildOptions(getTunnel().getClientOptions());
+                    if (remotePort > 0)
+                        isoOpts.setPort(remotePort);
+                    i2ps = isoMgr.connect(clientDest, isoOpts);
+                    synchronized (sockLock) {
+                        mySockets.add(i2ps);
+                    }
+                } else {
+                    i2ps = createI2PSocket(clientDest, sktOpts);
+                }
             }
 
             I2PTunnelRunner t;
@@ -1735,6 +1770,48 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // \r not stripped so length == 1 is empty
                 } while (line != null && line.length() > 1);
             } catch (IOException ioe) {}
+        }
+    }
+
+    /**
+     *  Per-eepsite destination isolation (RFC GH #319), phase 1, opt-in.
+     *  Returns a per-site I2PSocketManager (a distinct destination) so that
+     *  different eepsites cannot correlate a visitor by a shared destination.
+     *  Returns null to fall back to the shared manager, which happens when the
+     *  site key is null/empty, the bounded cache is full, or the build fails.
+     *  Lifecycle and idle eviction are phase 2; see the RFC.
+     *
+     *  @param site the eepsite host or b32 key, may be null
+     *  @return a connected per-site manager, or null to use the shared one
+     *  @since 0.9.72
+     */
+    private I2PSocketManager isolatedManager(String site) {
+        if (site == null || site.length() == 0)
+            return null;
+        I2PSocketManager m = _isolatedDests.get(site);
+        if (m != null && !m.isDestroyed())
+            return m;
+        if (_isolatedDests.size() >= MAX_ISOLATED_DESTS)
+            return null;   // bounded; fall back to the shared destination
+        synchronized (_isolatedDests) {
+            m = _isolatedDests.get(site);
+            if (m != null && !m.isDestroyed())
+                return m;
+            I2PSocketManager nm = buildSocketManager(getTunnel());
+            if (nm == null)
+                return null;
+            try {
+                nm.getSession().connect();
+            } catch (I2PException ie) {
+                if (_log.shouldWarn())
+                    _log.warn("Isolated destination build failed for " + site, ie);
+                nm.destroySocketManager();
+                return null;
+            }
+            _isolatedDests.put(site, nm);
+            if (_log.shouldInfo())
+                _log.info("Created isolated destination for " + site);
+            return nm;
         }
     }
 
