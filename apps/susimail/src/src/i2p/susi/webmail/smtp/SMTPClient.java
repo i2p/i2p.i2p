@@ -39,6 +39,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
+// Standard RFC 4648 Base64, required for SMTP AUTH. Not net.i2p.data.Base64,
+// whose I2P-specific '-~' alphabet would corrupt the AUTH credential lines.
 import java.util.Base64;
 import java.util.List;
 
