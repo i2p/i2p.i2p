@@ -80,10 +80,16 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String SERVER_HEADER = "server";
     private static final String X_POWERED_BY_HEADER = "x-powered-by";
     private static final String X_RUNTIME_HEADER = "x-runtime"; // Rails
+    private static final String X_ASPNET_VERSION_HEADER = "x-aspnet-version";       // ASP.NET
+    private static final String X_ASPNETMVC_VERSION_HEADER = "x-aspnetmvc-version"; // ASP.NET MVC
+    private static final String X_GENERATOR_HEADER = "x-generator";                 // Drupal and other CMSes
+    private static final String VIA_HEADER = "via";                                 // upstream proxy/cache identity
     // https://httpoxy.org
     private static final String PROXY_HEADER = "proxy";
     /** MUST ALL BE LOWER CASE */
     private static final String[] SERVER_SKIPHEADERS = {DATE_HEADER, SERVER_HEADER, X_POWERED_BY_HEADER, X_RUNTIME_HEADER,
+                                                        X_ASPNET_VERSION_HEADER, X_ASPNETMVC_VERSION_HEADER,
+                                                        X_GENERATOR_HEADER, VIA_HEADER,
                                                         PROXY_HEADER, PROXY_CONN_HEADER};
     /** timeout for first request line */
     private static final long HEADER_TIMEOUT = 15*1000;
