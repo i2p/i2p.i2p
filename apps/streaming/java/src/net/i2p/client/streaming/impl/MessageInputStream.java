@@ -67,6 +67,8 @@ class MessageInputStream extends InputStream {
     private static final ByteArray DUMMY_BA = new ByteArray(null);
     
     private static final int MIN_READY_BUFFERS = 16;
+    /** The one-byte NACK count can describe at most 255 missing packets. */
+    private static final int MAX_MESSAGE_GAP = 256;
 
 
     public MessageInputStream(I2PAppContext ctx, int maxMessageSize, int maxWindowSize, int maxBufferSize) {
@@ -113,7 +115,8 @@ class MessageInputStream extends InputStream {
     /**
      *  Determine if this packet will fit in our buffering limits.
      *
-     *  Always returns true for zero payloadSize and dups, even if locally closed.
+     *  Dups and empty packets within the acknowledgement window are accepted,
+     *  even if locally closed. Empty packets must still obey the sequence gap limit.
      *  Returns false if there is no room, OR it's not a dup and the stream has been closed on
      *  the read side with close().
      *  If this returns false, you probably want to call isLocallyClosed() to find out why.
@@ -123,12 +126,20 @@ class MessageInputStream extends InputStream {
      *         and we can efficiently do several checks
      */
     public boolean canAccept(long messageId, int payloadSize) { 
-        if (payloadSize <= 0)
-            return true;
         synchronized (_dataLock) {
             // ready dup check
             // we always allow sequence numbers less than or equal to highest received
             if (messageId <= _highestReadyBlockId)
+                return true;
+            // Check before the empty-payload and free-buffer shortcuts. Otherwise
+            // a far-ahead sequence number can trigger an unbounded NACK scan and
+            // a NACK list too large to encode in a streaming packet.
+            if (messageId > _highestReadyBlockId + MAX_MESSAGE_GAP) {
+                if (_log.shouldWarn())
+                    _log.warn("Dropping message " + messageId + ", too far ahead of " + _highestReadyBlockId);
+                return false;
+            }
+            if (payloadSize <= 0)
                 return true;
             // We do this after the above dup check.
             if (_locallyClosed) {
