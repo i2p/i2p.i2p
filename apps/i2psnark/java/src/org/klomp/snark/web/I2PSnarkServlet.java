@@ -1912,7 +1912,7 @@ public class I2PSnarkServlet extends BasicServlet {
             //                   ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             //else if (isRunning)
             //if (isRunning) {
-                statusString = toThemeImg("trackererror", "", err) + "</td>" +
+                statusString = toThemeImg("trackererror", "", DataHelper.escapeHTML(err)) + "</td>" +
                                "<td class=\"snarkTorrentStatus\"><b>" + _t("Tracker Error") +
                                ":</b> " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
@@ -4856,6 +4856,7 @@ public class I2PSnarkServlet extends BasicServlet {
      *  Icon file in the .war. Always 16x16.
      *
      *  @param icon name without the ".png"
+     *  @param altText non-null, must be HTML-escaped
      *  @since 0.8.2
      */
     private String toImg(String icon, String altText) {
@@ -4886,8 +4887,8 @@ public class I2PSnarkServlet extends BasicServlet {
      *  Image file in the theme.
      *
      *  @param image name without the ".png"
-     *  @param altText non-null
-     *  @param titleText non-null
+     *  @param altText non-null, must be HTML-escaped
+     *  @param titleText non-null, must be HTML-escaped
      *  @since 0.9.16
      */
     private String toThemeImg(String image, String altText, String titleText) {
@@ -4900,8 +4901,8 @@ public class I2PSnarkServlet extends BasicServlet {
      *  Image file in the theme.
      *
      *  @param image name without the ".png"
-     *  @param altText non-null
-     *  @param titleText non-null
+     *  @param altText non-null, must be HTML-escaped
+     *  @param titleText non-null, must be HTML-escaped
      *  @since 0.9.16
      */
     private void toThemeImg(StringBuilder buf, String image, String altText, String titleText) {
