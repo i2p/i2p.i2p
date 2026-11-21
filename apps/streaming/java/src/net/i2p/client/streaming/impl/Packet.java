@@ -657,7 +657,7 @@ class Packet {
                                                + optionSize + " options: " + length);
         
         int payloadBegin = cur + optionSize;
-        int payloadSize = length - payloadBegin;
+        int payloadSize = offset + length - payloadBegin;
         if ( (payloadSize < 0) || (payloadSize > MAX_PAYLOAD_SIZE) ) 
             throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         
@@ -674,7 +674,7 @@ class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(buffer, cur, length - cur);
+            ByteArrayInputStream bais = new ByteArrayInputStream(buffer, cur, payloadBegin - cur);
             try {
                 Destination optionFrom = Destination.create(bais);
                 cur += optionFrom.size();
