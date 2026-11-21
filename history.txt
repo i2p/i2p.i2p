@@ -1,3 +1,39 @@
+2026-11-21 zzz
+ * Crypto: Fix end index in 4-arg Arrays.fill() calls
+ * i2psnark: Escape tracker error messages in UI
+ * i2ptunnel:
+   - Handle HTTP headers with zero or multiple spaces after colon (GH #201)
+   - i2ptunnel: Use consistent chunk length limits (GH #202)
+ * NTCP2:
+   - Fix handling of handshake message 2 with zero padding
+   - Bounds checks in block parsing (GH #239)
+ * SSU2:
+   - Bounds checks in peer test parsing (GH #213)
+   - Fix version checks for PQ peers (GH #215)
+   - Restrict ACK scans to the received window (GH #198)
+ * Streaming: Eliminate offset arg in Packet.readPacket() (GH #241)
+ * Tunnels: Eliminate offset arg in FragmentHandler.receiveTunnelMessage() (GH #259)
+ * Util:
+   - Bound EepGet chunk length parsing (GH #245)
+   - Don't truncate remaining variable to int in EepGet read loop (GH #248)
+   - Fix EepGet Content-Length for UTF8 POST data (GH #244)
+
+2026-11-18 zzz
+ * i2ptunnel: Fix handling of multiple SOCKS 5 auth methods (GH #315)
+
+2026-11-17 zzz
+ * Build: Fix gradle tests (GH #188)
+ * Console: Remove DEBUG as a default logging option
+
+2026-11-15 zzz
+ * Console: Increase CSP nonces to 8 bytes (GH #273)
+ * Jetty: Remove obsolete user field logging in request logs (GH #309)
+ * NTCP: Remove hexdump from exception text (GH #243)
+
+2026-11-13 zzz
+ * Crypto: Remove redundant hash in ChaCha20 wrapper (GH #220)
+ * Jetty: Allow file schemas to prevent startup failure on Java 28 (GH #187)
+
 2026-11-04 2.14.1 (API 0.9.71) released
 
 2026-11-04 zzz
