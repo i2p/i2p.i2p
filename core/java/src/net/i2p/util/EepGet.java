@@ -1273,6 +1273,8 @@ public class EepGet {
                 case '\r':
                     nl++;
                 default:
+                    if (buf.length() >= 16)
+                        throw new IOException("Invalid chunk length [" + buf + "]");
                     buf.append((char)cur);
             }
             
@@ -1285,6 +1287,8 @@ public class EepGet {
             long bytes = Long.parseLong(len, 16);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Chunked length: " + bytes);
+            if (bytes < 0)
+                throw new IOException("Invalid chunk length [" + len + "]");
             return bytes;
         } catch (NumberFormatException nfe) {
             throw new IOException("Invalid chunk length [" + len + "]");
