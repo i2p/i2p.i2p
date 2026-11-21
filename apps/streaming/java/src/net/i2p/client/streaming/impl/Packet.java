@@ -605,23 +605,22 @@ class Packet {
     
 
     /**
-     * Read the packet from the buffer (starting at the offset) and return
+     * Read the packet from the buffer and return
      * the number of bytes read.
      *
-     * @param buffer packet buffer containing the data
-     * @param offset index into the buffer to start readign
+     * @param buffer packet buffer containing the data, must start at index 0.
      * @param length how many bytes within the buffer past the offset are 
      *               part of the packet?
      *
      * @throws IllegalArgumentException if the data is b0rked
      * @throws IndexOutOfBoundsException if the data is b0rked
      */
-    public void readPacket(byte buffer[], int offset, int length) throws IllegalArgumentException {
-        if (buffer.length - offset < length) 
-            throw new IllegalArgumentException("len=" + buffer.length + " off=" + offset + " length=" + length);
+    public void readPacket(byte buffer[], int length) throws IllegalArgumentException {
+        if (buffer.length < length) 
+            throw new IllegalArgumentException("len=" + buffer.length + " length=" + length);
         if (length < 22) // min header size
             throw new IllegalArgumentException("Too small: len=" + buffer.length);
-        int cur = offset;
+        int cur = 0;
         setSendStreamId(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
         setReceiveStreamId(DataHelper.fromLong(buffer, cur, 4));
@@ -659,7 +658,7 @@ class Packet {
         int payloadBegin = cur + optionSize;
         int payloadSize = length - payloadBegin;
         if ( (payloadSize < 0) || (payloadSize > MAX_PAYLOAD_SIZE) ) 
-            throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
+            throw new IllegalArgumentException("length: " + length + " begin: " + payloadBegin);
         
         // skip ahead to the payload
         //_payload = new ByteArray(new byte[payloadSize]);
