@@ -1526,7 +1526,7 @@ public class EepGet {
             buf.append("\r\n");
         }
         if (post)
-            buf.append("Content-length: ").append(_postData.length()).append("\r\n");
+            buf.append("Content-length: ").append(DataHelper.getUTF8(_postData).length).append("\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("Accept-Encoding: ");
         // as of 0.9.23, the proxy passes the Accept-Encoding header through
