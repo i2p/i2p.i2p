@@ -83,6 +83,8 @@ class NTCP2Payload {
         int i = off;
         final int end = off + length;
         while (i < end) {
+            if (end - i < BLOCK_HEADER_SIZE)
+                throw new IOException("Truncated block header at offset " + (i - off));
             int type = payload[i++] & 0xff;
             if (gotPadding)
                 throw new IOException("Illegal block after padding: " + type);
@@ -116,6 +118,8 @@ class NTCP2Payload {
                     break;
 
                 case BLOCK_ROUTERINFO:
+                    if (len == 0)
+                        throw new DataFormatException("Bad RI block");
                     int flag = payload[i] & 0xff;
                     if (len - 1 > RouterInfo.MAX_UNCOMPRESSED_SIZE)
                         throw new DataFormatException("RI too big: " + (len - 1));
