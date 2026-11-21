@@ -87,9 +87,9 @@ public final class MLKEM {
                         throws GeneralSecurityException {
         MLKEMParameters param = getParam(type);
         MLKEMGenerator gen = new MLKEMGenerator(I2PAppContext.getGlobalContext().random());
-        MLKEMPublicKeyParameters ppub = new MLKEMPublicKeyParameters(param, pub);
         SecretWithEncapsulation swe;
         try {
+            MLKEMPublicKeyParameters ppub = new MLKEMPublicKeyParameters(param, pub);
             swe = gen.generateEncapsulated(ppub);
         } catch (IllegalArgumentException iae) {
             throw new GeneralSecurityException(iae);
