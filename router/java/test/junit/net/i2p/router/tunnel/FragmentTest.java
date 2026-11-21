@@ -178,7 +178,7 @@ public class FragmentTest {
             _delay = delay;
         }
         public long receiveEncrypted(byte[] encrypted) {
-            _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
+            _handler.receiveTunnelMessage(encrypted, encrypted.length);
             try { Thread.sleep(_delay); } catch (Exception e) {}
             return -1; // or do we need to return the real message ID?
         }

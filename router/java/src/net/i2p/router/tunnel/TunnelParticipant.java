@@ -140,7 +140,7 @@ class TunnelParticipant {
             // IBEP
             TunnelCreatorConfig cfg = _inboundEndpointProcessor.getConfig();
             cfg.incrementProcessedMessages();
-            ok = _handler.receiveTunnelMessage(data, 0, data.length);
+            ok = _handler.receiveTunnelMessage(data, data.length);
             if (ok) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Receive fragment: on " + _config + ": " + msg);
