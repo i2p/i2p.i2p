@@ -138,12 +138,18 @@ class FragmentHandler {
      * @return ok (false if corrupt)
      */
     public boolean receiveTunnelMessage(byte preprocessed[], int offset, int length) {
-        boolean ok = verifyPreprocessed(preprocessed, offset, length);
+        if (preprocessed == null || length != TrivialPreprocessor.PREPROCESSED_SIZE ||
+            offset < 0 || offset > preprocessed.length - length) {
+            _context.statManager().addRateData("tunnel.corruptMessage", 1);
+            return false;
+        }
+        int end = offset + length;
+        boolean ok = verifyPreprocessed(preprocessed, offset, end);
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to verify preprocessed data (pre.length=" 
                           + preprocessed.length + " off=" +offset + " len=" + length);
-            _cache.release(new ByteArray(preprocessed));
+            releasePreprocessed(preprocessed);
             _context.statManager().addRateData("tunnel.corruptMessage", 1);
             return false;
         }
@@ -152,8 +158,8 @@ class FragmentHandler {
         int padding = 0;
         while (preprocessed[offset] != (byte)0x00) {
             offset++; // skip the padding
-            if (offset >= TrivialPreprocessor.PREPROCESSED_SIZE) {
-                _cache.release(new ByteArray(preprocessed));
+            if (offset >= end) {
+                releasePreprocessed(preprocessed);
                 // padding-only message, this is allowed by the spec
                 return false;
             }
@@ -165,8 +171,8 @@ class FragmentHandler {
             //_log.debug("fragments: " + Base64.encode(preprocessed, offset, preprocessed.length-offset));
         }
         try {
-            while (offset < length) {
-                int off = receiveFragment(preprocessed, offset, length);
+            while (offset < end) {
+                int off = receiveFragment(preprocessed, offset, end);
                 if (off < 0) {
                     _context.statManager().addRateData("tunnel.corruptMessage", 1);
                     if (_log.shouldWarn())
@@ -209,9 +215,14 @@ class FragmentHandler {
             //
             // This is certainly interesting, to wrap the 1024-byte array in a new ByteArray
             // in order to put it in the pool, but it shouldn't cause any harm.
-            _cache.release(new ByteArray(preprocessed));
+            releasePreprocessed(preprocessed);
         }
         return true;
+    }
+
+    private static void releasePreprocessed(byte[] preprocessed) {
+        if (preprocessed.length == TrivialPreprocessor.PREPROCESSED_SIZE)
+            _cache.release(new ByteArray(preprocessed));
     }
     
     public int getCompleteCount() { return _completed.get(); }
@@ -255,7 +266,7 @@ class FragmentHandler {
         byte preV[] = ba.getData();
         int validLength = length - offset - paddingEnd + HopProcessor.IV_LENGTH;
         System.arraycopy(preprocessed, offset + paddingEnd, preV, 0, validLength - HopProcessor.IV_LENGTH);
-        System.arraycopy(preprocessed, 0, preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
+        System.arraycopy(preprocessed, offset, preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
         
