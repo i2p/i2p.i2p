@@ -113,7 +113,7 @@ class MessageInputStream extends InputStream {
     /**
      *  Determine if this packet will fit in our buffering limits.
      *
-     *  Always returns true for zero payloadSize and dups, even if locally closed.
+     *  Always returns true for zero payloadSize and dups (within window limits), even if locally closed.
      *  Returns false if there is no room, OR it's not a dup and the stream has been closed on
      *  the read side with close().
      *  If this returns false, you probably want to call isLocallyClosed() to find out why.
@@ -123,12 +123,14 @@ class MessageInputStream extends InputStream {
      *         and we can efficiently do several checks
      */
     public boolean canAccept(long messageId, int payloadSize) { 
-        if (payloadSize <= 0)
-            return true;
         synchronized (_dataLock) {
             // ready dup check
             // we always allow sequence numbers less than or equal to highest received
             if (messageId <= _highestReadyBlockId)
+                return true;
+            if (messageId > _highestReadyBlockId + _maxWindowSize)
+                return false;
+            if (payloadSize <= 0)
                 return true;
             // We do this after the above dup check.
             if (_locallyClosed) {
