@@ -181,7 +181,7 @@ class MessageInputStream extends InputStream {
      * past the highest ready ID and below the highest received message 
      * ID.  This may return null if there are no such IDs.
      *
-     * @return array of message ID holes, or null if none
+     * @return array of message ID holes, 255 max, or null if none
      */
     public long[] getNacks() {
         synchronized (_dataLock) {
@@ -198,6 +198,8 @@ class MessageInputStream extends InputStream {
                 if (ids == null)
                     ids = new ArrayList<Long>(4);
                 ids.add(l);
+                if (ids.size() >= 255)
+                    break;
             }
         }
         if (ids != null) {
