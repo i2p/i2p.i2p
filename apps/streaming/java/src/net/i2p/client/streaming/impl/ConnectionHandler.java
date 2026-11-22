@@ -214,6 +214,14 @@ class ConnectionHandler {
                         // drop it
                         continue;
                     }
+                    if (syn.getSequenceNum() != 0) {
+                        // spec requires SYN seq number is zero
+                        // drop now to prevent issues in CPH.receivePacket()
+                        // and MIS.canAccept()
+                        if (_log.shouldWarn())
+                            _log.warn("Dropping SYN packet with nonzero seq num: " + syn);
+                        continue;
+                    }
                     Connection oldcon = _manager.getConnectionByOutboundId(syn.getReceiveStreamId());
                     if (oldcon != null) {
                         // His ID not guaranteed to be unique to us, but probably is...

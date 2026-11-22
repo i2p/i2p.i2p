@@ -75,6 +75,14 @@ class ConnectionPacketHandler {
             packet.releasePayload();
             return;
         }
+        if (seqNum != 0 && packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+            // spec requires SYN seq number is zero
+            // drop now to prevent issues in MIS.canAccept()
+            if (_log.shouldWarn())
+                _log.warn("Dropping SYN packet with nonzero seq num: " + packet);
+            packet.releasePayload();
+            return;
+        }
         
         if ( (con.getCloseSentOn() > 0) && (con.getUnackedPacketsSent() <= 0) && 
              (seqNum > 0) && (packet.getPayloadSize() > 0)) {
