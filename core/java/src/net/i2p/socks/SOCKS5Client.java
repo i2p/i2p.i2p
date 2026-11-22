@@ -130,9 +130,11 @@ public class SOCKS5Client {
             } else if (method == Method.USERNAME_PASSWORD) {
                 if (authAvail) {
                     // send the auth
-                    out.writeByte(AUTH_VERSION);
                     byte[] user = configUser.getBytes("UTF-8");
                     byte[] pw = configPW.getBytes("UTF-8");
+                    if (user.length > 255 || pw.length > 255)
+                        throw new SOCKSException("Proxy username or password exceeds 255 bytes");
+                    out.writeByte(AUTH_VERSION);
                     out.writeByte(user.length);
                     out.write(user);
                     out.writeByte(pw.length);
@@ -151,12 +153,17 @@ public class SOCKS5Client {
             }
 
             int addressType;
+            byte[] domain = null;
             if (Addresses.isIPv4Address(connHostName))
                 addressType = AddressType.IPV4;
             else if (Addresses.isIPv6Address(connHostName))
                 addressType = AddressType.IPV6;
-            else
+            else {
+                domain = connHostName.getBytes("ISO-8859-1");
+                if (domain.length > 255)
+                    throw new SOCKSException("Proxy destination hostname exceeds 255 bytes");
                 addressType = AddressType.DOMAINNAME;
+            }
 
             // send the connect command
             out.writeByte(SOCKS_VERSION_5);
@@ -166,9 +173,8 @@ public class SOCKS5Client {
             if (addressType == AddressType.IPV4 || addressType == AddressType.IPV6) {
                 out.write(InetAddress.getByName(connHostName).getAddress());
             } else {
-                byte[] d = connHostName.getBytes("ISO-8859-1");
-                out.writeByte(d.length);
-                out.write(d);
+                out.writeByte(domain.length);
+                out.write(domain);
             }
             out.writeShort(connPort);
             out.flush();
