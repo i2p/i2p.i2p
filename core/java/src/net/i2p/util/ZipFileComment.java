@@ -88,10 +88,14 @@ public abstract class ZipFileComment {
      *  go backwards from the end
      */
     private static String getComment(byte[] buffer) throws IOException {
-        for (int i = buffer.length - (1 + BLOCK_LEN - MAGIC_LEN); i >= 0; i--) {
+        for (int i = buffer.length - BLOCK_LEN; i >= 0; i--) {
             if (DataHelper.eq(buffer, i, magicDirEnd, 0, MAGIC_LEN)) {
                 int commentLen = (buffer[i + BLOCK_LEN - 2] & 0xff) +
                                  ((buffer[i + BLOCK_LEN - 1] & 0xff) * 256);
+                // A complete end record and its declared comment must fit
+                // exactly through the end of the ZIP file.
+                if (commentLen != buffer.length - i - BLOCK_LEN)
+                    continue;
                 return new String(buffer, i + BLOCK_LEN, commentLen, "UTF-8");
             }
         }
