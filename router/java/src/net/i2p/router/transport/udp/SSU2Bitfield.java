@@ -188,17 +188,18 @@ class SSU2Bitfield {
      *  @param ranges may be null
      */
     public static SSU2Bitfield fromACKBlock(long thru, int acnt, byte[] ranges, int rangeCount) {
-        int t = (int) thru;
+        // Packet numbers are unsigned 32-bit values. Keep absolute packet
+        // numbers as longs; only the bounded bitfield size fits in an int.
         if (ranges == null || rangeCount == 0) {
             // easy case, no ranges
             SSU2Bitfield rv = new SSU2Bitfield(acnt + 1, thru - acnt);
-            for (int i = t; i >= t - acnt; i--) {
+            for (long i = thru; i >= thru - acnt; i--) {
                 rv.set(i);
             }
             return rv;
         }
         // get the minimum acked value
-        int min = t - acnt;
+        long min = thru - acnt;
         for (int i = 0; i < rangeCount * 2; i++) {
             min -= ranges[i] & 0xff;
         }
@@ -207,12 +208,12 @@ class SSU2Bitfield {
         if (ranges[(rangeCount * 2) - 1] == 0)
             min += ranges[(rangeCount * 2) - 2] & 0xff;
 
-        SSU2Bitfield rv = new SSU2Bitfield(1 + t - min, min);
-        for (int i = t; i >= t - acnt; i--) {
+        SSU2Bitfield rv = new SSU2Bitfield((int) (1 + thru - min), min);
+        for (long i = thru; i >= thru - acnt; i--) {
             rv.set(i);
         }
 
-        int j = t - (acnt + 1);
+        long j = thru - (acnt + 1);
         for (int i = 0; i < rangeCount * 2; i += 2) {
             // nack count
             j -= ranges[i] & 0xff;
@@ -280,7 +281,7 @@ class SSU2Bitfield {
     public static String toString(long thru, int acnt, byte[] ranges, int rangeCount) {
         StringBuilder sb = new StringBuilder();
         sb.append("ACK ").append(thru);
-        int cur = (int) thru;
+        long cur = thru;
         if (acnt > 0) {
             sb.append('-').append(thru - acnt);
             cur -= acnt;
