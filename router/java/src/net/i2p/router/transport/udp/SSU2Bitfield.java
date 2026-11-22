@@ -27,6 +27,9 @@ class SSU2Bitfield {
     // before offset
     private int highestSet = -1;
 
+    /** see fromAckBlock() */
+    private static final int ACK_BLOCK_SOFT_LIMIT = 1024;
+
     /**
      * Creates a new SSU2Bitfield that represents <code>size</code> unset bits.
      */
@@ -201,6 +204,15 @@ class SSU2Bitfield {
         int min = t - acnt;
         for (int i = 0; i < rangeCount * 2; i++) {
             min -= ranges[i] & 0xff;
+            // limit ranges for sanity
+            // if we don't do this, limit is about 700 ranges of 255/255
+            // or approx. 356,000 bits
+            // truncate the ranges after the first range that goes over 1024
+            // so this limits us to about 1534
+            if ((i & 1) != 0 && min < t - ACK_BLOCK_SOFT_LIMIT) {
+                rangeCount = (i + 1) / 2;
+                break;
+            }
         }
         // fixup if the last ack count was zero
         // this doesn't handle multiple ranges with a zero ack count
@@ -321,16 +333,36 @@ class SSU2Bitfield {
 
     @Override
     public String toString() {
+        // generate a compact representation
         StringBuilder sb = new StringBuilder("SSU2Bitfield(");
         sb.append(size).append(")");
         sb.append(" offset: ").append(offset);
         sb.append(" highest set: ").append(getHighestSet());
         sb.append(" [");
+        long first = offset - 1;
+        long last = first - 1;
         for (long i = offset; i <= getHighestSet(); i++) {
             if (get(i)) {
-              sb.append(' ');
-              sb.append(i);
+                if (i == last + 1) {
+                    last++;
+                } else  {
+                    first = i;
+                    last = i;
+                    sb.append(i);
+                }
+            } else if (last >= 0) {
+                if (last != first) {
+                    sb.append('-');
+                    sb.append(i - 1);
+                }
+                sb.append(' ');
+                first = -1;
+                last = -1;
             }
+        }
+        if (last >= 0 && last != first) {
+            sb.append('-');
+            sb.append(last);
         }
         sb.append(" ]");
         return sb.toString();
@@ -345,6 +377,12 @@ class SSU2Bitfield {
     }
 
     public static void main(String[] args) {
+        // limit test
+        byte[] ranges = new byte[10];
+        Arrays.fill(ranges, (byte) 255);
+        SSU2Bitfield bf3 = fromACKBlock(10000, 255, ranges, 5);
+        System.out.println(bf3.toString());
+
         Callback cbi = new CallbackImpl();
         int off = 0;
         SSU2Bitfield bf = new SSU2Bitfield(256, off);
