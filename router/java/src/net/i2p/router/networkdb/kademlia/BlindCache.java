@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -183,6 +184,7 @@ class BlindCache {
     }
 
     /**
+     *  @throws IllegalArgumentException on various errors
      *  @since 0.9.41 from addToCache()
      */
     private void storeInCache(BlindData bd) {
@@ -239,8 +241,13 @@ class BlindCache {
      */
     public synchronized void rollover() {
         _reverseCache.clear();
-        for (BlindData bd : _cache.values()) {
-            _reverseCache.put(bd.getBlindedPubKey(), bd);
+        for (Iterator<BlindData> iter = _cache.values().iterator(); iter.hasNext(); ) {
+            BlindData bd = iter.next();
+            try {
+                _reverseCache.put(bd.getBlindedPubKey(), bd);
+            } catch (IllegalArgumentException iae) {
+                iter.remove();
+            }
         }
     }
 

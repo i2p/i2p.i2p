@@ -123,6 +123,7 @@ public class BlindData {
 
     /**
      *  @return The blinded key for the current day, non-null
+     *  @throws IllegalArgumentException on various errors
      */
     public synchronized SigningPublicKey getBlindedPubKey() {
         calculate();
@@ -138,6 +139,7 @@ public class BlindData {
 
     /**
      *  @return The hash of the blinded key for the current day
+     *  @throws IllegalArgumentException on various errors
      */
     public synchronized Hash getBlindedHash() {
         calculate();
@@ -146,6 +148,7 @@ public class BlindData {
 
     /**
      *  @return Alpha for the current day
+     *  @throws IllegalArgumentException on various errors
      */
     public synchronized SigningPrivateKey getAlpha() {
         calculate();
@@ -194,6 +197,9 @@ public class BlindData {
         return _authKey;
     }
 
+    /**
+     *  @throws IllegalArgumentException on various errors
+     */
     private synchronized void calculate() {
         if (_context.isRouterContext()) {
             RoutingKeyGenerator gen = _context.routingKeyGenerator();
