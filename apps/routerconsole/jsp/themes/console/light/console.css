@@ -837,6 +837,14 @@ p:empty+.sb_notice {
     vertical-align: baseline;
 }
 
+.sb_netstatus_detail {
+    display: block;
+    margin-top: 4px;
+    font-weight: normal;
+    line-height: 1.3;
+    white-space: normal;
+}
+
 .routersummary .firewalled {
     background: #dee2e6;
 }
