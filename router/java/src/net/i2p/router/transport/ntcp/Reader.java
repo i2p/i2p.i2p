@@ -167,8 +167,11 @@ class Reader {
                 break;
             }
             // FIXME call est.isCorrupt() before also? throws ISE here... see above
-            est.receive(buf);
-            EventPumper.releaseBuf(buf);
+            try {
+                est.receive(buf);
+            } finally {
+                EventPumper.releaseBuf(buf);
+            }
             if (est.isCorrupt()) {
                 con.close();
                 return;
@@ -177,8 +180,11 @@ class Reader {
         }
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message
-            con.recvEncryptedI2NP(buf);
-            EventPumper.releaseBuf(buf);
+            try {
+                con.recvEncryptedI2NP(buf);
+            } finally {
+                EventPumper.releaseBuf(buf);
+            }
         }
     }
 }
