@@ -371,7 +371,9 @@ class BasicServlet extends HttpServlet
         // if there are no satisfiable ranges, send 416 response
         // Completely punt on multiple ranges (unlike Default)
         if (ranges == null || ranges.size() != 1) {
-            writeHeaders(response, content, content_length);
+            // This response has no body; advertising the file length causes
+            // containers to turn the short response into a 500 error.
+            writeHeaders(response, content, 0);
             response.setStatus(416);
             response.setHeader("Content-Range", InclusiveByteRange.to416HeaderRangeString(content_length));
             in.close();
