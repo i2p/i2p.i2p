@@ -1,5 +1,20 @@
+2026-11-22 zzz
+ * i2psnark: Subject ut_metadata piece messages to bandwidth limiter
+ * i2ptunnel:
+   - Fix string == in DCC handlers (GH #190)
+   - Fix string == in getProxyAuth() (GH #191)
+ * NetDB: Catch unchecked blinded key exceptions in BlindCache.rollover()
+ * Streaming:
+   - Bound received sequence gaps (GH #193)
+   - Drop SYNs with nonzero sequence number
+   - Fix packet dup identification when after a sequence gap (GH #194)
+   - Limit NACK array size to 255
+ * SSU2: Limit size of expanded ACK block
+
 2026-11-21 zzz
- * Crypto: Fix end index in 4-arg Arrays.fill() calls
+ * Crypto:
+   - Fix end index in 4-arg Arrays.fill() calls
+   - Ensure MLKEM.encaps() with a bad pubkey is a checked exception
  * i2psnark: Escape tracker error messages in UI
  * i2ptunnel:
    - Handle HTTP headers with zero or multiple spaces after colon (GH #201)
