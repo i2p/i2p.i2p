@@ -2,6 +2,7 @@ package net.i2p.i2ptunnel.access;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import java.io.File;
 
@@ -136,28 +137,38 @@ class DefinitionParser {
         
         DefinitionBuilder builder = new DefinitionBuilder();
 
-        for (String line : definition) {
-            String [] split = DataHelper.split(line,"[ \t]");
-            split[0] = split[0].toLowerCase();
-            
-            Threshold threshold = parseThreshold(split[0]);
-            Rule rule = parseRule(split[1]);
-
-            File file;
-            switch(rule) {
-            case DEFAULT:
-                builder.setDefaultThreshold(threshold);
-                break;
-            case EXPLICIT:
-                builder.addElement(new ExplicitFilterDefinitionElement(split[2], threshold));
-                break;
-            case FILE:
-                file = parseFileName(line, split);
-                builder.addElement(new FileFilterDefinitionElement(file, threshold));
-                break;
-            case RECORDER: 
-                file = parseFileName(line, split);
-                builder.addRecorder(new Recorder(file, threshold));
+        for (int i = 0; i < definition.length; i++) {
+            String line = definition[i].trim();
+            if (line.length() == 0 || line.startsWith("#"))
+                continue;
+            try {
+                // Limit the split so a filename may contain spaces or tabs.
+                String[] split = DataHelper.split(line, "[ \t]+", 3);
+                if (split.length < 2)
+                    throw new InvalidDefinitionException("Expected a threshold and rule");
+                Threshold threshold = parseThreshold(split[0].toLowerCase(Locale.US));
+                Rule rule = parseRule(split[1].toLowerCase(Locale.US));
+                if (rule == Rule.DEFAULT) {
+                    if (split.length != 2)
+                        throw new InvalidDefinitionException("Default rule does not take an argument");
+                    builder.setDefaultThreshold(threshold);
+                } else {
+                    if (split.length != 3 || split[2].length() == 0)
+                        throw new InvalidDefinitionException("Missing destination or filename for " + split[1]);
+                    switch (rule) {
+                    case EXPLICIT:
+                        builder.addElement(new ExplicitFilterDefinitionElement(split[2], threshold));
+                        break;
+                    case FILE:
+                        builder.addElement(new FileFilterDefinitionElement(new File(split[2]), threshold));
+                        break;
+                    case RECORDER:
+                        builder.addRecorder(new Recorder(new File(split[2]), threshold));
+                        break;
+                    }
+                }
+            } catch (InvalidDefinitionException bad) {
+                throw new InvalidDefinitionException("Line " + (i + 1) + ": " + bad.getMessage(), bad);
             }
         }
 
@@ -199,16 +210,6 @@ class DefinitionParser {
 
         throw new InvalidDefinitionException("unknown rule "+s);
     }
-
-    private static File parseFileName(String s, String[] split) throws InvalidDefinitionException {
-        if (split.length < 3)
-            throw new InvalidDefinitionException("invalid definition "+s);
-        int beginIndex = s.indexOf(split[1]);
-        if (beginIndex < 0)
-            throw new IllegalStateException("shouldn't have gotten here "+s);
-        return new File(s.substring(beginIndex + split[1].length()).trim());
-    }
-
 
     private static class DefinitionBuilder {
         private Threshold threshold;
