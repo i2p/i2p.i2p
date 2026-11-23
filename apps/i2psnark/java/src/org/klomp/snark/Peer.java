@@ -73,7 +73,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   /** shared across all peers on this torrent */
   MagnetState magnetState;
 
-  private I2PSocket sock;
+  private volatile I2PSocket sock;
   
   private boolean deregister = true;
   private static final AtomicLong __id = new AtomicLong();
@@ -254,18 +254,35 @@ public class Peer implements Comparable<Peer>, BandwidthListener
     Hash h = null;
     try
       {
+        if (_disconnected.get())
+            return;
         // Do we need to handshake?
         if (din == null)
           {
             // Outgoing connection
             Destination d = peerID.getAddress();
+            if (_disconnected.get())
+                return;
             if (d == null)
                 throw new IOException("No destination for " + peerID);
             h = d.calculateHash();
             if (listener.isBanned(h))
                 throw new IOException("IsBanned: " + peerID);
 
-            sock = util.connect(peerID);
+            I2PSocket connectedSocket = util.connect(peerID);
+            if (_disconnected.get()) {
+                if (connectedSocket != null)
+                    connectedSocket.close();
+                return;
+            }
+            sock = connectedSocket;
+            // Disconnect may have raced with publishing the new socket.
+            if (_disconnected.get()) {
+                if (connectedSocket != null)
+                    connectedSocket.close();
+                sock = null;
+                return;
+            }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connected to " + peerID + ": " + sock);
             if ((sock == null) || (sock.isClosed())) {
@@ -319,6 +336,17 @@ public class Peer implements Comparable<Peer>, BandwidthListener
     
         // We are up and running!
         state = s;
+        // A pending handshake may have been cancelled before state existed.
+        // In that case disconnect() could not clean up this newly created state.
+        if (_disconnected.get()) {
+            state = null;
+            in.disconnect();
+            I2PSocket cancelledSocket = sock;
+            sock = null;
+            if (cancelledSocket != null)
+                cancelledSocket.close();
+            return;
+        }
         magnetState = mState;
         connected = util.getContext().clock().now();
         listener.connected(this);

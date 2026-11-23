@@ -5,13 +5,15 @@ package org.klomp.snark.dht;
  */
 
 import java.util.Collection;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 
 
 /**
- * Stub for KRPC
+ * Peer discovery interface for the I2P DHT.
  * @since 0.8.4
  */
 public interface DHT {
@@ -52,6 +54,18 @@ public interface DHT {
     public Collection<Hash> getPeersAndAnnounce(byte[] ih, int max, long maxWait,
                                                 int annMax, long annMaxWait,
                                                 boolean isSeed, boolean noSeeds);
+
+    /**
+     * Run discovery on a bounded background executor. The callback runs on that
+     * executor when discovery completes and must not block. Cancel the returned
+     * future to abandon the lookup; stopping the DHT also cancels queued work.
+     *
+     * @throws java.util.concurrent.RejectedExecutionException if stopped or busy
+     */
+    public Future<?> getPeersAndAnnounceAsync(byte[] ih, int max, long maxWait,
+                                            int annMax, long annMaxWait,
+                                            boolean isSeed, boolean noSeeds,
+                                            Consumer<Collection<Hash>> onPeers);
 
     /**
      *  Announce to ourselves.

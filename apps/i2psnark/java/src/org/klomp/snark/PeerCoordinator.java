@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -113,6 +114,9 @@ class PeerCoordinator implements PeerListener, BandwidthListener
    * External use by PeerMonitorTask only.
    */
   final Deque<Peer> peers;
+
+  /** Reserve connection slots while asynchronous destination lookups and handshakes run. */
+  private final Map<PeerID, Peer> pendingPeers = new ConcurrentHashMap<PeerID, Peer>();
 
   /**
    * Peers we heard about via PEX
@@ -583,7 +587,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
    */
   public boolean needPeers()
   {
-        return !halted && peers.size() < getMaxConnections();
+        return !halted && peers.size() + pendingPeers.size() < getMaxConnections();
   }
 
   /**
@@ -601,7 +605,7 @@ class PeerCoordinator implements PeerListener, BandwidthListener
                  // TODO
                  _commentsLastRequested.get() < _util.getContext().clock().now() - COMMENT_REQ_INTERVAL)) &&
                !halted &&
-               peers.size() < getMaxConnections() - 2 &&
+               peers.size() + pendingPeers.size() < getMaxConnections() - 2 &&
                (storage == null || !storage.isChecking());
   }
   
@@ -642,6 +646,8 @@ class PeerCoordinator implements PeerListener, BandwidthListener
 
         // Stop peers.
         removed.addAll(peers);
+        removed.addAll(pendingPeers.values());
+        pendingPeers.clear();
         peers.clear();
         peerCount = 0;
       }
@@ -691,6 +697,11 @@ class PeerCoordinator implements PeerListener, BandwidthListener
     Peer toDisconnect = null;
     synchronized(peers)
       {
+        pendingPeers.remove(peer.getPeerID(), peer);
+        if (halted || !peer.isConnected()) {
+            peer.disconnect(false);
+            return;
+        }
         Peer old = peerIDInList(peer.getPeerID(), peers);
         if (old != null && old.getInactiveTime() > old.getMaxInactiveTime()) {
             // idle for 8 minutes, kill the old con (32KB/8min = 68B/sec minimum for one block)
@@ -787,14 +798,16 @@ class PeerCoordinator implements PeerListener, BandwidthListener
     synchronized(peers)
       {
         peersize = peers.size();
-        // This isn't a strict limit, as we may have several pending connections;
-        // thus there is an additional check in connected()
-        need_more = (!peer.isConnected()) && peersize < getMaxConnections();
+        need_more = !halted && !peer.isConnected() &&
+                    peersize + pendingPeers.size() < getMaxConnections() &&
+                    !pendingPeers.containsKey(peer.getPeerID());
         // Check if we already have this peer before we build the connection
         if (need_more) {
             Peer old = peerIDInList(peer.getPeerID(), peers);
             need_more = old == null || old.getInactiveTime() > old.getMaxInactiveTime();
         }
+        if (need_more)
+            pendingPeers.put(peer.getPeerID(), peer);
       }
 
     if (need_more)
@@ -823,7 +836,14 @@ class PeerCoordinator implements PeerListener, BandwidthListener
           {
             public void run()
             {
-              peer.runConnection(_util, listener, PeerCoordinator.this, bitfield, magnetState, partialComplete);
+              try {
+                  if (!halted && pendingPeers.get(peer.getPeerID()) == peer)
+                      peer.runConnection(_util, listener, PeerCoordinator.this, bitfield, magnetState, partialComplete);
+              } finally {
+                  synchronized(peers) {
+                      pendingPeers.remove(peer.getPeerID(), peer);
+                  }
+              }
             }
           };
         String threadName = "Snark peer " + peer.toString();
