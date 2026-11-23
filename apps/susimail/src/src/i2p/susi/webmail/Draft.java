@@ -40,6 +40,8 @@ class Draft extends Mail {
 	 */
 	@Override
 	public synchronized void setBody(Buffer rb) {
+		attachments.clear();
+		bcc = null;
 		super.setBody(rb);
 		size = rb.getLength();
 		MailPart part = getPart();
@@ -47,7 +49,7 @@ class Draft extends Mail {
 			String[] hdrs = part.headerLines;
 			for (int i = 0; i < hdrs.length; i++) {
 				String hdr = hdrs[i];
-				if (hdr.startsWith(HDR_BCC)) {
+				if (hdr.regionMatches(true, 0, HDR_BCC, 0, HDR_BCC.length())) {
 					ArrayList<String> list = new ArrayList<String>();
 					getRecipientsFromList(list, hdr.substring(HDR_BCC.length()).trim(), true);
 					if (list.isEmpty()) {
@@ -57,13 +59,13 @@ class Draft extends Mail {
 					} else {	
 						// add to the array, shouldn't happen
 						for (int j = 0; j < bcc.length; j++) {
-							list.add(j, bcc[i]);
+							list.add(j, bcc[j]);
 						}
 						bcc = list.toArray(new String[list.size()]);
 					}
 				}
-				if (!hdr.startsWith(HDR_ATTACH))
-					break;
+				if (!hdr.regionMatches(true, 0, HDR_ATTACH, 0, HDR_ATTACH.length()))
+					continue;
 				String[] flds = DataHelper.split(hdr.substring(HDR_ATTACH.length()), ",", 4);
 				if (flds.length != 4)
 					continue;
@@ -73,11 +75,20 @@ class Draft extends Mail {
 				String name = DataHelper.getUTF8(b);
 				String type = flds[1];
 				String enc = flds[2];
+                if (!type.matches("[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+(?:;[^\\r\\n,]*)?") ||
+                    !(enc.equals("base64") || enc.equals("quoted-printable") || enc.equals("7bit") || enc.equals("8bit") || enc.equals("binary"))) continue;
 				b = Base64.decode(flds[3]);
 				if (b == null)
 					continue;
 				String path = DataHelper.getUTF8(b);
-				Attachment a = new Attachment(name, type, enc, new File(path));
+				MailVault vault = rb instanceof VaultFileBuffer ? ((VaultFileBuffer) rb).vault : null;
+				File file = new File(path);
+				if (vault != null) {
+					java.nio.file.Path allowed = vault.directory.resolve(WebMail.DIR_DRAFTS).resolve(PersistentMailCache.DIR_ATTACHMENTS);
+					if (!file.toPath().toAbsolutePath().normalize().startsWith(allowed) || java.nio.file.Files.isSymbolicLink(file.toPath()))
+						continue;
+				}
+				Attachment a = new Attachment(name, type, enc, file, vault);
 				size += a.getSize();
 				attachments.add(a);
 			}
