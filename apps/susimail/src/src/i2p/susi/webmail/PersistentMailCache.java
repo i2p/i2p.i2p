@@ -74,6 +74,7 @@ class PersistentMailCache {
 	private final I2PAppContext _context;
 	private final Log _log;
 	private final boolean _isDrafts;
+    private final boolean _isSent;
 
 	private static final String DIR_SUSI = "susimail";
 	private static final String DIR_CACHE = "cache";
@@ -98,6 +99,7 @@ class PersistentMailCache {
 		_context = ctx;
 		_log = ctx.logManager().getLog(PersistentMailCache.class);
 		_isDrafts = folder.equals(WebMail.DIR_DRAFTS);
+        _isSent = folder.equals(WebMail.DIR_SENT);
 		_lock = getLock(host, port, user, pass);
 		synchronized(_lock) {
 			_cacheDir = makeCacheDirs(host, port, user, pass, folder);
@@ -152,7 +154,7 @@ class PersistentMailCache {
 		int tcnt = Math.max(1, Math.min(sz / 4, Math.min(SystemVersion.getCores(), 16)));
 		List<Thread> threads = new ArrayList<Thread>(tcnt);
 		for (int i = 0; i < tcnt; i++) {
-			Thread t = new I2PAppThread(new Loader(fq, rv, _isDrafts), "Email loader " + i);
+			Thread t = new I2PAppThread(new Loader(fq, rv, _isDrafts, _isSent), "Email loader " + i);
 			t.start();
 			threads.add(t);
 		}
@@ -176,16 +178,17 @@ class PersistentMailCache {
 		private final Queue<File> _in;
 		private final Queue<Mail> _out;
 		private final boolean _isD;
+        private final boolean _isS;
 
-		public Loader(Queue<File> in, Queue<Mail> out, boolean isDrafts) {
+		public Loader(Queue<File> in, Queue<Mail> out, boolean isDrafts, boolean isSent) {
 			_in = in; _out = out;
-			_isD = isDrafts;
+			_isD = isDrafts; _isS = isSent;
 		}
 
 		public void run() {
 			File f;
 			while ((f = _in.poll()) != null) {
-				Mail mail = load(f, _isD);
+				Mail mail = load(f, _isD, _isS);
 				if (mail != null)
 					_out.offer(mail);
 			}
@@ -212,7 +215,7 @@ class PersistentMailCache {
 			Buffer rb = read(f);
 			if (rb != null) {
 				mail.setBody(rb);
-				return true;
+                return mail.hasBody();
 			} else {
 				if (_log.shouldWarn())
 					_log.warn("Unable to read file " + f);
@@ -431,7 +434,7 @@ class PersistentMailCache {
 	 *
 	 *  @return null on failure
 	 */
-	private static Mail load(File f, boolean isDrafts) {
+	private static Mail load(File f, boolean isDrafts, boolean isSent) {
 		String name = f.getName();
 		String uidl;
 		boolean headerOnly;
@@ -461,7 +464,7 @@ class PersistentMailCache {
 		if (isDrafts)
 			mail = new Draft(uidl);
 		else
-			mail = new Mail(uidl);
+			mail = new Mail(uidl, isSent);
 		if (headerOnly) {
 			mail.setHeader(rb);
 		} else if (isDrafts) {

@@ -1,0 +1,9 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0; padding: 1rem; line-height: 1.65; overflow-wrap: anywhere; font-family: system-ui, sans-serif !important; }
+.safe-message-note { border: 1px solid #8a96aa; border-radius: .6rem; padding: .65rem .85rem; margin-bottom: 1rem; font-size: .85rem; }
+img { max-width: 100%; max-height: 70vh; object-fit: contain; }
+table { border-collapse: collapse; max-width: 100%; }
+th, td { border: 1px solid #8a96aa; padding: .4rem .6rem; }
+pre, code { font-family: ui-monospace, monospace; white-space: pre-wrap; }
+blockquote { border-inline-start: .2rem solid #8a96aa; padding-inline-start: 1rem; margin-inline: .5rem; }
+a { color: light-dark(#174eae, #9bc4ff); text-decoration: underline; text-underline-offset: .2em; }
