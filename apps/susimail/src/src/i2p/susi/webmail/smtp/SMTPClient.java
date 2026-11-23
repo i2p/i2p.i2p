@@ -39,6 +39,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -74,12 +75,6 @@ public class SMTPClient {
 	private boolean supportsPipelining, eightBitMime;
 	private long maxSize = DEFAULT_MAX_SIZE;
 	
-	private static final Encoding base64;
-	
-	static {
-		base64 = EncodingFactory.getEncoding( "base64" );
-	}
-
 	public SMTPClient()
 	{
 		error = "";
@@ -128,7 +123,14 @@ public class SMTPClient {
 	 */
 	private void sendCmdNoWait(String cmd) throws IOException
 	{
-		if (_log.shouldDebug()) _log.debug("SMTP sendCmd(" + cmd +")" );
+		// Commands include AUTH credentials and envelope addresses. Never log them.
+		// getASCII() truncates to eight bits, so validate the actual wire bytes.
+		for (int i = 0; i < cmd.length(); i++) {
+			int c = cmd.charAt(i) & 0xff;
+			if (c < 32 || c == 127)
+				throw new IOException("Invalid SMTP command");
+		}
+		if (_log.shouldDebug()) _log.debug("Sending SMTP command");
 		
 		if( socket == null )
 			throw new IOException("no socket");
@@ -197,10 +199,15 @@ public class SMTPClient {
 		int result = 0;
 		StringBuilder fullResponse = new StringBuilder(512);
 		try {
-			InputStream in = socket.getInputStream();
+			InputStream in = new i2p.susi.util.TimedResponseInputStream(socket, 120000);
 			StringBuilder buf = new StringBuilder(128);
+            long start = System.nanoTime();
+            int lines = 0;
+            boolean complete = false;
 			while (DataHelper.readLine(in, buf)) {
-				if (_log.shouldDebug()) _log.debug("SMTP rcv \"" + buf.toString().trim() + '"');
+				if (++lines > 100 || fullResponse.length() + buf.length() > 65536 || System.nanoTime() - start > 120000000000L)
+                    throw new IOException("SMTP reply exceeds the safety limit");
+                // A server may echo credentials or addresses in its response.
 				int len = buf.length();
 				if (len < 4) {
 					result = 0;
@@ -214,15 +221,19 @@ public class SMTPClient {
 						break;
 					}
 				}
+                if (result < 100 || result > 599 || !buf.substring(0, 3).equals(Integer.toString(result)))
+                    throw new IOException("Inconsistent SMTP reply status");
 				fullResponse.append(buf.substring(4));
-				if (buf.charAt(3) == ' ')
-					break;
+				if (buf.charAt(3) == ' ') { complete = true; break; }
+                if (buf.charAt(3) != '-') throw new IOException("Malformed SMTP reply");
 				buf.setLength(0);
 			}
+            if (!complete) result = 0;
 		} catch (IOException e) {
 			error += e + "\n";
 			result = 0;
 		}
+		if (_log.shouldDebug()) _log.debug("SMTP response code " + result);
 		lastResponse = fullResponse.toString();
 		return new Result(result, lastResponse);
 	}
@@ -325,8 +336,9 @@ public class SMTPClient {
 				// that includes the user/pass on following lines
 				List<SendExpect> cmds = new ArrayList<SendExpect>();
 				cmds.add(new SendExpect("AUTH LOGIN", 334));
-				cmds.add(new SendExpect(base64.encode(user), 334));
-				cmds.add(new SendExpect(base64.encode(pass), 235));
+				// AUTH responses are single lines, including for long credentials.
+				cmds.add(new SendExpect(Base64.getEncoder().encodeToString(DataHelper.getUTF8(user)), 334));
+				cmds.add(new SendExpect(Base64.getEncoder().encodeToString(DataHelper.getUTF8(pass)), 235));
 				if (sendCmds(cmds) != 3) {
 					error += _t("Login failed") + '\n';
 					ok = false;
@@ -355,7 +367,7 @@ public class SMTPClient {
 				writeMail(out, body, attachments, boundary);
 				out.write("\r\n.\r\n");
 				out.flush();
-				socket.setSoTimeout(0);
+				socket.setSoTimeout(120*1000);
 				int result = sendCmd(null);
 				if (result == 250)
 					mailSent = true;

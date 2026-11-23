@@ -28,7 +28,6 @@ import i2p.susi.util.Config;
 import i2p.susi.util.CountingInputStream;
 import i2p.susi.util.EOFOnMatchInputStream;
 import i2p.susi.util.FileBuffer;
-import i2p.susi.util.MemoryBuffer;
 import i2p.susi.webmail.encoding.Encoding;
 import i2p.susi.webmail.encoding.EncodingFactory;
 
@@ -46,7 +45,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -65,10 +63,6 @@ class Mail {
 	
 	private static final String DATEFORMAT = "date.format";
 	private static final String unknown = "unknown";
-	private static final String P1 = "^[^@< \t]+@[A-Za-z0-9-]+\\.[A-Za-z0-9\\.-]+$";
-	private static final String P2 = "^<[^@< \t]+@[A-Za-z0-9-]+\\.[A-Za-z0-9\\.-]+>$";
-	private static final Pattern PATTERN1 = Pattern.compile(P1);
-	private static final Pattern PATTERN2 = Pattern.compile(P2);
 	/**
 	 *  Also used by MailPart
 	 *  See MailPart for why we don't do \r\n\r\n
@@ -83,7 +77,7 @@ class Mail {
 		//formattedSender,    // address only, enclosed with <>, not HTML escaped
 		formattedDate,  // US Locale, UTC
 		localFormattedDate,  // Current Locale, local time zone
-		shortSender,    // Either name or address but not both, HTML escaped, double-quotes removed, truncated with hellip
+		shortSender,    // Actual mailbox when available; HTML escaped
 		shortSubject,   // HTML escaped, truncated with hellip, non-null, default ""
 		quotedDate;  // Current Locale, local time zone, longer format
 	public final String uidl;
@@ -93,6 +87,18 @@ class Mail {
         /** May be null. Non-empty if non-null. Not HTML escaped. */
 	String[] to, cc;        // addresses only, enclosed by <>
 	private boolean isNew, isSpam, headersParsed;
+	private MailHeaders parsedHeaders;
+	private SenderIdentity senderIdentity;
+	private boolean ambiguousHeaders, changedHeaders, invalidReplyTo;
+	private DKIMVerifier.Result authentication = DKIMVerifier.UNVERIFIED;
+	private boolean locallySent;
+	private boolean bodyParseFailed;
+	private String verificationConfiguration = "";
+	private long verifiedFileLength, verifiedFileTime;
+	private MailVault policyVault;
+	private String policyConfiguration = "";
+	private MailPolicy.Signals policyBody = new MailPolicy.Signals();
+	private MailPolicy.Result policyResult = new MailPolicy.Result();
 	public String contentType;
 	public String messageID; // as received, trimmed only, probably enclosed with <>, not HTML escaped
 
@@ -102,6 +108,11 @@ class Mail {
 	private final Log _log;
 	
 	public Mail(String uidl) {
+		this(uidl, false);
+	}
+
+	Mail(String uidl, boolean locallySent) {
+		this.locallySent = locallySent;
 		this.uidl = uidl;
 		//formattedSender = unknown;
 		subject = "";
@@ -125,9 +136,14 @@ class Mail {
 
 	public synchronized void setHeader(Buffer rb) {
 		try {
+            if (rb == null) throw new IOException("Message header is unavailable");
 			setHeader(rb, rb.getInputStream(), true);
+			if (rb instanceof VaultFileBuffer) policyVault = ((VaultFileBuffer) rb).vault;
+			policyConfiguration = "";
+			refreshPolicy();
 		} catch (IOException ioe) {
-			// TODO...
+			header = body = null; part = null; headersParsed = false; bodyParseFailed = true;
+            authentication = new DKIMVerifier.Result(DKIMVerifier.State.FAILED, "", "Saved message headers failed a read or integrity check.");
 			if (_log.shouldWarn())
 				_log.warn("Header read error", ioe);
 		}
@@ -166,51 +182,152 @@ class Mail {
          *  @return may be null
          */
 	public synchronized Buffer getBody() {
+		refreshSecurity();
 		return body;
 	}
 
 	public synchronized void setBody(Buffer rb) {
 		if (rb == null)
 			return;
-		// In the common case where we have the body, we only parse the headers once.
-		// we always re-set the header, even if it was non-null before,
-		// as we have to parse them to find the start of the body
-		//if (header == null)
-		//	setHeader(rb);
-		body = rb;
+		// A failed replacement must not leave an old parsed body available.
+		body = null;
+		part = null;
+		bodyParseFailed = false;
+		policyBody = new MailPolicy.Signals();
+		policyConfiguration = "";
+		policyResult = new MailPolicy.Result();
 		boolean success = false;
 		CountingInputStream in = null;
 		try {
 			in = new CountingInputStream(rb.getInputStream());
 			String[] headerLines = setHeader(rb, in, false);
-			// TODO just fail?
 			if (headerLines == null)
-				headerLines = new String[0];
+				throw new IOException("Invalid message headers");
 			part = new MailPart(uidl, new AtomicInteger(), rb, in, in, headerLines);
 			rb.readComplete(true);
 			// may only be available after reading and calling readComplete()
 			size = rb.getLength();
+			body = rb;
+			verificationConfiguration = DKIMVerifier.configurationStamp();
+			authentication = DKIMVerifier.verify(rb, parsedHeaders, senderIdentity,
+				I2PAppContext.getGlobalContext().clock().now() / 1000, !locallySent && !(this instanceof Draft));
+			if (rb instanceof FileBuffer) {
+				java.io.File file = ((FileBuffer) rb).getFile();
+				verifiedFileLength = file.length();
+				verifiedFileTime = file.lastModified();
+			}
+			if (rb instanceof VaultFileBuffer && !(this instanceof Draft)) {
+				policyVault = ((VaultFileBuffer) rb).vault;
+				policyBody = MailPolicy.inspect(part);
+				refreshPolicy();
+			}
 			success = true;
 		} catch (IOException de) {
 			_log.error("Decode error", de);
 		} catch (RuntimeException e) {
 			_log.error("Parse error", e);
 		} finally {
+			if (!success) { body = null; part = null; bodyParseFailed = true; }
 			if (in != null) try { in.close(); } catch (IOException ioe) {}
 			rb.readComplete(success);
 		}
 	}
 
 	public synchronized boolean hasBody() {
+		refreshSecurity();
 		return body != null;
 	}
 
 	public synchronized MailPart getPart() {
+		refreshSecurity();
 		return part;
 	}
 
 	public synchronized boolean hasPart() {
 		return part != null;
+	}
+
+	public synchronized String getSenderAddress() {
+		return senderIdentity != null ? senderIdentity.address : "";
+	}
+
+	public synchronized boolean isReplyRedirected() {
+		SenderIdentity destination = SenderIdentity.parse(reply);
+		return senderIdentity != null && destination != null && !destination.address.equals(senderIdentity.address);
+	}
+
+	public synchronized boolean canReplySafely() {
+		refreshSecurity();
+		return headersParsed && !bodyParseFailed && !policyResult.spam && !ambiguousHeaders && !changedHeaders && !invalidReplyTo && senderIdentity != null
+			&& authentication.state != DKIMVerifier.State.FAILED;
+	}
+
+	public synchronized boolean hasUnsafeContent() {
+		refreshSecurity();
+		return !headersParsed || bodyParseFailed || policyResult.spam || ambiguousHeaders || changedHeaders || authentication.state == DKIMVerifier.State.FAILED;
+	}
+
+	public synchronized DKIMVerifier.Result getAuthentication() { refreshSecurity(); return authentication; }
+
+	private void refreshSecurity() {
+		if (body == null || bodyParseFailed) { refreshPolicy(); return; }
+		if (body instanceof FileBuffer) {
+			java.io.File file = ((FileBuffer) body).getFile();
+			if (file.length() != verifiedFileLength || file.lastModified() != verifiedFileTime) {
+				setBody(body);
+				return;
+			}
+		}
+		String current = DKIMVerifier.configurationStamp();
+		long now = I2PAppContext.getGlobalContext().clock().now() / 1000;
+		if (!current.equals(verificationConfiguration) || now >= authentication.validUntil) {
+			verificationConfiguration = current;
+			authentication = DKIMVerifier.verify(body, parsedHeaders, senderIdentity, now, !locallySent && !(this instanceof Draft));
+		}
+		refreshPolicy();
+	}
+
+	void setPolicyVault(MailVault vault) { policyVault = vault; policyConfiguration = ""; }
+
+	private void refreshPolicy() {
+		if (policyVault == null || locallySent || this instanceof Draft) return;
+		try {
+			AccountSecurity settings = new AccountSecurity(policyVault);
+			String revision = settings.revision();
+			if (!revision.equals(policyConfiguration)) {
+				policyResult = MailPolicy.assess(this, settings, policyBody);
+				policyConfiguration = revision;
+			}
+		} catch (IOException damaged) {
+			policyResult.spam = true;
+			policyResult.reasons.clear();
+			policyResult.reasons.add("Local mail-safety settings could not be read securely.");
+		}
+	}
+
+	public synchronized int getSpamScore() { refreshPolicy(); return policyResult.score; }
+	public synchronized boolean isBlockedSender() { refreshPolicy(); return policyResult.blocked; }
+
+	/** Folder context comes from MailCache, never from an email header. */
+	synchronized void setLocallySent(boolean locallySent) { this.locallySent = locallySent; }
+
+	public synchronized java.util.List<String> getSecurityWarnings() {
+		refreshSecurity();
+		java.util.List<String> warnings = new ArrayList<String>();
+		if (!headersParsed || ambiguousHeaders)
+			warnings.add("This message has missing or conflicting identity headers. Automatic replies are blocked.");
+		if (senderIdentity == null)
+			warnings.add("The sender address is ambiguous or unsupported. Do not rely on the display name.");
+		if (invalidReplyTo)
+			warnings.add("This message has an invalid reply address. Automatic replies are blocked.");
+		if (changedHeaders)
+			warnings.add("The message headers changed since the preview. Automatic replies and inline attachments are blocked.");
+		if (bodyParseFailed)
+			warnings.add("The message structure could not be read safely. Automatic replies and attachments are blocked.");
+		if (SenderIdentity.hasInvisible(sender) || SenderIdentity.hasInvisible(subject))
+			warnings.add("The sender or subject contains hidden formatting characters.");
+		if (policyResult.spam) warnings.addAll(policyResult.reasons);
+		return warnings;
 	}
 
 	/**
@@ -227,7 +344,8 @@ class Mail {
 	}
 
 	public synchronized boolean isSpam() {
-		return isSpam;
+		refreshPolicy();
+		return policyVault == null ? isSpam : policyResult.spam;
 	}
 
 	public synchronized boolean isNew() {
@@ -256,25 +374,7 @@ class Mail {
 	 */
 	public static boolean validateAddress( String address )
 	{
-		if( address == null || address.length() == 0 )
-			return false;
-		
-		address = address.trim();
-		
-		if( address.indexOf('\n') != -1 ||
-				address.indexOf('\r') != -1 )
-			return false;
-		
-		String[] tokens = DataHelper.split(address, "[ \t]+");
-
-		int addresses = 0;
-		
-		for( int i = 0; i < tokens.length; i++ ) {
-			if (PATTERN1.matcher(tokens[i]).matches() ||
-			    PATTERN2.matcher(tokens[i]).matches())
-				addresses++;
-		}
-		return addresses > 0;
+		return SenderIdentity.parse(address) != null;
 	}
 
 	/**
@@ -283,16 +383,8 @@ class Mail {
 	 */
 	public static String getAddress(String address )
 	{
-		String[] tokens = DataHelper.split(address, "[ \t]+");
-
-		for( int i = 0; i < tokens.length; i++ ) {
-			if (PATTERN1.matcher(tokens[i]).matches())
-				return "<" + tokens[i] + ">";
-			if (PATTERN2.matcher(tokens[i]).matches())
-				return tokens[i];
-		}
-		
-		return null;
+		SenderIdentity identity = SenderIdentity.parse(address);
+		return identity != null ? '<' + identity.address + '>' : null;
 	}
 
 	/**
@@ -417,6 +509,13 @@ class Mail {
 	{
 		String[] headerLines = null;
 		error = "";
+		headersParsed = false;
+		authentication = DKIMVerifier.UNVERIFIED;
+		sender = subject = shortSubject = "";
+		shortSender = unknown;
+		reply = contentType = messageID = dateString = null;
+		to = cc = null;
+		senderIdentity = null;
 		if( header != null ) {
 
 			boolean ok = true;
@@ -439,15 +538,16 @@ class Mail {
 				
 				try {
 					EOFOnMatchInputStream eofin = new EOFOnMatchInputStream(in, HEADER_MATCH);
-					MemoryBuffer decoded = new MemoryBuffer(4096);
-					hl.decode(eofin, decoded);
+					MailHeaders incoming = MailHeaders.read(eofin);
 					if (!eofin.wasFound())
-						if (_log.shouldDebug()) _log.debug("EOF hit before \\r\\n\\r\\n in Mail");
-					// Fixme UTF-8 to bytes to UTF-8
-					headerLines = DataHelper.split(new String(decoded.getContent(), decoded.getOffset(), decoded.getLength()), "\r\n");
-					// only do this once
-					if (headersParsed)
-						return headerLines;
+						throw new IOException("Incomplete message headers");
+					headerLines = incoming.decodedLines();
+					if (!(this instanceof Draft) && parsedHeaders != null && !parsedHeaders.raw.equals(incoming.raw))
+						changedHeaders = true;
+					parsedHeaders = incoming;
+					ambiguousHeaders = incoming.ambiguousField() != null;
+					date = null;
+					invalidReplyTo = isSpam = false;
 					for (int j = 0; j < headerLines.length; j++) {
 						String line = headerLines[j];
 						if( line.length() == 0 )
@@ -456,19 +556,6 @@ class Mail {
 						String hlc = line.toLowerCase(Locale.US);
 						if (hlc.startsWith("from:")) {
 							sender = line.substring( 5 ).trim();
-							//formattedSender = getAddress( sender );
-							shortSender = sender.replace("\"", "").trim();
-							int lt = shortSender.indexOf('<');
-							if (lt > 0)
-								shortSender = shortSender.substring(0, lt).trim();
-							else if (lt < 0 && shortSender.contains("@"))
-								shortSender = '<' + shortSender + '>';  // add missing <> (but thunderbird doesn't...)
-							boolean trim = shortSender.length() > 45;
-							if (trim)
-								shortSender = ServletUtil.truncate(shortSender, 42).trim();
-							shortSender = html.encode( shortSender );
-							if (trim)
-								shortSender += "&hellip;";  // must be after html encode
 						}
 						else if (hlc.startsWith("date:")) {
 							dateString = line.substring( 5 ).trim();
@@ -478,16 +565,17 @@ class Mail {
 						}
 						else if (hlc.startsWith("subject:")) {
 							subject = line.substring( 8 ).trim();
-							shortSubject = subject;
+							shortSubject = SenderIdentity.display(subject);
 							boolean trim = subject.length() > 75;
 							if (trim)
-								shortSubject = ServletUtil.truncate(subject, 72).trim();
+								shortSubject = ServletUtil.truncate(shortSubject, 72).trim();
 							shortSubject = html.encode( shortSubject );
 							if (trim)
 								shortSubject += "&hellip;";  // must be after html encode
 						}
 						else if (hlc.startsWith("reply-to:")) {
 							reply = getAddress( line.substring( 9 ).trim() );
+							invalidReplyTo = reply == null;
 						}
 						else if (hlc.startsWith("to:") ) {
 							ArrayList<String> list = new ArrayList<String>();
@@ -540,9 +628,14 @@ class Mail {
 								          " header: " + line.substring(7).trim());
 						}
 					}
+					senderIdentity = SenderIdentity.parse(sender);
+					// Show the actual mailbox in the inbox, where display-name spoofing starts.
+					shortSender = html.encode(senderIdentity != null ? senderIdentity.address : SenderIdentity.display(sender));
 					headersParsed = true;
 				}
 				catch( Exception e ) {
+					headerLines = null;
+					senderIdentity = null;
 					error += "Error parsing mail header: " + e.getClass().getName() + '\n';
 					_log.error("Parse error", e);
 				}		
