@@ -9,11 +9,12 @@
 
 #include <windows.h> 
 #include <stdio.h>   
+#include <string.h>
 #include <malloc.h>
 #include <sys/stat.h>
 
 //BOOL MoveFontPropertiesFile(const char *path);
-void SetWorkingDirectory(char *path);
+static void SetWorkingDirectory(char *path);
 void readOptions(char***, int*);
 //BOOL localJREExists(const char*);
 BOOL exist(const char*);
@@ -47,7 +48,7 @@ main(int argc, char** argv) {
 		readOptions(&read_options, &read_options_size);
 
 		// Construct a new argc & argv to pass to launchJVM
-		new_argc = read_options_size;
+        new_argc = read_options_size + 1;
 		new_argv = (char**)MemAlloc(sizeof(char*) * (new_argc+1));
 
 		// copy process name
@@ -130,8 +131,10 @@ void readOptions(char*** options, int* size) {
 	for(i = 0; i < MAX_OPTIONS && !feof(file); i++) {
 		buffer = (char*)MemAlloc(sizeof(char) * MAX_OPTION_SIZE);
 		// get the next option.
-		if(fgets(buffer, MAX_OPTION_SIZE - 1, file) == NULL)
+        if(fgets(buffer, MAX_OPTION_SIZE - 1, file) == NULL) {
+            free(buffer);
 			break;
+        }
 		// strip off the \n if it exists.
 		currentlen = strlen(buffer);
 		if(currentlen > 0 && buffer[currentlen-1] == '\n') {
