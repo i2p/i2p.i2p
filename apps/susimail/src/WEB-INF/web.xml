@@ -4,11 +4,11 @@
     "http://java.sun.com/j2ee/dtds/web-app_2.2.dtd">
 <web-app>
     <filter>
-        <filter-name>XSSFilter</filter-name>
-        <filter-class>net.i2p.servlet.filters.XSSFilter</filter-class>
+        <filter-name>MailRequestFilter</filter-name>
+        <filter-class>i2p.susi.webmail.MailRequestFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>XSSFilter</filter-name>
+        <filter-name>MailRequestFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
