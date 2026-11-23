@@ -1,10 +1,14 @@
 package net.i2p.servlet.util;
 
-import java.util.Locale;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.http.HttpVersion;
 
 /**
  * Simple utilities for servlets.
@@ -120,9 +124,9 @@ public class ServletUtil {
     }
 
     /**
-     *  Validate Origin header for POST requests.
+     *  Validate Origin for methods other than GET, HEAD, OPTIONS and TRACE.
      *  Allows requests with matching Origin (same-origin), or no Origin header.
-     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *  Rejects opaque, malformed, multiple and cross-origin values.
      *
      *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
      *
@@ -131,15 +135,22 @@ public class ServletUtil {
      *  @since 0.9.70
      */
     public static boolean allowOrigin(Request request) {
-        if (!request.getMethod().toUpperCase(Locale.US).equals("POST"))
+        if (isSafeMethod(request.getMethod()))
             return true;
-        return allowOrigin(request.getHeaders().get("Origin"), request.getHeaders().get("Host"), request.isSecure());
+        if ("cross-site".equals(request.getHeaders().get("Sec-Fetch-Site")))
+            return false;
+        List<String> origins = request.getHeaders().getValuesList("Origin");
+        if (origins.isEmpty())
+            return true;
+        String authority = request.getHttpURI().getAuthority();
+        return origins.size() == 1 && allowOrigin(origins.get(0),
+               authority != null ? authority : request.getHeaders().get("Host"), request.isSecure());
     }
 
     /**
-     *  Validate Origin header for POST requests.
+     *  Validate Origin for methods other than GET, HEAD, OPTIONS and TRACE.
      *  Allows requests with matching Origin (same-origin), or no Origin header.
-     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *  Rejects opaque, malformed, multiple and cross-origin values.
      *
      *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
      *
@@ -148,15 +159,37 @@ public class ServletUtil {
      *  @since 0.9.70
      */
     public static boolean allowOrigin(HttpServletRequest request) {
-        if (!request.getMethod().toUpperCase(Locale.US).equals("POST"))
+        if (isSafeMethod(request.getMethod()))
             return true;
-        return allowOrigin(request.getHeader("Origin"), request.getHeader("Host"), request.isSecure());
+        if ("cross-site".equals(request.getHeader("Sec-Fetch-Site")))
+            return false;
+        Enumeration<String> origins = request.getHeaders("Origin");
+        if (origins == null || !origins.hasMoreElements())
+            return true;
+        String origin = origins.nextElement();
+        return !origins.hasMoreElements() &&
+               allowOrigin(origin, servletAuthority(request), request.isSecure());
+    }
+
+    private static String servletAuthority(HttpServletRequest request) {
+        String protocol = request.getProtocol();
+        if (!HttpVersion.HTTP_2.asString().equals(protocol) && !HttpVersion.HTTP_3.asString().equals(protocol))
+            return request.getHeader("Host");
+        // HTTP/2 and HTTP/3 carry :authority; a Host field is optional.
+        String name = request.getServerName();
+        if (name == null) return null;
+        if (name.indexOf(':') >= 0 && !name.startsWith("[")) name = '[' + name + ']';
+        return name + ':' + request.getServerPort();
+    }
+
+    private static boolean isSafeMethod(String method) {
+        return "GET".equals(method) || "HEAD".equals(method) ||
+               "OPTIONS".equals(method) || "TRACE".equals(method);
     }
 
     /**
-     *  Validate Origin header for POST requests.
-     *  Allows requests with matching Origin (same-origin), or no Origin header.
-     *  Rejects cross-origin POST requests to prevent CSRF attacks.
+     *  Compare parsed scheme, host and effective port, without DNS lookups.
+     *  An Origin is an origin only, without credentials, path, query or fragment.
      *
      *  Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin
      *
@@ -165,81 +198,30 @@ public class ServletUtil {
      */
     private static boolean allowOrigin(String origin, String host, boolean isSecure) {
         if (origin == null || host == null)
-            return true;
-        origin = origin.toLowerCase(Locale.US);
-        host = host.toLowerCase(Locale.US);
-
-        // Origin format: "https://host:port" or "http://host:port"
-        // Or "https://host" or "http://host"
-        // Or "null"
-        if (origin.equals("null"))
-            return true;
-
-        // Host format: "host" or "host:port"
-        // normalize host
-        StringBuilder buf = new StringBuilder(origin.length());
-        buf.append(isSecure ? "https://" : "http://");
-        buf.append(host);
-        // shortcut
-        if (origin.equals(buf.toString()))
-            return true;
-        if (host.contains("]:")) {
-            // ipv6 has port
-        } else if (host.contains("]")) {
-            buf.append(':');
-            buf.append(isSecure ? "443" : "80");
-        } else if (host.contains(":")) {
-            // ipv4 has port
-        } else {
-            buf.append(':');
-            buf.append(isSecure ? "443" : "80");
+            return false;
+        try {
+            URI source = new URI(origin);
+            URI target = new URI((isSecure ? "https://" : "http://") + host);
+            return isOrigin(source) && isOrigin(target) &&
+                   source.getScheme().equalsIgnoreCase(target.getScheme()) &&
+                   source.getHost().equalsIgnoreCase(target.getHost()) &&
+                   originPort(source) == originPort(target);
+        } catch (URISyntaxException invalid) {
+            return false;
         }
-
-        // normalize origin
-        if (origin.contains("]:")) {
-            // ipv6 has port
-        } else if (origin.contains("]")) {
-            origin += ':';
-            origin += (origin.startsWith("https:")) ? "443" : "80";
-        } else if (origin.lastIndexOf(':') > 5) {
-            // ipv4 has port
-        } else {
-            origin += ':';
-            origin += (origin.startsWith("https:")) ? "443" : "80";
-        }
-
-        return origin.equals(buf.toString());
     }
 
-/*
-    public static void main(String[] args) {
-        test("http://localhost", "localhost");
-        test("https://localhost", "localhost");
-        test("http://localhost:80", "localhost");
-        test("https://localhost:443", "localhost");
-        test("http://localhost:80", "localhost:80");
-        test("https://localhost:443", "localhost:443");
-        test("http://1.2.3.4", "localhost");
-        test("https://1.2.3.4", "localhost");
-        test("http://localhost", "localhost:80");
-        test("https://localhost", "localhost:443");
-        test("http://1.2.3.4:99", "localhost");
-        test("https://1.2.3.4:99", "localhost");
-        test("http://[1::2]", "localhost");
-        test("http://[1::2]:99", "localhost");
-        test("http://[1::2]", "[1::2]");
-        test("http://[1::2]:99", "[1::2]");
-        test("http://[1::2]", "[1::2]:80");
-        test("http://[1::2]:99", "[1::2]:99");
-        test("https://[1::2]", "[1::2]:443");
-        test("https://[1::2]:99", "[1::2]:99");
+    private static boolean isOrigin(URI uri) {
+        int port = uri.getPort();
+        return ("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())) &&
+               uri.getHost() != null && uri.getRawUserInfo() == null &&
+               "".equals(uri.getRawPath()) && uri.getRawQuery() == null && uri.getRawFragment() == null &&
+               !uri.getRawAuthority().endsWith(":") &&
+               (port == -1 || (port > 0 && port <= 65535));
     }
 
-    private static void test(String o, String h) {
-        boolean a = allowOrigin(o, h, false);
-        System.out.println("Origin: " + o + " Host: " + h + " Secure? false Allow? " + a);
-        a = allowOrigin(o, h, true);
-        System.out.println("Origin: " + o + " Host: " + h + " Secure? true  Allow? " + a);
+    private static int originPort(URI uri) {
+        int port = uri.getPort();
+        return port >= 0 ? port : ("https".equalsIgnoreCase(uri.getScheme()) ? 443 : 80);
     }
-*/
 }
