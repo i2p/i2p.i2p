@@ -348,7 +348,7 @@ public class WebMail extends HttpServlet
 		 * @since 0.9.13
 		 */
 		public void valueUnbound(HttpSessionBindingEvent event) {
-			if (log.shouldDebug()) log.debug("Session unbound: " + event.getSession().getId());
+			if (log.shouldDebug()) log.debug("Mail session removed");
 			POP3MailBox mbox = mailbox;
 			if (mbox != null) {
 				mbox.destroy();
@@ -1813,6 +1813,7 @@ public class WebMail extends HttpServlet
 	private static void processDraftAttachmentLink(SessionObject sessionObject,
 	                                               RequestWrapper request, HttpServletResponse response)
 	{
+        setNoCacheHeaders(response);
 		String str = request.getParameter(DRAFT_ATTACHMENT);
 		if (str != null) {
 			InputStream in = null;
@@ -1826,7 +1827,6 @@ public class WebMail extends HttpServlet
 							if (ct != null)
 								response.setContentType(ct);
 							response.setContentLength((int) att.getSize());
-							response.setHeader("Cache-Control", "public, max-age=3600");
 							in = att.getData();
 							out = response.getOutputStream();
 							DataHelper.copy(in, out);
@@ -2147,12 +2147,11 @@ public class WebMail extends HttpServlet
 			try {
 				httpSession.setAttribute("sessionObject", sessionObject);
 			} catch (IllegalStateException ise) {}
-			if (_log.shouldDebug()) _log.debug("NEW session " + httpSession.getId());
+			if (_log.shouldDebug()) _log.debug("New mail session");
 		} else {
 			if (_log.shouldDebug()) {
 				try {
-					_log.debug("Existing session " + httpSession.getId() +
-					           " created " + new Date(httpSession.getCreationTime()));
+					_log.debug("Existing mail session created " + new Date(httpSession.getCreationTime()));
 				} catch (IllegalStateException ise) {}
 			}
 		}
@@ -2283,6 +2282,7 @@ public class WebMail extends HttpServlet
 		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
 
 		httpRequest.setCharacterEncoding("UTF-8");
+        setNoCacheHeaders(response);
 		response.setHeader("X-Frame-Options", "SAMEORIGIN");
 		// very strict CSP for HTML emails in iframes
 		if (httpRequest.getParameter(RAW_ATTACHMENT) != null ||
@@ -2362,6 +2362,7 @@ public class WebMail extends HttpServlet
 			// This calls processLogout() which processes the logout button and invalidates sessionobject
 			State oldstate = state;
 			state = processStateChangeButtons(sessionObject, request, isPOST, state);
+            if (oldstate == State.AUTH && sessionObject.mailbox != null) httpRequest.changeSessionId();
 			if (oldstate != State.AUTH && state == State.AUTH) {
 				if (_log.shouldDebug())
 					 _log.debug("OLD state is " + oldstate + " NEW state is AUTH, session invalidated");
@@ -2596,8 +2597,6 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control","no-cache");
 
 			//// Begin output
 
@@ -2924,6 +2923,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
 						 HttpServletResponse response, boolean isRaw)
 	{
+        setNoCacheHeaders(response);
 		boolean shown = false;
 		if(part != null) {
 			Log log = sessionObject.log;
@@ -2938,7 +2938,6 @@ public class WebMail extends HttpServlet
 			}
 			String name2 = FilenameUtil.sanitizeFilename(name);
 			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
-			response.setHeader("Cache-Control", "public, max-age=604800");
 			if (isRaw) {
 				OutputStream out = null;
 				try {
@@ -3009,6 +3008,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
 						 HttpServletResponse response)
 	{
+        setNoCacheHeaders(response);
 		Buffer content = mail.getBody();
 		if(content == null)
 			return false;
@@ -3025,7 +3025,6 @@ public class WebMail extends HttpServlet
 			long sz = mail.getSize();
 			if (sz > 0 && sz <= Integer.MAX_VALUE)
 				response.setContentLength((int) sz);
-			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
 			in = content.getInputStream();
@@ -4273,4 +4272,9 @@ public class WebMail extends HttpServlet
     private static String[] getThemes(I2PAppContext ctx) {
         return THEMES;
     }
+private static void setNoCacheHeaders(HttpServletResponse response) {
+		response.setHeader("Cache-Control", "private, no-store, max-age=0");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", 0);
+	}
 }

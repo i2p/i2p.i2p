@@ -39,6 +39,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.util.ArrayList;
+// Standard RFC 4648 Base64, required for SMTP AUTH. Not net.i2p.data.Base64,
+// whose I2P-specific '-~' alphabet would corrupt the AUTH credential lines.
+import java.util.Base64;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -74,12 +77,6 @@ public class SMTPClient {
 	private boolean supportsPipelining, eightBitMime;
 	private long maxSize = DEFAULT_MAX_SIZE;
 	
-	private static final Encoding base64;
-	
-	static {
-		base64 = EncodingFactory.getEncoding( "base64" );
-	}
-
 	public SMTPClient()
 	{
 		error = "";
@@ -128,7 +125,14 @@ public class SMTPClient {
 	 */
 	private void sendCmdNoWait(String cmd) throws IOException
 	{
-		if (_log.shouldDebug()) _log.debug("SMTP sendCmd(" + cmd +")" );
+		// Commands include AUTH credentials and envelope addresses. Never log them.
+		// getASCII() truncates to eight bits, so validate the actual wire bytes.
+		for (int i = 0; i < cmd.length(); i++) {
+			int c = cmd.charAt(i) & 0xff;
+			if (c < 32 || c == 127)
+				throw new IOException("Invalid SMTP command");
+		}
+		if (_log.shouldDebug()) _log.debug("Sending SMTP command");
 		
 		if( socket == null )
 			throw new IOException("no socket");
@@ -200,7 +204,7 @@ public class SMTPClient {
 			InputStream in = socket.getInputStream();
 			StringBuilder buf = new StringBuilder(128);
 			while (DataHelper.readLine(in, buf)) {
-				if (_log.shouldDebug()) _log.debug("SMTP rcv \"" + buf.toString().trim() + '"');
+				// A server may echo credentials or addresses in its response.
 				int len = buf.length();
 				if (len < 4) {
 					result = 0;
@@ -223,6 +227,7 @@ public class SMTPClient {
 			error += e + "\n";
 			result = 0;
 		}
+		if (_log.shouldDebug()) _log.debug("SMTP response code " + result);
 		lastResponse = fullResponse.toString();
 		return new Result(result, lastResponse);
 	}
@@ -325,8 +330,9 @@ public class SMTPClient {
 				// that includes the user/pass on following lines
 				List<SendExpect> cmds = new ArrayList<SendExpect>();
 				cmds.add(new SendExpect("AUTH LOGIN", 334));
-				cmds.add(new SendExpect(base64.encode(user), 334));
-				cmds.add(new SendExpect(base64.encode(pass), 235));
+				// AUTH responses are single lines, including for long credentials.
+				cmds.add(new SendExpect(Base64.getEncoder().encodeToString(DataHelper.getUTF8(user)), 334));
+				cmds.add(new SendExpect(Base64.getEncoder().encodeToString(DataHelper.getUTF8(pass)), 235));
 				if (sendCmds(cmds) != 3) {
 					error += _t("Login failed") + '\n';
 					ok = false;
