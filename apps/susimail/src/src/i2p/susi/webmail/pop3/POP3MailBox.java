@@ -103,7 +103,7 @@ public class POP3MailBox implements NewMailListener {
 		_context = I2PAppContext.getGlobalContext();
 		_log = _context.logManager().getLog(POP3MailBox.class);
 		if (_log.shouldDebug())
-			_log.debug("Mailbox(" + host + "," + port + "," + user + ",password)");
+			_log.debug("Creating POP3 mailbox");
 		this.host = host;
 		this.port = port;
 		this.user = user;
@@ -953,18 +953,14 @@ public class POP3MailBox implements NewMailListener {
 		if (foo != null) {
 			lastLine = foo;
 			if (lastLine.startsWith("+OK")) {
-				if (cmd.startsWith("PASS"))
-					cmd = "PASS provided";
-				if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") success: \"" + lastLine.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 command succeeded");
 				result = true;
 			} else {
-				if (cmd.startsWith("PASS"))
-					cmd = "PASS provided";
-				if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") FAIL: \"" + lastLine.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 command failed");
 				lastError = lastLine;
 			}
 		} else {
-			if (_log.shouldDebug()) _log.debug("sendCmd1a: (" + cmd + ") NO RESPONSE");
+			if (_log.shouldDebug()) _log.debug("No response to POP3 command");
 			lastError = _t("No response from server");
 			throw new IOException(lastError);
 		}
@@ -1013,13 +1009,13 @@ public class POP3MailBox implements NewMailListener {
 			sr.response = foo.trim();
 			i++;
 			if (!foo.startsWith("+OK")) {
-				if (_log.shouldDebug()) _log.debug("Fail after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 failure after " + i + " of " + cmds.size() + " responses");
 				if (result)
 				    lastError = foo;   // actually the first error, for better info to the user
 				result = false;
 				sr.result = false;
 			} else {
-				if (_log.shouldDebug()) _log.debug("OK after " + i + " of " + cmds.size() + " responses: \"" + foo.trim() + '"');
+				if (_log.shouldDebug()) _log.debug("POP3 success after " + i + " of " + cmds.size() + " responses");
 				switch (sr.mode) {
 				    case A1:
 					sr.result = true;
@@ -1072,13 +1068,14 @@ public class POP3MailBox implements NewMailListener {
          * @since 0.9.13
 	 */
 	private void sendCmd1aNoWait(String cmd) throws IOException {
-		/*
-		 * dont log password
-		 */
-		String msg = cmd;
-		if (msg.startsWith("PASS"))
-			msg = "PASS provided";
-		if (_log.shouldDebug()) _log.debug("sendCmd1a(" + msg + ")");
+		// Credentials must not introduce additional commands or appear in logs.
+		// getASCII() truncates to eight bits, so validate the actual wire bytes.
+		for (int i = 0; i < cmd.length(); i++) {
+			int c = cmd.charAt(i) & 0xff;
+			if (c < 32 || c == 127)
+				throw new IOException("Invalid POP3 command");
+		}
+		if (_log.shouldDebug()) _log.debug("Sending POP3 command");
 		cmd += "\r\n";
 		socket.getOutputStream().write(DataHelper.getASCII(cmd));
 		updateActivity();
