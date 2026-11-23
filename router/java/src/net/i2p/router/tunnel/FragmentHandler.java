@@ -345,7 +345,7 @@ class FragmentHandler {
         long messageId = -1;
         
         if (type == TYPE_TUNNEL) {
-            if (offset + 4 >= preprocessed.length)
+            if (offset + 4 >= length)
                 return -1;
             long id = DataHelper.fromLong(preprocessed, offset, 4);
             // i2pd 2.19 bug? 0 will throw IAE.
@@ -356,7 +356,7 @@ class FragmentHandler {
             offset += 4;
         }
         if ( (type == TYPE_ROUTER) || (type == TYPE_TUNNEL) ) {
-            if (offset + Hash.HASH_LENGTH >= preprocessed.length)
+            if (offset + Hash.HASH_LENGTH >= length)
                 return -1;
             //byte h[] = new byte[Hash.HASH_LENGTH];
             //System.arraycopy(preprocessed, offset, h, 0, Hash.HASH_LENGTH);
@@ -365,7 +365,7 @@ class FragmentHandler {
             offset += Hash.HASH_LENGTH;
         }
         if (fragmented) {
-            if (offset + 4 >= preprocessed.length)
+            if (offset + 4 >= length)
                 return -1;
             messageId = DataHelper.fromLong(preprocessed, offset, 4);
             if (_log.shouldLog(Log.DEBUG))
@@ -376,15 +376,22 @@ class FragmentHandler {
             offset += 4;
         }
         if (extended) {
+            if (offset >= length)
+                return -1;
             int extendedSize = preprocessed[offset] & 0xff;
             offset++;
             offset += extendedSize; // we don't interpret these yet, but skip them for now
         }
         
-        if (offset + 2 >= preprocessed.length)
+        if (offset + 2 >= length)
             return -1;
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
+
+        // Check the payload before allocating reassembly state.
+        if (size <= 0 || size > length - offset ||
+            (fragmented && size > FragmentedMessage.MAX_FRAGMENT_SIZE))
+            return -1;
         
         if (type == TYPE_UNDEF) {
             // do this after the above since we have to return offset
@@ -466,6 +473,8 @@ class FragmentHandler {
     private int receiveSubsequentFragment(byte preprocessed[], int offset, int length) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("subsequent begins at " + offset + " for " + length);
+        if (length - offset < 7)
+            return -1;
         int fragmentNum = ((preprocessed[offset] & MASK_FRAGMENT_NUM) >>> 1);
         boolean isLast = (0 != (preprocessed[offset] & 1));
         offset++;
@@ -475,6 +484,11 @@ class FragmentHandler {
         
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
+
+        // Fragment zero uses the initial fragment encoding.
+        if (fragmentNum == 0 || size <= 0 || size > length - offset ||
+            size > FragmentedMessage.MAX_FRAGMENT_SIZE)
+            return -1;
         
         if (messageId < 0)
             throw new RuntimeException("Preprocessed message was invalid [messageId =" + messageId + " size=" 
