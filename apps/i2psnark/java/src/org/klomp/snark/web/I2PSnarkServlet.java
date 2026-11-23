@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -44,6 +45,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.servlet.RequestWrapper;
+import net.i2p.servlet.filters.XSSRequestWrapper;
 import net.i2p.servlet.util.ServletUtil;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -420,8 +422,8 @@ public class I2PSnarkServlet extends BasicServlet {
             }
         }
 
-        String newURL = req.getParameter("newURL");
-        if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
+        String newURL = getAddURL(req);
+        if (newURL.length() > 0)
             _manager.addMessage(_t("Click \"Add torrent\" button to fetch torrent"));
         out.write("<div id=\"page\" class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
 
@@ -2553,13 +2555,22 @@ public class I2PSnarkServlet extends BasicServlet {
         return buf.toString();
     }
 
+    private static String getAddURL(HttpServletRequest req) {
+        if (!"GET".equals(req.getMethod()))
+            return "";
+        String url = req.getParameter("nofilter_newURL");
+        if (url == null || url.trim().length() == 0) {
+            // Legacy links predate the nofilter_ name. This value is only shown
+            // in the HTML-escaped input, never passed to a download action here.
+            ServletRequest original = req instanceof XSSRequestWrapper ?
+                    ((XSSRequestWrapper) req).getRequest() : req;
+            url = original.getParameter("newURL");
+        }
+        return url != null ? url.trim() : "";
+    }
+
     private void writeAddForm(PrintWriter out, HttpServletRequest req, String nonce) throws IOException {
-        // display incoming parameter if a GET so links will work
-        String newURL = req.getParameter("nofilter_newURL");
-        if (newURL == null || newURL.trim().length() <= 0 || req.getMethod().equals("POST"))
-            newURL = "";
-        else
-            newURL = DataHelper.stripHTML(newURL);    // XSS
+        String newURL = DataHelper.escapeHTML(getAddURL(req));
 
         out.write("<div id=\"add\" class=\"snarkNewTorrent\">\n" +
                   "<form action=\"_post\" method=\"POST\" enctype=\"multipart/form-data\" accept-charset=\"UTF-8\">\n");
