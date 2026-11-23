@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +22,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
 import net.i2p.I2PAppContext;
@@ -32,6 +32,7 @@ import static net.i2p.app.ClientAppState.*;
 import net.i2p.crypto.KeyStoreUtil;
 import net.i2p.data.DataHelper;
 import net.i2p.jetty.I2PLogger;
+import net.i2p.jetty.WebServerPolicy;
 import net.i2p.router.RouterContext;
 import net.i2p.router.app.RouterApp;
 import net.i2p.router.news.NewsManager;
@@ -62,6 +63,7 @@ import org.eclipse.jetty.security.UserIdentity;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.NetworkConnectionLimit;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.Handler;
@@ -75,6 +77,7 @@ import org.eclipse.jetty.server.Session;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.QoSHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.resource.URLResourceFactory;
@@ -140,10 +143,12 @@ public class RouterConsoleRunner implements RouterApp {
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
                                         "Usage: [[port host[,host]] [-s sslPort [host[,host]]] [webAppsDir]]";
 
-    /** this is for the handlers only. We will adjust for the connectors and acceptors below. */
+    /** Application threads only; connector and reserved threads are added below. */
     private static final int MIN_THREADS = 1;
-    /** this is for the handlers only. We will adjust for the connectors and acceptors below. */
+    /** Application threads only; connector and reserved threads are added below. */
     private static final int MAX_THREADS = 24;
+    private static final int RESERVED_THREADS = 1;
+    private static final int MAX_CONNECTIONS = 128;
     private static final int MAX_IDLE_TIME = 90*1000;
     private static final String THREAD_NAME = "RouterConsole Jetty";
     public static final String PROP_DTG_ENABLED = "desktopgui.enabled";
@@ -408,43 +413,21 @@ public class RouterConsoleRunner implements RouterApp {
     }
 
     /**
-     *  http://irc.codehaus.org/display/JETTY/Porting+to+jetty6
+     *  Start the console and its webapps using Jetty's asynchronous connectors.
+     *  Host and origin checks precede request admission, which leaves worker
+     *  threads available for I/O and callback completion during overload.
      *
-     *<pre>
-     *	Server
-     *		HandlerCollection
-     *			HostCheckHandler (extends GzipHandler)
-     *				ContextHandlerCollection
-     *					LocaleWebAppHandler (routerconsole)
-     *						SessionHandler
-     *						SecurityHandler
-     *						ServletHandler
-     *							servlets...
-     *					WebAppContext (i2psnark)
-     *					WebAppContext (i2ptunnel)
-     *					WebAppContext (imagegen)
-     *					WebAppContext (susidns)
-     *					WebAppContext (susimail)
-     *					WebAppContext (for each plugin with a .war)
-     *			DefaultHandler
-     *			RequestLogHandler (opt)
-     *</pre>
-     *
-     *  Porting to Jetty 9:
-     *
-     *  http://dev.eclipse.org/mhonarc/lists/jetty-dev/msg01952.html
-     *  You are missing a few facts about Jetty 9.1 ...
-     *  First, there are no longer any blocking connectors.
-     *  Its all async / nio connectors now. (mainly because that's the direction that the servlet api 3.1 is taking)
-     *
-     *  Next, there is only 1 connector.   The ServerConnector.
-     *  However, it takes 1 or more ConnectionFactory implementations to know how to handle the incoming connection.
-     *  We have factories for HTTP (0.9 thru 1.1), SPDY, SSL-http, and SSL-npn so far.
-     *  This list of factories will expand as the future of connectivity to web servers is ever growing (think HTTP/2)
-     *
-     *  Use the embedded examples for help understanding this.
-     *  http://git.eclipse.org/c/jetty/org.eclipse.jetty.project.git/tree/examples/embedded/src/main/java/org/eclipse/jetty/embedded/ManyConnectors.java?id=jetty-9.1.0.RC0
-     *
+     * <pre>
+     * Server (optional request log; global network connection limit)
+     *   Handler.Sequence
+     *     HostCheckHandler (also handles gzip and HTTPS redirects)
+     *       QoSHandler
+     *         ContextHandlerCollection
+     *           LocaleWebAppHandler (routerconsole)
+     *             WebAppContext (sessions, security, servlets)
+     *           WebAppContext (each bundled or plugin webapp)
+     *     DefaultHandler
+     * </pre>
      */
     public void startConsole() {
         File workDir = new SecureDirectory(_context.getTempDir(), "jetty-work");
@@ -461,48 +444,27 @@ public class RouterConsoleRunner implements RouterApp {
         // http://dev.eclipse.org/mhonarc/lists/jetty-users/msg03487.html
         //_server.setGracefulShutdown(1000);
 
-        // In Jetty 6, QTP was not concurrent, so we switched to
-        // ThreadPoolExecutor with a fixed-size queue, a set maxThreads,
-        // and a RejectedExecutionPolicy of CallerRuns.
-        // Unfortunately, CallerRuns causes lockups in Jetty NIO (ticket #1395)
-        // In addition, no flavor of TPE gives us what QTP does:
-        // - TPE direct handoff (which we were using) never queues.
-        //   This doesn't provide any burst management when maxThreads is reached.
-        //   CallerRuns was an attempt to work around that.
-        // - TPE unbounded queue does not adjust the number of threads.
-        //   This doesn't provide automatic resource management.
-        // - TPE bounded queue does not add threads until the queue is full.
-        //   This doesn't provide good responsiveness to even small bursts.
-        // QTP adds threads as soon as the queue is non-empty.
-        // QTP as of Jetty 7 uses concurrent.
-        // QTP unbounded queue is the default in Jetty.
-        // So switch back to QTP with a bounded queue.
-        //
-        // ref:
-        // http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ThreadPoolExecutor.html
-        // https://wiki.eclipse.org/Jetty/Howto/High_Load
-        //
-        //try {
-        //    ThreadPool ctp = new CustomThreadPoolExecutor();
-        //    // Gone in Jetty 7
-        //    //ctp.prestartAllCoreThreads();
-        //    _server.setThreadPool(ctp);
-        //} catch (Throwable t) {
-            // class not found...
-            //System.out.println("INFO: Jetty concurrent ThreadPool unavailable, using QueuedThreadPool");
-            LinkedBlockingQueue<Runnable> lbq = new LinkedBlockingQueue<Runnable>(4*MAX_THREADS);
-            // min and max threads will be reset below
-            QueuedThreadPool qtp = new QueuedThreadPool(MAX_THREADS, MIN_THREADS, MAX_IDLE_TIME, lbq);
-            qtp.setName(THREAD_NAME);
-            qtp.setDaemon(true);
-            _server = new Server(qtp);
-        //}
+        // Jetty must be able to queue internal I/O and completion tasks even under
+        // load. Limit HTTP requests with QoSHandler, never with the worker queue.
+        // Min and max threads are adjusted below for the connector threads.
+        QueuedThreadPool qtp = new QueuedThreadPool(MAX_THREADS, MIN_THREADS, MAX_IDLE_TIME);
+        qtp.setReservedThreads(RESERVED_THREADS);
+        qtp.setName(THREAD_NAME);
+        qtp.setDaemon(true);
+        _server = new Server(qtp);
 
         Handler.Sequence hColl = new Handler.Sequence();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
         HostCheckHandler chCollWrapper = new HostCheckHandler(_context);
-        chCollWrapper.setHandler(chColl);
-        _server.setHandler(hColl);
+        QoSHandler requestLimit = new QoSHandler(chColl);
+        requestLimit.setMaxRequestCount(MAX_THREADS / 2);
+        requestLimit.setMaxSuspendedRequestCount(4 * MAX_THREADS);
+        requestLimit.setMaxSuspend(Duration.ofSeconds(5));
+        chCollWrapper.setHandler(requestLimit);
+        _server.setHandler(WebServerPolicy.protect(hColl,
+                _context.getProperty("routerconsole.requestsPerSecond", 64),
+                _context.getProperty("routerconsole.requestBurst", 128), 128L * 1024 * 1024));
+        _server.setStopTimeout(5000);
         hColl.addHandler(chCollWrapper);
         hColl.addHandler(new DefaultHandler());
 
@@ -542,6 +504,7 @@ public class RouterConsoleRunner implements RouterApp {
         List<Connector> connectors = new ArrayList<Connector>(4);
         try {
             int boundAddresses = 0;
+            int connectorThreads = 0;
             SortedSet<String> addresses = Addresses.getAllAddresses();
             boolean hasIPV4 = addresses.contains("0.0.0.0");
             boolean hasIPV6 = addresses.contains("0:0:0:0:0:0:0:0");
@@ -580,8 +543,11 @@ public class RouterConsoleRunner implements RouterApp {
                             if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                         }
                         HttpConfiguration httpConfig = new HttpConfiguration();
-                        // number of acceptors, (default) number of selectors
-                        ServerConnector lsnr = new ServerConnector(_server, 1, 0,
+                        httpConfig.setSendServerVersion(false);
+                        httpConfig.setSendXPoweredBy(false);
+                        httpConfig.setMinRequestDataRate(128);
+                        // One acceptor and one selector, matching the thread budget below.
+                        ServerConnector lsnr = new ServerConnector(_server, 1, 1,
                                                                    new HttpConnectionFactory(httpConfig));
                         //lsnr.setUseDirectBuffers(false);  // default true seems to be leaky
                         lsnr.setHost(host);
@@ -590,6 +556,7 @@ public class RouterConsoleRunner implements RouterApp {
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
                         //_server.addConnector(lsnr);
                         connectors.add(lsnr);
+                        connectorThreads += 2;
                         boundAddresses++;
                         hosts.add(host);
                     } catch (Exception ioe) {
@@ -668,11 +635,14 @@ public class RouterConsoleRunner implements RouterApp {
                                 if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
                             }
                             HttpConfiguration httpConfig = new HttpConfiguration();
+                            httpConfig.setSendServerVersion(false);
+                            httpConfig.setSendXPoweredBy(false);
+                            httpConfig.setMinRequestDataRate(128);
                             httpConfig.setSecureScheme("https");
                             httpConfig.setSecurePort(sslPort);
                             httpConfig.addCustomizer(new SecureRequestCustomizer());
-                            // number of acceptors, (default) number of selectors
-                            ServerConnector ssll = new ServerConnector(_server, 1, 0,
+                            // One acceptor and one selector, matching the thread budget below.
+                            ServerConnector ssll = new ServerConnector(_server, 1, 1,
                                                                        new SslConnectionFactory(sslFactory, "http/1.1"),
                                                                        new HttpConnectionFactory(httpConfig));
                             //sssll.setUseDirectBuffers(false);  // default true seems to be leaky
@@ -682,6 +652,7 @@ public class RouterConsoleRunner implements RouterApp {
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
                             //_server.addConnector(ssll);
                             connectors.add(ssll);
+                            connectorThreads += 2;
                             boundAddresses++;
                             hosts.add(host);
                         } catch (Exception e) {
@@ -709,10 +680,10 @@ public class RouterConsoleRunner implements RouterApp {
                 System.err.println("Unable to bind routerconsole to any address on port " + _listenPort + (sslPort > 0 ? (" or SSL port " + sslPort) : ""));
                 return;
             }
-            // Each address spawns a Connector and an Acceptor thread
-            // If the min is less than this, we have no thread for the handlers or the expiration thread.
-            qtp.setMinThreads(MIN_THREADS + (2 * boundAddresses));
-            qtp.setMaxThreads(MAX_THREADS + (2 * boundAddresses));
+            // Each TCP listener leases one acceptor and one selector.
+            // Account for the explicitly configured reserved thread as well.
+            qtp.setMinThreads(MIN_THREADS + connectorThreads + RESERVED_THREADS);
+            qtp.setMaxThreads(MAX_THREADS + connectorThreads + RESERVED_THREADS);
 
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
@@ -762,6 +733,8 @@ public class RouterConsoleRunner implements RouterApp {
             }
         }
         chCollWrapper.setListenHosts(listenHosts);
+        // These connectors are started after the server, so pass them explicitly.
+        _server.addBean(new NetworkConnectionLimit(MAX_CONNECTIONS, connectors.toArray(new Connector[connectors.size()])));
 
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=364936
         // WARN:oejw.WebAppContext:Failed startup of context o.e.j.w.WebAppContext{/,jar:file:/.../webapps/routerconsole.war!/},/.../webapps/routerconsole.war

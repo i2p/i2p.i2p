@@ -59,31 +59,19 @@
     <!-- =========================================================== -->
     <Arg>
 
-      <!-- PICK ONE -->
-
       <!--
-           Recommended.
-           Two threads are used for the Connector and Acceptor.
-           Concurrent requests above maxThreads + queue size - 2 will be rejected and logged.
-           Due to the way QTP works, queue size should be larger than maxThreads.
-           Increase all values for high-traffic eepsites.
-
-           ref:
-           https://wiki.eclipse.org/Jetty/Howto/High_Load
-           http://trac.i2p2.i2p/ticket/1395
+           Keep Jetty's internal task queue unbounded so asynchronous I/O and
+           completion tasks can always run. QoSHandler below bounds requests
+           instead. One acceptor, one selector and one reserved thread leave
+           capacity for application work. An HTTPS connector leases two more.
+           Increase the thread and request limits together for busy sites.
+           https://jetty.org/docs/jetty/12/programming-guide/arch/threads.html
        -->
       <New class="org.eclipse.jetty.util.thread.QueuedThreadPool">
-        <Arg type="int">20</Arg>     <!-- maxThreads, overridden below -->
-        <Arg type="int">3</Arg>      <!-- minThreads, overridden below -->
-        <Arg type="int">60000</Arg>  <!-- maxIdleTimeMs, overridden below -->
-        <Arg>
-           <New class="java.util.concurrent.LinkedBlockingQueue">
-              <Arg type="int">40</Arg>
-           </New>
-        </Arg>
-        <Set name="minThreads">3</Set>
-        <Set name="maxThreads">20</Set>
-        <Set name="idleTimeout">60000</Set>
+        <Arg type="int"><Property name="jetty.threads.max" default="20"/></Arg>
+        <Arg type="int"><Property name="jetty.threads.min" default="4"/></Arg>
+        <Arg type="int"><Property name="jetty.threads.idleTimeout" default="60000"/></Arg>
+        <Set name="reservedThreads">1</Set>
         <Set name="daemon">true</Set>
         <Set name="name">Eepsite Jetty</Set>
       </New>
@@ -97,19 +85,13 @@
     <!-- One of each type!                                           -->
     <!-- =========================================================== -->
 
-    <!-- Use this connector for many frequently idle connections
-         and for threadless continuations.
-         Not recommended on Java 5 - comment this out, and uncomment the
-         SocketConnector below.
-         Do not use for gij or JamVM - comment this out, and uncomment the
-         SocketConnector below.
-    -->
+    <!-- Non-blocking networking with a predictable connector thread budget. -->
     <Call name="addConnector">
       <Arg>
           <New class="org.eclipse.jetty.server.ServerConnector">
             <Arg><Ref refid="Server" /></Arg>
             <Arg type="int">1</Arg>     <!-- number of acceptors -->
-            <Arg type="int">0</Arg>     <!-- default number of selectors -->
+            <Arg type="int">1</Arg>     <!-- number of selectors -->
             <Arg>
               <Array type="org.eclipse.jetty.server.ConnectionFactory">    <!-- varargs so we need an array -->
                 <Item>
@@ -119,6 +101,7 @@
                         <Set name="sendServerVersion">false</Set>
                         <Set name="sendDateHeader">false</Set>
                         <Set name="sendXPoweredBy">false</Set>
+                        <Set name="minRequestDataRate"><Property name="jetty.http.minRequestDataRate" default="16"/></Set>
                       </New>
                     </Arg>
                   </New>
@@ -127,8 +110,19 @@
             </Arg>
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
-            <Set name="idleTimeout">600000</Set>
+            <Set name="idleTimeout"><Property name="jetty.http.idleTimeout" default="120000"/></Set>
           </New>
+      </Arg>
+    </Call>
+
+    <!-- Bound open connections, including clients that have not sent headers.
+         This is a global limit, since I2P tunnel clients share a loopback IP. -->
+    <Call name="addBean">
+      <Arg>
+        <New class="org.eclipse.jetty.server.NetworkConnectionLimit">
+          <Arg type="int"><Property name="jetty.connectionLimit" default="256"/></Arg>
+          <Arg><Ref refid="Server"/></Arg>
+        </New>
       </Arg>
     </Call>
 
@@ -160,7 +154,27 @@
       </New>
     </Set>
     <Set name="handler">
-      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+      <Call class="net.i2p.jetty.WebServerPolicy" name="protect">
+        <Arg>
+          <!-- Waiting requests consume no worker thread. Reject excess requests
+               and expired waits with 503, leaving capacity for Jetty's I/O work. -->
+          <New id="RequestLimit" class="org.eclipse.jetty.server.handler.QoSHandler">
+            <Set name="maxRequestCount"><Property name="jetty.qos.maxRequestCount" default="12"/></Set>
+            <Set name="maxSuspendedRequestCount"><Property name="jetty.qos.maxSuspendedRequestCount" default="64"/></Set>
+            <Set name="maxSuspend">
+              <Call class="java.time.Duration" name="ofMillis">
+                <Arg type="long"><Property name="jetty.qos.maxSuspendMillis" default="10000"/></Arg>
+              </Call>
+            </Set>
+            <Set name="handler">
+              <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+            </Set>
+          </New>
+        </Arg>
+        <Arg type="double"><Property name="jetty.requestsPerSecond" default="64"/></Arg>
+        <Arg type="int"><Property name="jetty.requestBurst" default="128"/></Arg>
+        <Arg type="long"><Property name="jetty.maxRequestBytes" default="134217728"/></Arg>
+      </Call>
     </Set>
 
     <!-- =============================================================== -->
@@ -337,6 +351,6 @@
     <!-- extra options                                               -->
     <!-- =========================================================== -->
     <Set name="stopAtShutdown">true</Set>
-    <Set name="stopTimeout">1000</Set>
+    <Set name="stopTimeout"><Property name="jetty.stopTimeout" default="5000"/></Set>
 
 </Configure>
