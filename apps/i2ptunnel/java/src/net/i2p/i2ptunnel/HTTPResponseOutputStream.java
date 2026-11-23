@@ -253,7 +253,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             if (valLen == 0)
                                 val = "";
                             else
-                                val = DataHelper.getUTF8(data, j+2, valLen).trim();
+                                val = DataHelper.getUTF8(data, j+1, valLen).trim();
                             
                             if (_log.shouldInfo())
                                 _log.info("Response header [" + key + "] = [" + val + "]");

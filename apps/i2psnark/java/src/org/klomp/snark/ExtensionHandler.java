@@ -223,6 +223,15 @@ abstract class ExtensionHandler {
 
             MagnetState state = peer.getMagnetState();
             if (type == TYPE_REQUEST) {
+                // BW check. Assume 16 KB here
+                // shouldSend calls uploaded() if rv is true
+                if (!peer.canRequestMetadata() ||
+                    !peer.shouldSend(MagnetState.CHUNK_SIZE)) {
+                    if (log.shouldWarn())
+                        log.debug("Rejecting request for " + piece + " from: " + peer);
+                    sendReject(peer, piece);
+                    return;
+                }
                 if (log.shouldLog(Log.DEBUG))
                     log.debug("Got request for " + piece + " from: " + peer);
                 byte[] pc;
@@ -232,8 +241,6 @@ abstract class ExtensionHandler {
                     totalSize = state.getSize();
                 }
                 sendPiece(peer, piece, pc, totalSize);
-                // Do this here because PeerConnectionOut only reports for PIECE messages
-                peer.uploaded(pc.length);
             } else if (type == TYPE_DATA) {
                 // On close reading of BEP 9, this is the total metadata size.
                 // Prior to 0.9.21, we sent the piece size, so we can't count on it.
@@ -291,11 +298,9 @@ abstract class ExtensionHandler {
         sendMessage(peer, TYPE_REQUEST, piece);
     }
 
-  /****
     private static void sendReject(Peer peer, int piece) {
         sendMessage(peer, TYPE_REJECT, piece);
     }
-  ****/
 
     /** REQUEST and REJECT are the same except for message type */
     private static void sendMessage(Peer peer, int type, int piece) {

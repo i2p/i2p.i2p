@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -14,6 +15,7 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleTimer2;
@@ -133,19 +135,20 @@ class FragmentHandler {
      * sending the resulting I2NPMessages where necessary.  The received 
      * fragments are all verified.
      *
+     * @param preprocessed data must start at index 0
      * @return ok (false if corrupt)
      */
-    public boolean receiveTunnelMessage(byte preprocessed[], int offset, int length) {
-        boolean ok = verifyPreprocessed(preprocessed, offset, length);
+    public boolean receiveTunnelMessage(byte preprocessed[], int length) {
+        boolean ok = verifyPreprocessed(preprocessed, length);
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to verify preprocessed data (pre.length=" 
-                          + preprocessed.length + " off=" +offset + " len=" + length);
+                          + preprocessed.length + " len=" + length);
             _cache.release(new ByteArray(preprocessed));
             _context.statManager().addRateData("tunnel.corruptMessage", 1);
             return false;
         }
-        offset += HopProcessor.IV_LENGTH; // skip the IV
+        int offset = HopProcessor.IV_LENGTH; // skip the IV
         offset += 4; // skip the hash segment
         int padding = 0;
         while (preprocessed[offset] != (byte)0x00) {
@@ -225,8 +228,10 @@ class FragmentHandler {
      * very wasteful of memory usage as it doesn't operate inline (since IV and
      * payload are mixed up).  Later it may be worthwhile to explore optimizing
      * this.
+     *
+     * @param preprocessed data must start at index 0
      */
-    private boolean verifyPreprocessed(byte preprocessed[], int offset, int length) {
+    private boolean verifyPreprocessed(byte preprocessed[], int length) {
         // ByteCache/ByteArray corruption detection
         //byte[] orig = new byte[length];
         //System.arraycopy(preprocessed, 0, orig, 0, length);
@@ -236,13 +241,14 @@ class FragmentHandler {
 
         // now we need to verify that the message was received correctly
         int paddingEnd = HopProcessor.IV_LENGTH + 4;
-        while (preprocessed[offset+paddingEnd] != (byte)0x00) {
+        while (preprocessed[paddingEnd] != (byte)0x00) {
             paddingEnd++;
-            if (offset+paddingEnd >= length) {
+            if (paddingEnd >= length) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("cannot verify, going past the end [off=" 
-                              + offset + " len=" + length + " paddingEnd="
-                              + paddingEnd + ']');
+                    _log.warn("cannot verify, going past the end [len="
+                              + length + " paddingEnd="
+                              + paddingEnd + " data: "
+                              + Base64.encode(preprocessed, 0, length));
                 return false;
             }
         }
@@ -250,8 +256,8 @@ class FragmentHandler {
         
         ByteArray ba = _validateCache.acquire(); // larger than necessary, but always sufficient
         byte preV[] = ba.getData();
-        int validLength = length - offset - paddingEnd + HopProcessor.IV_LENGTH;
-        System.arraycopy(preprocessed, offset + paddingEnd, preV, 0, validLength - HopProcessor.IV_LENGTH);
+        int validLength = length - paddingEnd + HopProcessor.IV_LENGTH;
+        System.arraycopy(preprocessed, paddingEnd, preV, 0, validLength - HopProcessor.IV_LENGTH);
         System.arraycopy(preprocessed, 0, preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
@@ -260,12 +266,14 @@ class FragmentHandler {
         _context.sha().calculateHash(preV, 0, validLength, v, 0);
         _validateCache.release(ba);
         
-        boolean eq = DataHelper.eq(v, 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
+        boolean eq = DataHelper.eq(v, 0, preprocessed, HopProcessor.IV_LENGTH, 4);
         if (!eq) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Corrupt tunnel message - verification fails: padding="
-                           + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
-                           + " offset=" + offset + " length=" + length);
+                _log.warn("Corrupt tunnel message - verification fails: " + Base64.encode(preprocessed, HopProcessor.IV_LENGTH, 4)
+                           + " != " + Base64.encode(v, 0, 4));
+                _log.warn("No matching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
+                           + " length=" + length + " paddingEnd=" + paddingEnd + ' '
+                           + Base64.encode(preprocessed, 0, length), new Exception("trace"));
             }
         }
         SimpleByteCache.release(v);
@@ -380,9 +388,9 @@ class FragmentHandler {
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
 
-        // Validate before creating reassembly state. A rejected first fragment
-        // would otherwise occupy a slot without ever scheduling its timeout.
-        if (size <= 0 || size > length - offset)
+        // Check the payload before allocating reassembly state.
+        if (size <= 0 || size > length - offset ||
+            (fragmented && size > FragmentedMessage.MAX_FRAGMENT_SIZE))
             return -1;
         
         if (type == TYPE_UNDEF) {
@@ -463,10 +471,10 @@ class FragmentHandler {
      * @throws RuntimeException
      */
     private int receiveSubsequentFragment(byte preprocessed[], int offset, int length) {
-        if (length - offset < 7)
-            return -1;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("subsequent begins at " + offset + " for " + length);
+        if (length - offset < 7)
+            return -1;
         int fragmentNum = ((preprocessed[offset] & MASK_FRAGMENT_NUM) >>> 1);
         boolean isLast = (0 != (preprocessed[offset] & 1));
         offset++;
@@ -477,9 +485,9 @@ class FragmentHandler {
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
 
-        // Fragment zero uses the initial-fragment encoding. Reject invalid
-        // follow-ons before inserting an unscheduled FragmentedMessage.
-        if (fragmentNum <= 0 || size <= 0 || size > length - offset)
+        // Fragment zero uses the initial fragment encoding.
+        if (fragmentNum == 0 || size <= 0 || size > length - offset ||
+            size > FragmentedMessage.MAX_FRAGMENT_SIZE)
             return -1;
         
         if (messageId < 0)
@@ -561,7 +569,11 @@ class FragmentHandler {
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (I2NPMessageException ime) {
             if (_log.shouldWarn()) {
-                _log.warn("Error receiving fragmented message (corrupt?): " + msg);
+                _log.warn("Error receiving fragmented message (corrupt?): " + msg, ime);
+                if (_log.shouldInfo()) {
+                    _log.info("DUMP:\n" + HexDump.dump(data));
+                    _log.info("RAW:\n" + Base64.encode(data));
+                }
             }
         }
     }
@@ -595,7 +607,9 @@ class FragmentHandler {
             _receiver.receiveComplete(m, router, tunnelId);
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Error receiving unfragmented message (corrupt?), size=" + len);
+                _log.warn("Error receiving unfragmented message (corrupt?)", ime);
+                _log.warn("DUMP:\n" + HexDump.dump(data, offset, len));
+                _log.warn("RAW:\n" + Base64.encode(data, offset, len));
             }
         }
     }

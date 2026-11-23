@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
@@ -99,6 +100,7 @@ public class Peer implements Comparable<Peer>, BandwidthListener
   private int _maxPipeline = PeerState.MIN_PIPELINE;
   private long connected;
   private long pexLastSent;
+  private final AtomicInteger _metadataRequests = new AtomicInteger();
 
   /**
    * Outgoing connection.
@@ -934,5 +936,19 @@ public class Peer implements Comparable<Peer>, BandwidthListener
    */
   public void setPexLastSent(long now) {
       pexLastSent = now;
+  }
+
+  /**
+   * Can the peer request metadata from us?
+   * Limit as recommended by BEP 9.
+   *
+   * @since 0.9.72
+   */
+  public boolean canRequestMetadata() {
+      if (metainfo == null)
+          return false;
+      // limit to 3 requests per chunk, as this is called before the BW limit check
+      int max = Math.max(4, metainfo.getInfoBytesLength() * 3 / MagnetState.CHUNK_SIZE);
+      return _metadataRequests.incrementAndGet() <= max;
   }
 }

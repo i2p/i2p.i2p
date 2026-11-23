@@ -54,7 +54,7 @@ class OutboundTunnelEndpoint {
                 _log.warn("Invalid IV, dropping at OBEP " + _config);
             return;
         }
-        ok = _handler.receiveTunnelMessage(data, 0, data.length);
+        ok = _handler.receiveTunnelMessage(data, data.length);
         if (!ok) {
             // blame previous hop
             Hash h = _config.getReceiveFrom();

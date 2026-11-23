@@ -988,7 +988,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 // end first line processing
 
                 } else {
-                    if (lowercaseLine.startsWith("connection: ")) {
+                    if (lowercaseLine.startsWith("connection:")) {
                         if (lowercaseLine.contains("upgrade")) {
                             // pass through for websocket
                             preserveConnectionHeader = true;
@@ -1004,26 +1004,26 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 keepalive = false;
                             continue;
                         }
-                    } else if (lowercaseLine.startsWith("keep-alive: ") ||
-                               lowercaseLine.startsWith("proxy-connection: ")) {
+                    } else if (lowercaseLine.startsWith("keep-alive:") ||
+                               lowercaseLine.startsWith("proxy-connection:")) {
                         if (lowercaseLine.contains("close"))
                             keepalive = false;
                         continue;
-                    } else if (lowercaseLine.startsWith("host: ") && !usingWWWProxy && !usingInternalOutproxy) {
+                    } else if (lowercaseLine.startsWith("host:") && !usingWWWProxy && !usingInternalOutproxy) {
                         // Note that we only pass the original Host: line through to the outproxy
                         // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
                         if (_log.shouldDebug()) {
                             _log.debug(getPrefix(requestId) + "Setting host = " + host);
                         }
-                    } else if(lowercaseLine.startsWith("user-agent: ")) {
+                    } else if(lowercaseLine.startsWith("user-agent:")) {
                         // save for deciding whether to offer address book form
-                        userAgent = lowercaseLine.substring(12);
+                        userAgent = lowercaseLine.substring(11).trim();
                         if(!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT))) {
                             line = null;
                             continue;
                         }
-                    } else if(lowercaseLine.startsWith("accept: ")) {
+                    } else if(lowercaseLine.startsWith("accept:")) {
                         if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
                             // Replace with a standard one if possible
                             boolean html = lowercaseLine.indexOf("text/html") > 0;
@@ -1044,15 +1044,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // strip the accept-blah headers, as they vary dramatically from
                         // browser to browser
                         // But allow Accept-Encoding: gzip, deflate
-                        if (lowercaseLine.startsWith("accept-encoding: ")) {
+                        if (lowercaseLine.startsWith("accept-encoding:")) {
                             allowGzip = lowercaseLine.contains("gzip");
                         } else if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_ACCEPT))) {
                             line = null;
                             continue;
                         }
-                    } else if (lowercaseLine.startsWith("referer: ")) {
+                    } else if (lowercaseLine.startsWith("referer:")) {
                         // save for address helper form below
-                        referer = line.substring(9);
+                        referer = line.substring(8).trim();
                         if (!Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_REFERER))) {
                             try {
                                 // Either strip or rewrite the referer line
@@ -1081,25 +1081,25 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 continue; // completely strip the line
                             }
                         } // else allow
-                    } else if(lowercaseLine.startsWith("via: ") &&
+                    } else if(lowercaseLine.startsWith("via:") &&
                             !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_VIA))) {
                         //line = "Via: i2p";
                         line = null;
                         continue; // completely strip the line
-                    } else if(lowercaseLine.startsWith("from: ")) {
+                    } else if(lowercaseLine.startsWith("from:")) {
                         //line = "From: i2p";
                         line = null;
                         continue; // completely strip the line
-                    } else if(lowercaseLine.startsWith("authorization: ntlm ")) {
+                    } else if(lowercaseLine.startsWith("authorization:") && lowercaseLine.contains("ntlm")) {
                         // Block Windows NTLM after 401
                         line = null;
                         continue;
-                    } else if(lowercaseLine.startsWith("proxy-authorization: ")) {
+                    } else if(lowercaseLine.startsWith("proxy-authorization:")) {
                         // This should be for us. It is a
                         // hop-by-hop header, and we definitely want to block Windows NTLM after a far-end 407.
                         // Response to far-end shouldn't happen, as we
                         // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
-                        authorization = line.substring(21);  // "proxy-authorization: ".length()
+                        authorization = line.substring(20).trim();  // "proxy-authorization:".length()
                         line = null;
                         continue;
                     } else if(lowercaseLine.startsWith("icy")) {

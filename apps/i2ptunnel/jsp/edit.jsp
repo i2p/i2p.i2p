@@ -1,5 +1,5 @@
 <%
-    String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
+    String cspNonce = Long.toHexString(net.i2p.util.RandomSource.getInstance().nextLong());
 
     response.setHeader("X-Frame-Options", "SAMEORIGIN");
     // edit pages need script for the delete button 'are you sure'

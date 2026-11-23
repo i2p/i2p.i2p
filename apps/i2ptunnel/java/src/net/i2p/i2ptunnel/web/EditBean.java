@@ -389,7 +389,7 @@ public class EditBean extends IndexBean {
     
     /** all proxy auth @since 0.8.2 */
     public boolean getProxyAuth(int tunnel) {
-        return _helper.getProxyAuth(tunnel) != "false";
+        return Boolean.parseBoolean(_helper.getProxyAuth(tunnel));
     }
     // TODO think
     public boolean getOutproxyAuth(int tunnel) {

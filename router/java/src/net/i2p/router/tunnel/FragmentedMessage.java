@@ -33,7 +33,7 @@ class FragmentedMessage {
     private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     // 64 is pretty absurd, 32 is too, most likely
     private static final int MAX_FRAGMENTS = 64;
-    private static final int MAX_FRAGMENT_SIZE = 996;
+    static final int MAX_FRAGMENT_SIZE = 996;
     
     public FragmentedMessage(I2PAppContext ctx, long messageId) {
         _context = ctx;

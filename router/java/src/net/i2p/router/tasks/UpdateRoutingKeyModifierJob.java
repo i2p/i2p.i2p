@@ -36,10 +36,15 @@ public class UpdateRoutingKeyModifierJob extends JobImpl {
         RouterKeyGenerator gen = getContext().routerKeyGenerator();
         // make sure we requeue quickly if just before midnight
         long delay = Math.max(5, Math.min(MAX_DELAY_FAILSAFE, gen.getTimeTillMidnight()));
-        // tell netdb if mod data changed
-        boolean changed = gen.generateDateBasedModData();
-        if (changed)
-            getContext().netDb().routingKeyChanged();
+        try {
+            // tell netdb if mod data changed
+            boolean changed = gen.generateDateBasedModData();
+            if (changed)
+                getContext().netDb().routingKeyChanged();
+        } catch (Throwable t) {
+            // make sure it always gets requeued
+            _log.error("URKMJ", t);
+        }
         requeue(delay);
     }
 }

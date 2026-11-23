@@ -466,7 +466,7 @@ abstract class IRCFilter {
         String type = args[0];
         boolean haveIP = true;
         // no IP in these, replace port only
-        if (type == "RESUME" || type == "ACCEPT") {
+        if (type.equals("RESUME") || type.equals("ACCEPT")) {
             haveIP = false;
         } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_IN) {
@@ -558,7 +558,7 @@ abstract class IRCFilter {
         String type = args[0];
         boolean haveIP = true;
         // no IP in these, replace port only
-        if (type == "RESUME" || type == "ACCEPT") {
+        if (type.equals("RESUME") || type.equals("ACCEPT")) {
             haveIP = false;
         } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_OUT) {
@@ -566,6 +566,7 @@ abstract class IRCFilter {
                     return pfx + msg + (char) 0x01;
                 return pfx + msg;
             }
+            return null;
         }
         if (helper == null || !helper.isEnabled())
             return null;

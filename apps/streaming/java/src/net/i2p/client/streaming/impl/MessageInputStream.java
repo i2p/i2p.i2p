@@ -113,7 +113,7 @@ class MessageInputStream extends InputStream {
     /**
      *  Determine if this packet will fit in our buffering limits.
      *
-     *  Always returns true for zero payloadSize and dups, even if locally closed.
+     *  Always returns true for zero payloadSize and dups (within window limits), even if locally closed.
      *  Returns false if there is no room, OR it's not a dup and the stream has been closed on
      *  the read side with close().
      *  If this returns false, you probably want to call isLocallyClosed() to find out why.
@@ -123,12 +123,14 @@ class MessageInputStream extends InputStream {
      *         and we can efficiently do several checks
      */
     public boolean canAccept(long messageId, int payloadSize) { 
-        if (payloadSize <= 0)
-            return true;
         synchronized (_dataLock) {
             // ready dup check
             // we always allow sequence numbers less than or equal to highest received
             if (messageId <= _highestReadyBlockId)
+                return true;
+            if (messageId > _highestReadyBlockId + _maxWindowSize)
+                return false;
+            if (payloadSize <= 0)
                 return true;
             // We do this after the above dup check.
             if (_locallyClosed) {
@@ -181,7 +183,7 @@ class MessageInputStream extends InputStream {
      * past the highest ready ID and below the highest received message 
      * ID.  This may return null if there are no such IDs.
      *
-     * @return array of message ID holes, or null if none
+     * @return array of message ID holes, 255 max, or null if none
      */
     public long[] getNacks() {
         synchronized (_dataLock) {
@@ -198,6 +200,8 @@ class MessageInputStream extends InputStream {
                 if (ids == null)
                     ids = new ArrayList<Long>(4);
                 ids.add(l);
+                if (ids.size() >= 255)
+                    break;
             }
         }
         if (ids != null) {
@@ -362,16 +366,22 @@ class MessageInputStream extends InputStream {
                 }
                 _dataLock.notifyAll();
             } else {
+                Long id = Long.valueOf(messageId);
+                if (_notYetReadyBlocks.containsKey(id)) {
+                    if (_log.shouldInfo())
+                        _log.info("ignoring dup message " + messageId);
+                    return false;
+                }
                 // _notYetReadyBlocks size is limited in canAccept()
                 if (_locallyClosed) {
                     if (_log.shouldInfo())
                         _log.info("Message received on closed stream: " + messageId);
                     // dont need the payload, just the msgId in order
-                    _notYetReadyBlocks.put(Long.valueOf(messageId), DUMMY_BA);
+                    _notYetReadyBlocks.put(id, DUMMY_BA);
                 } else {
                     if (_log.shouldInfo())
                         _log.info("Message is out of order: " + messageId);
-                    _notYetReadyBlocks.put(Long.valueOf(messageId), payload);
+                    _notYetReadyBlocks.put(id, payload);
                 }
             }
         }

@@ -916,12 +916,12 @@ public class EepGet {
             pusher.start();
         }
 
-        int remaining = (int)_bytesRemaining;
+        long remaining = _bytesRemaining;
         byte buf[] = new byte[16*1024];
         while (_keepFetching && ( (remaining > 0) || !strictSize ) && !_aborted) {
             int toRead = buf.length;
             if (strictSize && toRead > remaining)
-                toRead = remaining;
+                toRead = (int) remaining;
             int read = _proxyIn.read(buf, 0, toRead);
             if (read == -1)
                 break;
@@ -937,7 +937,7 @@ public class EepGet {
                 if (char1 == '\r') {
                     int char2 = _proxyIn.read();
                     if (char2 == '\n') {
-                        remaining = (int) readChunkLength();
+                        remaining = readChunkLength();
                     } else {
                         _out.write(char1);
                         _out.write(char2);
@@ -1273,6 +1273,8 @@ public class EepGet {
                 case '\r':
                     nl++;
                 default:
+                    if (buf.length() >= 16)
+                        throw new IOException("Invalid chunk length [" + buf + "]");
                     buf.append((char)cur);
             }
             
@@ -1285,6 +1287,8 @@ public class EepGet {
             long bytes = Long.parseLong(len, 16);
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Chunked length: " + bytes);
+            if (bytes < 0)
+                throw new IOException("Invalid chunk length [" + len + "]");
             return bytes;
         } catch (NumberFormatException nfe) {
             throw new IOException("Invalid chunk length [" + len + "]");
@@ -1526,7 +1530,7 @@ public class EepGet {
             buf.append("\r\n");
         }
         if (post)
-            buf.append("Content-length: ").append(_postData.length()).append("\r\n");
+            buf.append("Content-length: ").append(DataHelper.getUTF8(_postData).length).append("\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("Accept-Encoding: ");
         // as of 0.9.23, the proxy passes the Accept-Encoding header through

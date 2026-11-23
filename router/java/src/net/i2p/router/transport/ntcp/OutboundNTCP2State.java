@@ -407,14 +407,14 @@ class OutboundNTCP2State implements EstablishState {
             _received = 0;
         }
 
-        // Read in the padding for message #2
-        if (_state == State.OB_GOT_HXY && src.hasRemaining()) {
-            int toGet = Math.min(src.remaining(), _padlen2 - _received);
-            src.get(_tmp, _received, toGet);
-            _received += toGet;
-            if (_received < _padlen2)
-                return;
+        // Read in the padding (if any) for message #2
+        if (_state == State.OB_GOT_HXY && (src.hasRemaining() || _padlen2 == 0)) {
             if (_padlen2 > 0) {
+                int toGet = Math.min(src.remaining(), _padlen2 - _received);
+                src.get(_tmp, _received, toGet);
+                _received += toGet;
+                if (_received < _padlen2)
+                    return;
                 _handshakeState.mixHash(_tmp, 0, _padlen2);
                 if (_log.shouldDebug())
                     _log.debug("After mixhash padding " + _padlen2 + " msg 2: " + _handshakeState.toString());

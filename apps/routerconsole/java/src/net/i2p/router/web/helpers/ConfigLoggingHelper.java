@@ -81,7 +81,7 @@ public class ConfigLoggingHelper extends HelperBase {
     }
 
     /** these are translated in the core bundle */
-    private static final String[] levels = { "CRIT", "ERROR", "WARN", "INFO", "DEBUG" };
+    private static final String[] levels = { "CRIT", "ERROR", "WARN", "INFO"  /* , "DEBUG" */  };
 
     public String getDefaultLogLevelBox() {
         StringBuilder buf = new StringBuilder(128);

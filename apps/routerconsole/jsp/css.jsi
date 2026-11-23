@@ -35,7 +35,7 @@
 
    response.setHeader("Accept-Ranges", "none");
 
-   String cspNonce = Integer.toHexString(net.i2p.util.RandomSource.getInstance().nextInt());
+   String cspNonce = Long.toHexString(net.i2p.util.RandomSource.getInstance().nextLong());
 
    // clickjacking
    if (intl.shouldSendXFrame()) {

@@ -323,10 +323,7 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
                 }
 
                 buf.append(addr);
-                buf.append(" - ");
-                String user = request.getHttpURI().getUser();
-                buf.append((user == null)? " - " : user);
-                buf.append(" [");
+                buf.append(" -  -  [");
                 if (_logDateCache!=null)
                     buf.append(_logDateCache.format(Request.getTimeStamp(request)));
                 else

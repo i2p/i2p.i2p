@@ -166,7 +166,7 @@ public abstract class GatewayITBase extends RouterITBase {
             
             handleAtEndpoint(encrypted);
             
-            _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
+            _handler.receiveTunnelMessage(encrypted, encrypted.length);
             return -1; // or do we need to return the real message ID?
         }        
         

@@ -46,12 +46,12 @@ public class DechunkedOutputStream extends LimitOutputStream {
                         _remaining <<= 4;
                         _remaining |= c - '0';
                     } else if (c >= 'a' && c <= 'f') {
-                        if (_remaining >= 0x800000)
+                        if (_remaining >= 0x8000000)
                             throw new IOException("Chunk length too big");
                         _remaining <<= 4;
                         _remaining |= 10 + c - 'a';
                     } else if (c >= 'A' && c <= 'F') {
-                        if (_remaining >= 0x800000)
+                        if (_remaining >= 0x8000000)
                             throw new IOException("Chunk length too big");
                         _remaining <<= 4;
                         _remaining |= 10 + c - 'A';
