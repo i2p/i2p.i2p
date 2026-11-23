@@ -122,6 +122,10 @@ class MessageOutputStream extends OutputStream {
     
     @Override
     public void write(byte b[], int off, int len) throws IOException {
+        if (b == null)
+            throw new NullPointerException();
+        if (off < 0 || len < 0 || off > b.length - len)
+            throw new IndexOutOfBoundsException();
         if (_closed.get()) throw new IOException("Output stream closed");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("write(b[], " + off + ", " + len + ") ");
