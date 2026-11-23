@@ -1,28 +1,26 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <!--
-#
-# If you have a 'split' directory installation, with configuration
-# files in ~/.i2p (Linux), %LOCALAPPDATA%\I2P (Windows),
-# or /Users/(user)/Library/Application Support/i2p (Mac), be sure to
-# edit the file in the configuration directory, NOT the install directory.
-# When running as a Linux daemon, the configuration directory is /var/lib/i2p
-# and the install directory is /usr/share/i2p .
-# When running as a Windows service, the configuration directory is \ProgramData\i2p
-# and the install directory is \Program Files\i2p .
-#
+  Replace this file in your configuration directory's eepsite/docroot with your
+  own content. Remove the refresh below when you replace this welcome page.
+  In split installations, edit the configuration copy, not the install copy:
+  Linux: ~/.i2p/eepsite/docroot/ or /var/lib/i2p/i2p-config/eepsite/docroot/
+  Windows: %LOCALAPPDATA%\I2P\eepsite\docroot\
+  macOS: ~/Library/Application Support/i2p/eepsite/docroot/
 -->
 <head>
-<!--
-  *  Remove the following three lines to stop redirecting to the help page.
-  *  If it continues to redirect:
-  *    1) Make sure you edited the correct file (see above)
-  *    2) Clear your browser's cache.
- -->
-<meta http-equiv="refresh" content="1;url=/help/" />
-<meta http-equiv="pragma" content="no-cache">
-<meta http-equiv="cache-control" content="no-cache">
-<title>I2P Anonymous Webserver</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="refresh" content="0;url=/help/">
+  <title>I2P Webserver</title>
+  <link rel="stylesheet" href="/help/lib/eepsite.css">
 </head>
 <body>
+  <main class="main">
+    <h1>Your I2P webserver is ready</h1>
+    <p><a href="/help/">Open the setup guide</a> to publish your site.</p>
+  </main>
 </body>
 </html>
