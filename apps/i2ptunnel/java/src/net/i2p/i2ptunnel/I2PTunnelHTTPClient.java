@@ -193,6 +193,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             "The request uses a bad protocol. " +
             "The I2P HTTP Proxy supports HTTP and HTTPS requests only. Other protocols such as FTP are not allowed.<BR>";
 
+    private final static String ERR_BAD_QUERY =
+            "HTTP/1.1 400 Bad Request\r\n" +
+            "Content-Type: text/plain; charset=UTF-8\r\n" +
+            "Connection: close\r\n\r\n" +
+            "Invalid address-helper encoding";
+
     private final static String ERR_BAD_URI =
             "HTTP/1.1 403 Bad URI\r\n" +
             "Content-Type: text/html; charset=iso-8859-1\r\n" +
@@ -699,7 +705,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             boolean ahelperConflict = false;
 
                             // Try to find an address helper in the query
-                            String[] helperStrings = removeHelper(query);
+                            final String[] helperStrings;
+                            try {
+                                helperStrings = removeHelper(query);
+                            } catch (IllegalArgumentException iae) {
+                                // Invalid helper bytes must not enter the helper cache.
+                                out.write(ERR_BAD_QUERY.getBytes("UTF-8"));
+                                reader.drain();
+                                return;
+                            }
                             if(helperStrings != null &&
                                     !Boolean.parseBoolean(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER))) {
                                 query = helperStrings[0];
@@ -1872,8 +1886,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 if(valstart < 0) {
                     key = query.substring(keystart, i);
                 }
-                String decodedKey = LocalHTTPServer.decode(key);
-                if(decodedKey.equals(HELPER_PARAM)) {
+                String decodedKey;
+                try {
+                    decodedKey = LocalHTTPServer.decode(key);
+                } catch (IllegalArgumentException iae) {
+                    // An opaque remote query key cannot identify our ASCII helper.
+                    // Leave unrelated query bytes unchanged for the destination.
+                    decodedKey = null;
+                }
+                if(HELPER_PARAM.equals(decodedKey)) {
                     String newQuery = keystart > 0 ? query.substring(0, keystart - 1) : "";
                     if(i < query.length() - 1) {
                         if(keystart > 0) {
