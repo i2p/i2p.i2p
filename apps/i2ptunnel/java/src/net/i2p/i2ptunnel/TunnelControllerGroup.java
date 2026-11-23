@@ -54,6 +54,8 @@ public class TunnelControllerGroup implements ClientApp {
     private final ReadWriteLock _controllersLock;
     // locking: this
     private boolean _controllersLoaded;
+    /** Invalidates delayed bulk restarts. Guarded by this. */
+    private long _restartGeneration;
     private final String _configFile;
     private final String _configDirectory;
 
@@ -551,6 +553,7 @@ public class TunnelControllerGroup implements ClientApp {
      *
      */
     public synchronized void unloadControllers() {
+        _restartGeneration++;
         if (!_controllersLoaded)
             return;
 
@@ -609,6 +612,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels generate when stopped
      */
     public synchronized List<String> stopAllControllers() {
+        _restartGeneration++;
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
@@ -645,6 +649,7 @@ public class TunnelControllerGroup implements ClientApp {
      * @return list of messages the tunnels generate when started
      */
     public synchronized List<String> startAllControllers() {
+        _restartGeneration++;
         List<String> msgs = new ArrayList<String>();
         _controllersLock.readLock().lock();
         try {
@@ -662,24 +667,55 @@ public class TunnelControllerGroup implements ClientApp {
     }
 
     /**
-     * Restart all tunnels.
+     * Stop all tunnels, then start them in the background after the sockets
+     * have had time to close. Independent tunnel starts may proceed in parallel.
+     * A subsequent bulk stop, start, reload or restart cancels the delayed start.
      * Side effect - clears all messages from all controllers.
      *
-     * @return list of messages the tunnels generate when restarted
+     * @return messages generated while stopping; startup messages arrive later
      */
     public synchronized List<String> restartAllControllers() {
-        List<String> msgs = new ArrayList<String>();
+        List<String> msgs = stopAllControllers();
+        final List<TunnelController> controllers;
+        final Map<TunnelController, Long> generations = new HashMap<TunnelController, Long>();
         _controllersLock.readLock().lock();
         try {
-            for (TunnelController controller : _controllers) {
-                controller.restartTunnel();
-                msgs.addAll(controller.clearMessages());
-            }
-            if (_log.shouldLog(Log.INFO))
-                _log.info(_controllers.size() + " controllers restarted");
+            controllers = new ArrayList<TunnelController>(_controllers);
+            for (TunnelController controller : controllers)
+                generations.put(controller, Long.valueOf(controller.getLifecycleGeneration()));
         } finally {
             _controllersLock.readLock().unlock();
         }
+        if (controllers.isEmpty())
+            return msgs;
+        final long generation = _restartGeneration;
+        new I2PAppThread(new Runnable() {
+            public void run() {
+                // Retain restartTunnel()'s socket-settling delay, once per batch.
+                try {
+                    Thread.sleep(_context.isRouterContext() ? 100 : 500);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                synchronized (TunnelControllerGroup.this) {
+                    if (generation != _restartGeneration)
+                        return;
+                    _controllersLock.readLock().lock();
+                    try {
+                        Set<TunnelController> current = new HashSet<TunnelController>(_controllers);
+                        for (TunnelController controller : controllers) {
+                            if (current.contains(controller))
+                                controller.startTunnelBackground(generations.get(controller).longValue());
+                        }
+                    } finally {
+                        _controllersLock.readLock().unlock();
+                    }
+                }
+            }
+        }, "Restart tunnels", true).start();
+        if (_log.shouldLog(Log.INFO))
+            _log.info(controllers.size() + " controllers restarting");
         return msgs;
     }
 
