@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+<!-- Optional direct UDP HTTP/3. Load after jetty.xml and jetty-ssl.xml.
+     Install the matching optional HTTP/3 runtime jars first. This is not a
+     QUIC transport inside I2P streaming tunnels. The PEM directory stores an
+     exported private key and is restricted to its owner by Http3Support. -->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+  <Call class="net.i2p.jetty.Http3Support" name="configure">
+    <Arg><Ref refid="Server"/></Arg>
+    <Arg><Ref refid="sslContextFactory"/></Arg>
+    <Arg><Property name="jetty.quic.host" default="127.0.0.1"/></Arg>
+    <Arg type="int"><Property name="jetty.quic.port" default="7668"/></Arg>
+    <Arg><Property name="jetty.quic.pemDirectory" default="./eepsite/keys/quic"/></Arg>
+    <Arg type="int"><Property name="jetty.quic.maxSessions" default="128"/></Arg>
+  </Call>
+</Configure>
