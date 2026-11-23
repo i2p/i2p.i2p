@@ -296,7 +296,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             // replay check using encrypted key
             if (!_transport.isHXHIValid(_X)) {
                 _context.statManager().addRateData("ntcp.replayHXxorBIH", 1);
-                fail("Replay msg 1, eX = " + Base64.encode(_X, 0, KEY_SIZE));
+                failInboundMsg1(src, "Replay msg 1", null);
                 return;
             }
 
@@ -306,7 +306,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
             System.arraycopy(_X, KEY_SIZE - IV_SIZE, _prevEncrypted, 0, IV_SIZE);
             _context.aes().decrypt(_X, 0, _X, 0, bobHash, _transport.getNTCP2StaticIV(), KEY_SIZE);
             if (DataHelper.eqCT(_X, 0, ZEROKEY, 0, KEY_SIZE)) {
-                fail("Bad msg 1, X = 0");
+                failInboundMsg1(src, "Bad msg 1, X = 0", null);
                 return;
             }
             // PQ marker or fast MSB check for key < 2^255
@@ -317,20 +317,32 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                     _X[KEY_SIZE - 1] &= (byte) 0x7f;
                 } else {
                     // same probing resistance strategy as below
-                    _padlen1 = _context.random().nextInt(PADDING1_FAIL_MAX) - src.remaining();
-                    if (_padlen1 > 0) {
-                        if (_log.shouldWarn())
-                            _log.warn("Bad PK msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " with " + src.remaining() +
-                                      " more bytes, waiting for " + _padlen1 + " more bytes");
-                        changeState(State.IB_NTCP2_READ_RANDOM);
-                    } else {
-                        fail("Bad PK msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " remaining = " + src.remaining());
-                    }
+                    failInboundMsg1(src, "Bad PK msg 1", null);
                     _transport.getPumper().blockIP(_con.getRemoteIP());
                     return;
                 }
             }
             _con.setVersion(_version);
+        }
+    }
+
+    /**
+     * Reject message 1 without replying or a deterministic immediate close.
+     * Use the existing random byte budget and handshake timeout; no further
+     * cryptographic work is performed. Count coalesced bytes only once.
+     */
+    private void failInboundMsg1(ByteBuffer src, String reason, Exception cause) {
+        int budget = _context.random().nextInt(PADDING1_FAIL_MAX);
+        int consumed = Math.min(src.remaining(), budget);
+        src.position(src.position() + consumed);
+        _padlen1 = budget - consumed;
+        _received = 0;
+        if (_padlen1 > 0) {
+            if (_log.shouldWarn())
+                _log.warn(reason + ", waiting for " + _padlen1 + " more bytes", cause);
+            changeState(State.IB_NTCP2_READ_RANDOM);
+        } else {
+            fail(reason, cause);
         }
     }
 
@@ -392,19 +404,7 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
                     _log.debug("After start: " + _handshakeState.toString());
                 _handshakeState.readMessage(_X, 0, MSG1_SIZE + extralen, options, 0);
             } catch (GeneralSecurityException gse) {
-                // Read a random number of bytes, store wanted in _padlen1
-                _padlen1 = _context.random().nextInt(PADDING1_FAIL_MAX) - src.remaining();
-                if (_padlen1 > 0) {
-                    // delayed fail for probing resistance
-                    // need more bytes before failure
-                    if (_log.shouldWarn())
-                        _log.warn("Bad msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " with " + src.remaining() +
-                                  " more bytes, waiting for " + _padlen1 + " more bytes", gse);
-                    changeState(State.IB_NTCP2_READ_RANDOM);
-                } else {
-                    // got all we need, fail now
-                    fail("Bad msg 1, X = " + Base64.encode(_X, 0, KEY_SIZE) + " remaining = " + src.remaining(), gse);
-                }
+                failInboundMsg1(src, "Bad msg 1", gse);
                 _transport.getPumper().blockIP(_con.getRemoteIP());
                 return;
             } catch (RuntimeException re) {
@@ -480,13 +480,15 @@ class InboundEstablishState extends EstablishBase implements NTCP2Payload.Payloa
         // delayed fail for probing resistance
         if (_state == State.IB_NTCP2_READ_RANDOM && src.hasRemaining()) {
             // read more bytes before failing
-            _received += src.remaining();
+            int consumed = Math.min(src.remaining(), _padlen1 - _received);
+            src.position(src.position() + consumed);
+            _received += consumed;
             if (_received < _padlen1) {
                 if (_log.shouldWarn())
-                    _log.warn("Bad msg 1, got " + src.remaining() +
+                    _log.warn("Bad msg 1, got " + consumed +
                               " more bytes, waiting for " + (_padlen1 - _received) + " more bytes");
             } else {
-                fail("Bad msg 1, failing after getting " + src.remaining() + " more bytes");
+                fail("Bad msg 1, failing after getting " + consumed + " more bytes");
             }
             return;
         }
