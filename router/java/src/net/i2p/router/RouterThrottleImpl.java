@@ -419,7 +419,10 @@ public class RouterThrottleImpl implements RouterThrottle {
                           + " est = " + bytesAllocated);
         } else {
             // limit at 90% - 4KBps (see above)
-            float maxBps = (maxKBps * 1024f * 0.9f) - MIN_AVAILABLE_BPS;
+            // Measure fullness against the bandwidth offered to participating
+            // tunnels, bounded by the existing total-bandwidth reserve.
+            float maxBps = Math.min((float) (maxKBps * 1024 * share),
+                                   (maxKBps * 1024f * 0.9f) - MIN_AVAILABLE_BPS);
             float pctFull = (maxBps - availBps) / (maxBps);
             if (pctFull < 0.83f) {
                 // probReject < ~5%
