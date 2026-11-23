@@ -1,0 +1,440 @@
+{
+  "date": "2026-11-11",
+  "junit": {
+    "tests": 553,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "routerJunit": {
+    "tests": 178,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "scala": {
+    "passed": 46,
+    "pending": 1
+  },
+  "runs": {
+    "normal": {
+      "mode": "normal",
+      "started": "2026-11-11T08:12:56.702296518Z",
+      "lastSample": "2026-11-11T08:19:12.280706550Z",
+      "elapsedSeconds": 375,
+      "samples": 26,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/normal/i2p-live-artifacts-0j2qz3g4/lib/router.jar",
+        "sha256": "e2d03531f5b0ce6c34e61e63e7f84d61cd9b1e8ac42872f1e791eb1fcb7f695a"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/normal/i2p-live-artifacts-0j2qz3g4/lib/i2p.jar",
+        "sha256": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6"
+      },
+      "observedStatuses": [
+        "DIFFERENT",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 18,
+      "maxKnownRouters": 152,
+      "maxSSU2Peers": 12,
+      "maxPublishedIntroducers": 3,
+      "maxAvailableIntroducerTags": 9,
+      "firstBothTwoHopTunnelSeconds": 15,
+      "samplesWithBothTwoHopTunnels": 8,
+      "exploratoryBuildSuccesses": 11,
+      "exploratoryBuildRejections": 2,
+      "exploratoryBuildTimeouts": 72,
+      "exploratorySuccessEventSharePercent": 12.94,
+      "tunnelRoundtripSuccesses": 17,
+      "averageTunnelRoundtripMs": 659.11767578125,
+      "averageTestedRemoteHops": 1.1764705181121826,
+      "outboundUDPEstablishments": 14,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 3,
+      "introducedPeerProbesAttempted": 3,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 169252,
+      "outboundBytes": 278009,
+      "jarSha256": {
+        "i2p.jar": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6",
+        "router.jar": "e2d03531f5b0ce6c34e61e63e7f84d61cd9b1e8ac42872f1e791eb1fcb7f695a",
+        "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+        "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+        "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+        "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+      },
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0
+      },
+      "phase": "before-symmetric-adjacency-refinement"
+    },
+    "ntcp2": {
+      "mode": "ntcp2-only",
+      "started": "2026-11-11T08:11:58.650108367Z",
+      "lastSample": "2026-11-11T08:18:14.123454639Z",
+      "elapsedSeconds": 375,
+      "samples": 26,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/ntcp2/i2p-live-artifacts-sq4d94m5/lib/router.jar",
+        "sha256": "e2d03531f5b0ce6c34e61e63e7f84d61cd9b1e8ac42872f1e791eb1fcb7f695a"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/ntcp2/i2p-live-artifacts-sq4d94m5/lib/i2p.jar",
+        "sha256": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6"
+      },
+      "observedStatuses": [
+        "OK",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 9,
+      "maxKnownRouters": 142,
+      "maxSSU2Peers": 0,
+      "maxPublishedIntroducers": 0,
+      "maxAvailableIntroducerTags": 0,
+      "firstBothTwoHopTunnelSeconds": 15,
+      "samplesWithBothTwoHopTunnels": 25,
+      "exploratoryBuildSuccesses": 13,
+      "exploratoryBuildRejections": 0,
+      "exploratoryBuildTimeouts": 3,
+      "exploratorySuccessEventSharePercent": 81.25,
+      "tunnelRoundtripSuccesses": 37,
+      "averageTunnelRoundtripMs": 650.0270385742188,
+      "averageTestedRemoteHops": 1.5405404567718506,
+      "outboundUDPEstablishments": 0,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 0,
+      "introducedPeerProbesAttempted": 0,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 150231,
+      "outboundBytes": 175032,
+      "jarSha256": {
+        "i2p.jar": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6",
+        "router.jar": "e2d03531f5b0ce6c34e61e63e7f84d61cd9b1e8ac42872f1e791eb1fcb7f695a",
+        "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+        "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+        "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+        "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+      },
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0
+      },
+      "phase": "before-symmetric-adjacency-refinement"
+    },
+    "final-normal": {
+      "mode": "normal",
+      "started": "2026-11-11T08:20:19.890549808Z",
+      "lastSample": "2026-11-11T08:23:35.568968183Z",
+      "elapsedSeconds": 195,
+      "samples": 14,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/final-normal/i2p-live-artifacts-vnoxva63/lib/router.jar",
+        "sha256": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/final-normal/i2p-live-artifacts-vnoxva63/lib/i2p.jar",
+        "sha256": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6"
+      },
+      "observedStatuses": [
+        "DIFFERENT",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 12,
+      "maxKnownRouters": 130,
+      "maxSSU2Peers": 10,
+      "maxPublishedIntroducers": 3,
+      "maxAvailableIntroducerTags": 7,
+      "firstBothTwoHopTunnelSeconds": 90,
+      "samplesWithBothTwoHopTunnels": 8,
+      "exploratoryBuildSuccesses": 8,
+      "exploratoryBuildRejections": 3,
+      "exploratoryBuildTimeouts": 38,
+      "exploratorySuccessEventSharePercent": 16.33,
+      "tunnelRoundtripSuccesses": 16,
+      "averageTunnelRoundtripMs": 626.5625,
+      "averageTestedRemoteHops": 1.5,
+      "outboundUDPEstablishments": 11,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 0,
+      "introducedPeerProbesAttempted": 0,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 59720,
+      "outboundBytes": 107442,
+      "jarSha256": {
+        "i2p.jar": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6",
+        "router.jar": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e",
+        "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+        "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+        "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+        "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+      },
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0
+      },
+      "phase": "final",
+      "metricsFile": "nat-followup-20261111-final-normal-metrics.jsonl"
+    },
+    "final-ntcp2": {
+      "mode": "ntcp2-only",
+      "started": "2026-11-11T08:20:19.906485689Z",
+      "lastSample": "2026-11-11T08:23:35.547123989Z",
+      "elapsedSeconds": 195,
+      "samples": 14,
+      "shutdownRecorded": true,
+      "routerArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/final-ntcp2/i2p-live-artifacts-h_fw1k0t/lib/router.jar",
+        "sha256": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e"
+      },
+      "coreArtifact": {
+        "path": "/tmp/i2p-nat-followup-20261111/final-ntcp2/i2p-live-artifacts-h_fw1k0t/lib/i2p.jar",
+        "sha256": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6"
+      },
+      "observedStatuses": [
+        "OK",
+        "UNKNOWN"
+      ],
+      "maxActivePeers": 6,
+      "maxKnownRouters": 127,
+      "maxSSU2Peers": 0,
+      "maxPublishedIntroducers": 0,
+      "maxAvailableIntroducerTags": 0,
+      "firstBothTwoHopTunnelSeconds": 30,
+      "samplesWithBothTwoHopTunnels": 12,
+      "exploratoryBuildSuccesses": 10,
+      "exploratoryBuildRejections": 1,
+      "exploratoryBuildTimeouts": 8,
+      "exploratorySuccessEventSharePercent": 52.63,
+      "tunnelRoundtripSuccesses": 8,
+      "averageTunnelRoundtripMs": 630.125,
+      "averageTestedRemoteHops": 1.125,
+      "outboundUDPEstablishments": 0,
+      "inboundUDPEstablishments": 0,
+      "introductionTimeouts": 0,
+      "introducedPeerProbesAttempted": 0,
+      "introducedPeerProbesEverEstablishedUDP": 0,
+      "introducedPeerProbeMessagesSent": 0,
+      "inboundBytes": 29377,
+      "outboundBytes": 57634,
+      "jarSha256": {
+        "i2p.jar": "68716bf3a9a208c09c1f7d75dccbff88664052d3374171474958a22ad14cbef6",
+        "router.jar": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e",
+        "mstreaming.jar": "7f7b742dc5aed4ff4e651a9da60f6a0cf315ddf8ad95e1f850b4f9580271af26",
+        "streaming.jar": "02d8a83e6c1ed7edb82e8d0a234b09876c6f6dbc9bdcbf5f7fc6fa8030e5a623",
+        "java-getopt-1.0.13.jar": "f09dc6369ffc4fe4362cbd49b6ac6c4a7471375ac5d884c71b0a625a889c38c4",
+        "libintl-0.18.3.jar": "7f3d73b7a7887da142c05722adc2701b4f93bcb9bdacdb6dcba5b62d8919f2c4"
+      },
+      "exceptionCounts": {
+        "NullPointerException": 0,
+        "ArrayIndexOutOfBoundsException": 0,
+        "NoClassDefFoundError": 0,
+        "OutOfMemoryError": 0,
+        "IllegalArgumentException": 0
+      },
+      "phase": "final",
+      "metricsFile": "nat-followup-20261111-final-ntcp2-metrics.jsonl"
+    }
+  },
+  "scope": "One Internet connection; no China packet-inspection test, physical USB reconnect, or controlled NAT-pair emulation; runs are not a controlled performance comparison.",
+  "installation": {
+    "source": "/home/kali/Downloads/i2p/router/build/libs/router.jar",
+    "target": "/home/kali/i2p/lib/router.jar",
+    "newSha256": "b63cdb3e1ddd565eeef9b066da2c6fd8cd37fbc26ef177e31f3be7b84749b35e",
+    "previousSha256": "2d7bfedf65448c26a4cf16ec0d0b545cb3ba0f2fe73a04f03c373c00a6c51478",
+    "backup": "/tmp/i2p-nat-followup-20261111/installed/router.jar.before",
+    "tests": {
+      "junit": 553,
+      "scala": 46
+    },
+    "checks": {
+      "local-pages": {
+        "at": "2026-11-11T08:28:59.314130+00:00",
+        "event": "local-pages",
+        "pages": [
+          {
+            "bytesRead": 0,
+            "contentType": "text/html",
+            "elapsedSeconds": 0.003,
+            "errorMarkers": [],
+            "location": "http://127.0.0.1:7657/home",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "status": 307,
+            "target": "/",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 14395,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.007,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "ae0607ccc8bb2176bcca79ec5806e4fa50dcda07b9aeadac1627d28ef46d2ec7",
+            "status": 200,
+            "target": "/home",
+            "title": "I2P Router Console - home",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 24988,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.011,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "32f7c3322c573141a784fd52e966c59276769d9e025e7708d9d8e8e4c044d10a",
+            "status": 200,
+            "target": "/console",
+            "title": "I2P Router Console - home",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 32352,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.014,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "ee341db23835bfb953192f3191047816a90de614e99b3ad88bea07e13d85301b",
+            "status": 200,
+            "target": "/tunnels",
+            "title": "I2P Router Console - tunnel summary",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 12770,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.005,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "455105fd8e30278d3a7363fa8d1fcd7eb45b6f4a2f22a19f69d5d827efc1bc9c",
+            "status": 200,
+            "target": "/configclients",
+            "title": "I2P Router Console - config clients",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 12483,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.013,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "f01e194fce7c3adb90761fc9225d585e19539780b604ca76889872768bd01ddc",
+            "status": 200,
+            "target": "/i2ptunnel/",
+            "title": "Hidden Services Manager",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 3550,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.004,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "48debc70424c8f25964803c7c4c4eea01b716f4aa1c07b58465d14567706dc06",
+            "status": 200,
+            "target": "/susidns/",
+            "title": "Introduction - SusiDNS",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 1745,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.004,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "25b0b01aa0c35e926f2f571ee847132088e26d54e89eeccb418f1b26b96631d2",
+            "status": 200,
+            "target": "/susimail/",
+            "title": "Email - Login",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 6908,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.003,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "5791af7344941eaa73469964fd99fa2d743da954b2d3bac234d68546d8e4449c",
+            "status": 200,
+            "target": "/i2psnark/",
+            "title": "I2PSnark - Anonymous BitTorrent Client",
+            "truncatedAt2MiB": false
+          },
+          {
+            "bytesRead": 31868,
+            "contentType": "text/html;charset=utf-8",
+            "elapsedSeconds": 0.31,
+            "errorMarkers": [],
+            "location": null,
+            "sha256": "a15b8b7d028898308bf6cc429195d6783effcd3f886b5bc2eb9ff69a1c137ad2",
+            "status": 200,
+            "target": "/debug?d=7",
+            "title": "I2P Router Console - Debug",
+            "truncatedAt2MiB": false
+          }
+        ]
+      },
+      "sample": {
+        "at": "2026-11-11T08:28:59.314410+00:00",
+        "event": "sample",
+        "networkClass": "error",
+        "networkStatus": "Network: SymmetricNAT",
+        "ntcpConnections": 21,
+        "ntcpConnectionsHTTP": 200,
+        "peers": {
+          "Active": "34 / 83",
+          "Fast": "6",
+          "Floodfill": "322",
+          "High capacity": "21",
+          "Known": "491"
+        },
+        "sidebarHTTP": 200,
+        "tunnels": {
+          "Client": "5",
+          "Exploratory": "10",
+          "Participating": "0",
+          "Share ratio": "0.00"
+        },
+        "udpConnections": 13,
+        "udpConnectionsHTTP": 200
+      },
+      "proxy-request": {
+        "at": "2026-11-11T08:29:01.082967+00:00",
+        "bytesRead": 248,
+        "contentType": "text/html",
+        "elapsedSeconds": 1.743,
+        "errorMarkers": [],
+        "event": "proxy-request",
+        "location": null,
+        "proxyErrorPage": false,
+        "sha256": "dc00a47f65e26f5192d2762a54d81f33e1d7539291ea491a9536020afb57710c",
+        "status": 200,
+        "target": "http://stats.i2p/",
+        "title": "stats.i2p | The Home for I2P Statistics",
+        "truncatedAt2MiB": false
+      }
+    },
+    "installedMatchesTestedJar": true,
+    "processState": {
+      "wrapper": "STARTED",
+      "java": "STARTED"
+    },
+    "initialProxyCheck": "Connection refused during application startup; subsequent check returned HTTP 200.",
+    "configAndIdentityPreserved": true
+  }
+}

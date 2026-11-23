@@ -1,0 +1,48 @@
+Baseline: HEAD size=8
+bytes,median_ns_per_call
+8,619.7
+checksum=-205016
+Current source size=8
+bytes,median_ns_per_call
+8,325.4
+checksum=-205016
+Baseline: HEAD size=32
+bytes,median_ns_per_call
+32,572.9
+checksum=-29829
+Current source size=32
+bytes,median_ns_per_call
+32,347.4
+checksum=-29829
+Baseline: HEAD size=64
+bytes,median_ns_per_call
+64,697.4
+checksum=18305
+Current source size=64
+bytes,median_ns_per_call
+64,481.1
+checksum=18305
+Baseline: HEAD size=256
+bytes,median_ns_per_call
+256,1384.7
+checksum=-2572
+Current source size=256
+bytes,median_ns_per_call
+256,1226.1
+checksum=-2572
+Baseline: HEAD size=1024
+bytes,median_ns_per_call
+1024,3727.0
+checksum=-6136
+Current source size=1024
+bytes,median_ns_per_call
+1024,3589.8
+checksum=-6136
+Baseline: HEAD size=4096
+bytes,median_ns_per_call
+4096,13339.5
+checksum=-5303
+Current source size=4096
+bytes,median_ns_per_call
+4096,13592.2
+checksum=-5303
