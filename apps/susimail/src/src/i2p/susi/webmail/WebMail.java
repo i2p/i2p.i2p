@@ -348,7 +348,7 @@ public class WebMail extends HttpServlet
 		 * @since 0.9.13
 		 */
 		public void valueUnbound(HttpSessionBindingEvent event) {
-			if (log.shouldDebug()) log.debug("Session unbound: " + event.getSession().getId());
+			if (log.shouldDebug()) log.debug("Mail session removed");
 			POP3MailBox mbox = mailbox;
 			if (mbox != null) {
 				mbox.destroy();
@@ -681,7 +681,7 @@ public class WebMail extends HttpServlet
 					 "&amp;" + B64UIDL + '=' + Base64.encode(mailPart.uidl) +
 					 "\" name=\"mailhtmlframe" + mailPart.getID() +
 					 "\" id=\"mailhtmlframe" + mailPart.getID() +
-					 "\" class=\"iframedsusi\" width=\"100%\" height=\"100%\" scrolling=\"auto\" frameborder=\"0\" border=\"0\" allowtransparency=\"true\"></iframe>");
+					 "\" sandbox=\"allow-same-origin\" class=\"iframedsusi\" width=\"100%\" height=\"100%\" scrolling=\"auto\" frameborder=\"0\" border=\"0\" allowtransparency=\"true\"></iframe>");
 				out.println("</td></tr><tr class=\"mailbody\"><td colspan=\"2\" align=\"center\">" );
 				out.println("<p class=\"info\"><i>" + _t("To protect your privacy, SusiMail has blocked remote content in this message.") + "</i>");
 				out.println("<noscript><br><i>" + _t("Enable javascript for improved display of this message.") + "</i></noscript></p>");
@@ -1813,6 +1813,7 @@ public class WebMail extends HttpServlet
 	private static void processDraftAttachmentLink(SessionObject sessionObject,
 	                                               RequestWrapper request, HttpServletResponse response)
 	{
+        setNoCacheHeaders(response);
 		String str = request.getParameter(DRAFT_ATTACHMENT);
 		if (str != null) {
 			InputStream in = null;
@@ -1826,7 +1827,6 @@ public class WebMail extends HttpServlet
 							if (ct != null)
 								response.setContentType(ct);
 							response.setContentLength((int) att.getSize());
-							response.setHeader("Cache-Control", "public, max-age=3600");
 							in = att.getData();
 							out = response.getOutputStream();
 							DataHelper.copy(in, out);
@@ -2147,12 +2147,11 @@ public class WebMail extends HttpServlet
 			try {
 				httpSession.setAttribute("sessionObject", sessionObject);
 			} catch (IllegalStateException ise) {}
-			if (_log.shouldDebug()) _log.debug("NEW session " + httpSession.getId());
+			if (_log.shouldDebug()) _log.debug("New mail session");
 		} else {
 			if (_log.shouldDebug()) {
 				try {
-					_log.debug("Existing session " + httpSession.getId() +
-					           " created " + new Date(httpSession.getCreationTime()));
+					_log.debug("Existing mail session created " + new Date(httpSession.getCreationTime()));
 				} catch (IllegalStateException ise) {}
 			}
 		}
@@ -2283,23 +2282,25 @@ public class WebMail extends HttpServlet
 		boolean isMobile = (forceMobileConsole || isMobile(httpRequest.getHeader("User-Agent")));
 
 		httpRequest.setCharacterEncoding("UTF-8");
+        setNoCacheHeaders(response);
 		response.setHeader("X-Frame-Options", "SAMEORIGIN");
 		// very strict CSP for HTML emails in iframes
 		if (httpRequest.getParameter(RAW_ATTACHMENT) != null ||
 		    httpRequest.getParameter(CID_ATTACHMENT) != null ||
 		    httpRequest.getParameter(DRAFT_ATTACHMENT) != null) {
 			// we don't even let the iframe get to the console, it must be within /susimail/
-			String me = "127.0.0.1:7657";
+			String me = "http://127.0.0.1:7657";
 			String requrl = httpRequest.getRequestURL().toString();
 			try {
 				URI uri = new URI(requrl);
-				me = uri.getHost() + ':' + uri.getPort();
+				me = new URI(uri.getScheme(), uri.getRawAuthority(), null, null, null).toASCIIString();
 			} catch(URISyntaxException use) {}
 			// img-src allows for cid: urls that were fixed up by RegexOutputStream
-			response.setHeader("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src " + me + "/js/iframeResizer.contentWindow.js; form-action 'none'; frame-ancestors " + me + myself + "; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
+			// Keep scripts disabled even when the attachment is opened outside its iframe.
+			response.setHeader("Content-Security-Policy", "default-src 'none'; base-uri 'none'; sandbox allow-same-origin; style-src 'unsafe-inline'; script-src 'none'; form-action 'none'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src " + me + myself + "; font-src 'none'; frame-src 'none'; worker-src 'none'");
 			// character encoding will be set in sendAttachment()
 		} else {
-			response.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
+			response.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'none'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; media-src 'none'; img-src 'self'");
 			response.setCharacterEncoding("UTF-8");
 		}
 		response.setHeader("Permissions-Policy", "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), fullscreen=(self), geolocation=(), gyroscope=(), interest-cohort=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), vibrate=(), vr=()");
@@ -2362,6 +2363,7 @@ public class WebMail extends HttpServlet
 			// This calls processLogout() which processes the logout button and invalidates sessionobject
 			State oldstate = state;
 			state = processStateChangeButtons(sessionObject, request, isPOST, state);
+            if (oldstate == State.AUTH && sessionObject.mailbox != null) httpRequest.changeSessionId();
 			if (oldstate != State.AUTH && state == State.AUTH) {
 				if (_log.shouldDebug())
 					 _log.debug("OLD state is " + oldstate + " NEW state is AUTH, session invalidated");
@@ -2596,8 +2598,6 @@ public class WebMail extends HttpServlet
 				}
 			}
 
-			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control","no-cache");
 
 			//// Begin output
 
@@ -2719,7 +2719,6 @@ public class WebMail extends HttpServlet
 					out.println("<script src=\"/susimail/js/Markdown.Converter.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 					out.println("<script src=\"/susimail/js/iframer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 					out.println("<script src=\"/js/iframed.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
-					out.println("<script src=\"/js/iframeResizer.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				}
 				out.println("<script src=\"/susimail/js/notifications.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>");
 				out.print("</head>\n<body>");
@@ -2924,6 +2923,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendAttachment(SessionObject sessionObject, MailPart part,
 						 HttpServletResponse response, boolean isRaw)
 	{
+		setNoCacheHeaders(response);
 		boolean shown = false;
 		if(part != null) {
 			Log log = sessionObject.log;
@@ -2938,7 +2938,6 @@ public class WebMail extends HttpServlet
 			}
 			String name2 = FilenameUtil.sanitizeFilename(name);
 			String name3 = FilenameUtil.encodeFilenameRFC5987(name);
-			response.setHeader("Cache-Control", "public, max-age=604800");
 			if (isRaw) {
 				OutputStream out = null;
 				try {
@@ -2950,11 +2949,6 @@ public class WebMail extends HttpServlet
 						response.setCharacterEncoding(part.charset);
 					out = response.getOutputStream();
 					if ("text/html".equals(part.type)) {
-						// inject the js into the iframe
-						// For content without <head>, we put it at the end and hope for the best.
-						out = new RegexOutputStream(out, "<head>",
-						                            "<head>\n\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n",
-						                            "\n<!--injected by susimail-->\n<script src=\"/js/iframeResizer.contentWindow.js?" + CoreVersion.VERSION + "\" type=\"text/javascript\"></script>\n");
 						// convert cid: urls to /susimail/?cid= urls
 						out = new RegexOutputStream(out, " src=\"cid:",
 						                            " src=\"/susimail/?msg=" + Base64.encode(part.uidl) + "&amp;cid=",
@@ -2980,6 +2974,7 @@ public class WebMail extends HttpServlet
 					response.setContentType( "application/zip; name=\"" + name2 + ".zip\"" );
 					response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + ".zip\"; " +
 					                   "filename*=" + name3 + ".zip");
+					// The name inside the archive must be safe too, not just the HTTP filename.
 					ZipEntry entry = new ZipEntry( name );
 					zip.putNextEntry( entry );
 					// was 2
@@ -3009,6 +3004,7 @@ public class WebMail extends HttpServlet
 	private static boolean sendMailSaveAs(SessionObject sessionObject, Mail mail,
 						 HttpServletResponse response)
 	{
+        setNoCacheHeaders(response);
 		Buffer content = mail.getBody();
 		if(content == null)
 			return false;
@@ -3025,7 +3021,6 @@ public class WebMail extends HttpServlet
 			long sz = mail.getSize();
 			if (sz > 0 && sz <= Integer.MAX_VALUE)
 				response.setContentLength((int) sz);
-			response.setHeader("Cache-Control", "public, max-age=604800");
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + name2 + "\"; " +
 			                   "filename*=" + name3);
 			in = content.getInputStream();
@@ -4273,4 +4268,9 @@ public class WebMail extends HttpServlet
     private static String[] getThemes(I2PAppContext ctx) {
         return THEMES;
     }
+private static void setNoCacheHeaders(HttpServletResponse response) {
+		response.setHeader("Cache-Control", "private, no-store, max-age=0");
+		response.setHeader("Pragma", "no-cache");
+		response.setDateHeader("Expires", 0);
+	}
 }
