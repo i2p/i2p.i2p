@@ -39,7 +39,6 @@ import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.i2ptunnel.localServer.LocalHTTPServer;
 import net.i2p.util.ConvertToHash;
-import net.i2p.util.DNSOverHTTPS;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
@@ -90,13 +89,24 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     private final String _proxyNonce;
 
     public static final String AUTH_REALM = "I2P HTTP Proxy";
-    private static final String UA_I2P = "User-Agent: " +
-                                         "MYOB/6.66 (AN/ON)" +
-                                         "\r\n";
-    // ESR version of Firefox, same as Tor Browser
-    private static final String UA_CLEARNET = "User-Agent: " +
-                                              DNSOverHTTPS.UA_CLEARNET +
-                                              "\r\n";
+    /**
+     *  Pool of current, real-world desktop browser User-Agents: latest stable
+     *  Chrome and Firefox across Windows, macOS and Linux. When User-Agent
+     *  spoofing is on (the default), one is chosen uniformly at random for each
+     *  request, so the User-Agent cannot be used to correlate a visitor's
+     *  requests and does not flag the client as I2P (or as Tor). Chrome entries
+     *  use Chrome's reduced-UA form (Chrome/NNN.0.0.0). Keep these tracking the
+     *  current stable Chrome/Firefox releases.
+     *  @since 0.9.72
+     */
+    private static final String[] RANDOM_UAS = {
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:160.0) Gecko/20100101 Firefox/160.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:160.0) Gecko/20100101 Firefox/160.0",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:160.0) Gecko/20100101 Firefox/160.0"
+    };
     // overrides
     private static final String PROP_UA_I2P = "httpclient.userAgent.i2p";
     private static final String PROP_UA_CLEARNET = "httpclient.userAgent.outproxy";
@@ -1133,13 +1143,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 if (ua != null)
                                     ua = "User-Agent: " + ua + "\r\n";
                                 else
-                                    ua = UA_CLEARNET;
+                                    ua = randomUserAgent();
                             } else {
                                 ua = getTunnel().getClientOptions().getProperty(PROP_UA_I2P);
                                 if (ua != null)
                                     ua = "User-Agent: " + ua + "\r\n";
                                 else
-                                    ua = UA_I2P;
+                                    ua = randomUserAgent();
                             }
                             newRequest.append(ua);
                         }
@@ -1736,6 +1746,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 } while (line != null && line.length() > 1);
             } catch (IOException ioe) {}
         }
+    }
+
+    /**
+     *  A complete "User-Agent: ...\r\n" header line using one of RANDOM_UAS
+     *  chosen uniformly at random for this request, so the spoofed User-Agent
+     *  cannot be used to correlate requests or to identify the client as I2P.
+     *
+     *  @return the header line, including the trailing CRLF
+     *  @since 0.9.72
+     */
+    private String randomUserAgent() {
+        String ua = RANDOM_UAS[_context.random().nextInt(RANDOM_UAS.length)];
+        return "User-Agent: " + ua + "\r\n";
     }
 
     /**
