@@ -79,17 +79,17 @@ class SubscriptionList implements Iterable<AddressBook> {
         List<String> locations = ConfigParser.parseSubscriptions(locationsFile, 
                 defaultSubs);
         try {
-            etags = ConfigParser.parse(etagsFile);
+            etags = ConfigParser.parseSubscriptionMetadata(etagsFile);
         } catch (IOException exp) {
             etags = Collections.<String, String>emptyMap();
         }
         try {
-            lastModified = ConfigParser.parse(lastModifiedFile);
+            lastModified = ConfigParser.parseSubscriptionMetadata(lastModifiedFile);
         } catch (IOException exp) {
             lastModified = Collections.<String, String>emptyMap();
         }
         try {
-            lastFetched = ConfigParser.parse(lastFetchedFile);
+            lastFetched = ConfigParser.parseSubscriptionMetadata(lastFetchedFile);
         } catch (IOException exp) {
             lastFetched = Collections.<String, String>emptyMap();
         }
