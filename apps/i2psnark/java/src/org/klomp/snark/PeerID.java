@@ -84,21 +84,37 @@ public class PeerID implements Comparable<PeerID>
   public PeerID(Map<String, BEValue> m)
     throws InvalidBEncodingException, UnknownHostException
   {
+    this(readTrackerID(m), readTrackerAddress(m));
+  }
+
+  /** Parse a non-compact tracker response while retaining compatibility with older trackers. */
+  public static PeerID fromTrackerResponse(Map<String, BEValue> m)
+    throws InvalidBEncodingException, UnknownHostException
+  {
+    return new PeerID(readTrackerID(m), readTrackerAddress(m));
+  }
+
+  private static byte[] readTrackerID(Map<String, BEValue> m) throws InvalidBEncodingException
+  {
     BEValue bevalue = m.get("peer id");
     if (bevalue == null)
       throw new InvalidBEncodingException("peer id missing");
-    id = bevalue.getBytes();
+    byte[] id = bevalue.getBytes();
+    if (id.length != 20)
+      throw new InvalidBEncodingException("bad peer id length");
+    return id;
+  }
 
-    bevalue = m.get("ip");
+  private static Destination readTrackerAddress(Map<String, BEValue> m)
+    throws InvalidBEncodingException
+  {
+    BEValue bevalue = m.get("ip");
     if (bevalue == null)
       throw new InvalidBEncodingException("ip missing");
-    address = I2PSnarkUtil.getDestinationFromBase64(bevalue.getString());
+    Destination address = I2PSnarkUtil.getDestinationFromBase64(bevalue.getString());
     if (address == null)
         throw new InvalidBEncodingException("Invalid destination [" + bevalue.getString() + "]");
-
-    port = TrackerClient.PORT;
-    this.destHash = address.calculateHash().getData();
-    util = null;
+    return address;
   }
 
   /**
