@@ -57,6 +57,15 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public static final String OPT_REJECT_REFERER = "rejectReferer";
     public static final String OPT_REJECT_USER_AGENTS = "rejectUserAgents";
     public static final String OPT_USER_AGENTS = "userAgentRejectList";
+    /**
+     *  If false, do not add the X-I2P-DestHash/DestB32/DestB64 headers that
+     *  disclose the visiting client's destination to the local server app.
+     *  Default true (unchanged behavior). See issue: the destination is a
+     *  stable, uncloaked, per-visitor identifier, so operators that do not
+     *  need it can disable it for data minimization.
+     *  @since 0.9.72
+     */
+    public static final String OPT_SEND_DEST_HEADERS = "sendDestHeaders";
     public static final String OPT_KEEPALIVE = "keepalive.i2p";
     public static final int DEFAULT_POST_WINDOW = 5*60;
     public static final int DEFAULT_POST_BAN_TIME = 20*60;
@@ -526,9 +535,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
             }
             
-            addEntry(headers, HASH_HEADER, peerHash.toBase64());
-            addEntry(headers, DEST32_HEADER, peerB32);
-            addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
+            // Hand the visiting client's own destination to the local server app
+            // so it can identify/authenticate the peer. This is a stable, unique,
+            // uncloaked per-visitor identifier - effectively a supercookie that
+            // survives cookie/cache clearing and private browsing, and lets
+            // colluding eepsites link the same visitor across sites. Operators
+            // that do not need it can turn it off for data minimization; default
+            // true preserves existing behavior. Spoofed client-supplied copies are
+            // always stripped regardless, via CLIENT_SKIPHEADERS.
+            if (Boolean.parseBoolean(opts.getProperty(OPT_SEND_DEST_HEADERS, "true"))) {
+                addEntry(headers, HASH_HEADER, peerHash.toBase64());
+                addEntry(headers, DEST32_HEADER, peerB32);
+                addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
+            }
 
             // Port-specific spoofhost
             String spoofHost;
