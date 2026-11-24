@@ -52,7 +52,8 @@ class TrackerInfo
   public TrackerInfo(InputStream in, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
     throws IOException, Throwable
   {
-    this(new BDecoder(in), my_id, infohash, metainfo, util);
+    // TrackerClient bounds fetched responses to 32 KiB.
+    this(new BDecoder(in, 32*1024), my_id, infohash, metainfo, util);
   }
 
   private TrackerInfo(BDecoder be, byte[] my_id, byte[] infohash, MetaInfo metainfo, I2PSnarkUtil util)
